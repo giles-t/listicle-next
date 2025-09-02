@@ -36,3 +36,7 @@ next-env.d.ts
 
 # subframe
 .subframe/access-token
+
+
+# Authentication tokens
+.npmrc

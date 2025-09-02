@@ -1,5 +1,9 @@
 import "./globals.css";
+import "@/src/client/tiptap/styles/_variables.scss";
+import "@/src/client/tiptap/styles/_keyframe-animations.scss";
 import type { Metadata } from "next";
+import { Toaster } from "@subframe/core";
+import { DefaultPageLayout } from "@/ui/layouts/DefaultPageLayout";
 
 export const metadata: Metadata = {
   title: "Subframe Next.js Starter",
@@ -14,20 +18,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        {/* eslint-disable-next-line */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
       </head>
-
-      <body>{children}</body>
+      <body>
+        <Toaster richColors />
+        <DefaultPageLayout>
+          {children}
+        </DefaultPageLayout>
+      </body>
     </html>
   );
 }
