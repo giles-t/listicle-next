@@ -244,13 +244,91 @@ export function EditorProvider(props: EditorProviderProps) {
       }),
       Typography,
       UiState,
-      // Keep Ai extension for text features, but we'll handle images ourselves
+      // Configure Ai extension to use our custom OpenAI route instead of TipTap cloud
       Ai.configure({
         appId: TIPTAP_AI_APP_ID,
         token: aiToken || undefined,
         autocompletion: false,
         showDecorations: true,
         hideDecorationsOnStreamEnd: false,
+        // Custom resolver that calls our OpenAI API route
+        resolver: async ({ prompt, options }) => {
+          try {
+            console.log('🤖 Calling custom AI resolver:', { prompt: prompt?.substring(0, 100) + '...', options })
+            
+            const response = await fetch('/api/ai-text', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                prompt,
+                tone: options?.tone,
+                format: options?.format || 'rich-text',
+                stream: options?.stream || false,
+                model: 'gpt-4o-mini',
+                maxTokens: 1000,
+                temperature: 0.7,
+              }),
+            })
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+              throw new Error(errorData.error || `HTTP ${response.status}`)
+            }
+
+            if (options?.stream) {
+              // Handle streaming response - TipTap expects a ReadableStream
+              const reader = response.body?.getReader()
+              if (!reader) {
+                throw new Error('No readable stream available')
+              }
+
+              return new ReadableStream({
+                start(controller) {
+                  function pump(): Promise<void> {
+                    return reader.read().then(({ done, value }) => {
+                      if (done) {
+                        controller.close()
+                        return
+                      }
+
+                      // Parse the server-sent events format
+                      const chunk = new TextDecoder().decode(value)
+                      const lines = chunk.split('\n')
+                      
+                      for (const line of lines) {
+                        if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+                          try {
+                            const data = JSON.parse(line.slice(6))
+                            if (data.content) {
+                              // Encode the content for TipTap
+                              controller.enqueue(new TextEncoder().encode(data.content))
+                            }
+                          } catch (e) {
+                            console.warn('Failed to parse streaming chunk:', e)
+                          }
+                        }
+                      }
+
+                      return pump()
+                    })
+                  }
+
+                  return pump()
+                }
+              })
+            } else {
+              // Handle regular response
+              const data = await response.json()
+              console.log('✅ AI response received:', data.content?.substring(0, 100) + '...')
+              return data.content
+            }
+          } catch (error) {
+            console.error('❌ Custom AI resolver error:', error)
+            throw error
+          }
+        },
         onError: (error) => {
           console.error('🔍 DEBUG: AI Error:', error)
         },
