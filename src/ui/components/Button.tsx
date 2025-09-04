@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

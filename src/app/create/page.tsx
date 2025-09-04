@@ -48,13 +48,7 @@ function CreateList() {
           title: title.trim(),
           description: description.trim() || undefined,
           listType: 'ordered',
-          isPublished: false,
-          items: [
-            {
-              content: "Start writing your first list item...",
-              mediaType: 'none'
-            }
-          ]
+          isPublished: false
         }),
       });
 

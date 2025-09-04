@@ -1,4 +1,4 @@
-.ai-image-node-wrapper {
+.embed-display-node-wrapper {
   // Remove any default background
   background: transparent !important;
   
@@ -7,7 +7,7 @@
       @apply rounded-xl shadow-[0_0_0_2px_theme(colors.brand-primary)] transition-all duration-150;
     }
     
-    // When input is focused, remove the outer selection shadow
+    // When embed content is focused, remove the outer selection shadow
     &:focus-within {
       > div {
         @apply shadow-none;

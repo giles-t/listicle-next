@@ -103,7 +103,7 @@ export function canColorText(editor: Editor | null): boolean {
   if (!editor || !editor.isEditable) return false
   if (
     !isMarkInSchema("textStyle", editor) ||
-    isNodeTypeSelected(editor, ["image", "aiImage", "embed"])
+    isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"])
   )
     return false
 

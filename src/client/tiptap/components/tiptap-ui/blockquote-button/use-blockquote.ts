@@ -51,7 +51,7 @@ export function canToggleBlockquote(
   if (!editor || !editor.isEditable) return false
   if (
     !isNodeInSchema("blockquote", editor) ||
-    isNodeTypeSelected(editor, ["image", "aiImage", "embed"])
+    isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"])
   )
     return false
 

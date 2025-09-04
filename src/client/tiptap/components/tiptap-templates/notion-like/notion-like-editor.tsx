@@ -33,15 +33,17 @@ import { Image } from "@/src/client/tiptap/components/tiptap-node/image-node/ima
 
 // --- Tiptap Node ---
 import { ImageUploadNode } from "@/src/client/tiptap/components/tiptap-node/image-upload-node/image-upload-node-extension"
-import { EmbedNode } from "@/src/client/tiptap/components/tiptap-node/embed-node/embed-node-extension"
+import { EmbedInputNode } from "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node-extension"
+import { EmbedDisplayNode } from "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node-extension"
 import { AiImageNode } from "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node-extension"
 import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/image-node/image-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/embed-node/embed-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
@@ -223,7 +225,8 @@ export function EditorProvider(props: EditorProviderProps) {
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
-      EmbedNode,
+      EmbedInputNode,
+      EmbedDisplayNode,
       AiImageNode,
       UniqueID.configure({
         types: [
@@ -234,7 +237,8 @@ export function EditorProvider(props: EditorProviderProps) {
           "heading",
           "blockquote",
           "codeBlock",
-          "embed",
+          "embedInput",
+          "embedDisplay",
           "aiImage",
         ],
       }),

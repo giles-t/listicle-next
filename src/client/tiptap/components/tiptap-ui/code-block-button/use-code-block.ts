@@ -51,7 +51,7 @@ export function canToggle(
   if (!editor || !editor.isEditable) return false
   if (
     !isNodeInSchema("codeBlock", editor) ||
-    isNodeTypeSelected(editor, ["image", "aiImage", "embed"])
+    isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"])
   )
     return false
 

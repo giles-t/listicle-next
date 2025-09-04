@@ -20,7 +20,7 @@ import {
 } from "@subframe/core";
 import ChangeListTypeModal, { type ListType } from "./ChangeListTypeModal";
 import NewListItemForm from "./NewListItemForm";
-import RichTextEditor from "@/client/components/NotionEditor";
+import ListItemEditDialog from "./ListItemEditDrawer";
 
 type ListItem = { id: string; title: string; content: string; sort_order: number };
 type Props = {
@@ -37,9 +37,35 @@ export default function EditListClient({ listId, listType: initialType, isPublis
   const [listType, setListType] = useState<ListType>(initialType);
   const [isSavingType, setIsSavingType] = useState(false);
   const [items, setItems] = useState<ListItem[]>(initialItems);
+  const [editingItem, setEditingItem] = useState<ListItem | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   // NewListItemForm now manages its own open/close state
 
   const openChangeType = () => setIsChangeTypeOpen(true);
+  
+  const handleEditItem = (item: ListItem) => {
+    setEditingItem(item);
+    setIsDrawerOpen(true);
+  };
+  
+  const handleSaveItem = async (itemId: string, content: string) => {
+    try {
+      const res = await fetch(`/api/lists/${listId}/items`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: itemId, content }),
+      });
+      if (!res.ok) throw new Error("Failed to update item");
+      
+      // Update local state
+      setItems((prev) => prev.map((it) => (it.id === itemId ? { ...it, content } : it)));
+      toast.success("Item updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update item");
+    }
+  };
+  
   const handleConfirmChangeType = async (newType: ListType) => {
     if (!listId) return;
     try {
@@ -119,15 +145,32 @@ export default function EditListClient({ listId, listType: initialType, isPublis
               <ul className="list-disc list-outside w-full">
                 {items.map((item) => (
                   <li key={item.id} className="mb-4 marker:text-heading-2 marker:font-heading-2 marker:text-default-font">
-                    <span className="w-full text-heading-2 font-heading-2 text-default-font">{item.title}</span>
-                    <RichTextEditor
-                      value={item.content}
-                      onChange={(html) => {
-                        setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, content: html } : it)));
-                      }}
-                      placeholder="Write details…"
-                      className="w-full"
-                    />
+                    <div className="flex items-center justify-between w-full mb-2">
+                      <span className="text-heading-2 font-heading-2 text-default-font">{item.title}</span>
+                      <Button
+                        variant="neutral-tertiary"
+                        size="small"
+                        icon={<FeatherEdit2 />}
+                        onClick={() => handleEditItem(item)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                    {item.content && (
+                      <div 
+                        className="prose prose-sm max-w-none cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors" 
+                        onClick={() => handleEditItem(item)}
+                        dangerouslySetInnerHTML={{ __html: item.content }}
+                      />
+                    )}
+                    {!item.content && (
+                      <div 
+                        className="text-subtext-color italic cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors"
+                        onClick={() => handleEditItem(item)}
+                      >
+                        Click to add details...
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -137,15 +180,32 @@ export default function EditListClient({ listId, listType: initialType, isPublis
                   .sort((a, b) => b.sort_order - a.sort_order)
                   .map((item) => (
                     <li key={item.id} className="mb-4 marker:text-heading-2 marker:font-heading-2 marker:text-default-font">
-                      <span className="w-full text-heading-2 font-heading-2 text-default-font">{item.title}</span>
-                      <RichTextEditor
-                        value={item.content}
-                        onChange={(html) => {
-                          setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, content: html } : it)));
-                        }}
-                        placeholder="Write details…"
-                        className="w-full"
-                      />
+                      <div className="flex items-center justify-between w-full mb-2">
+                        <span className="text-heading-2 font-heading-2 text-default-font">{item.title}</span>
+                        <Button
+                          variant="neutral-tertiary"
+                          size="small"
+                          icon={<FeatherEdit2 />}
+                          onClick={() => handleEditItem(item)}
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                      {item.content && (
+                        <div 
+                          className="prose prose-sm max-w-none cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors" 
+                          onClick={() => handleEditItem(item)}
+                          dangerouslySetInnerHTML={{ __html: item.content }}
+                        />
+                      )}
+                      {!item.content && (
+                        <div 
+                          className="text-subtext-color italic cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors"
+                          onClick={() => handleEditItem(item)}
+                        >
+                          Click to add details...
+                        </div>
+                      )}
                     </li>
                   ))}
               </ol>
@@ -155,15 +215,32 @@ export default function EditListClient({ listId, listType: initialType, isPublis
                   .sort((a, b) => a.sort_order - b.sort_order)
                   .map((item) => (
                     <li key={item.id} className="mb-4 marker:text-heading-2 marker:font-heading-2 marker:text-default-font">
-                      <span className="w-full text-heading-2 font-heading-2 text-default-font">{item.title}</span>
-                      <RichTextEditor
-                        value={item.content}
-                        onChange={(html) => {
-                          setItems((prev) => prev.map((it) => (it.id === item.id ? { ...it, content: html } : it)));
-                        }}
-                        placeholder="Write details…"
-                        className="w-full"
-                      />
+                      <div className="flex items-center justify-between w-full mb-2">
+                        <span className="text-heading-2 font-heading-2 text-default-font">{item.title}</span>
+                        <Button
+                          variant="neutral-tertiary"
+                          size="small"
+                          icon={<FeatherEdit2 />}
+                          onClick={() => handleEditItem(item)}
+                        >
+                          Edit
+                        </Button>
+                      </div>
+                      {item.content && (
+                        <div 
+                          className="prose prose-sm max-w-none cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors" 
+                          onClick={() => handleEditItem(item)}
+                          dangerouslySetInnerHTML={{ __html: item.content }}
+                        />
+                      )}
+                      {!item.content && (
+                        <div 
+                          className="text-subtext-color italic cursor-pointer hover:bg-neutral-50 p-2 rounded transition-colors"
+                          onClick={() => handleEditItem(item)}
+                        >
+                          Click to add details...
+                        </div>
+                      )}
                     </li>
                   ))}
               </ol>
@@ -182,6 +259,13 @@ export default function EditListClient({ listId, listType: initialType, isPublis
         onOpenChange={setIsChangeTypeOpen}
         initialValue={listType}
         onConfirm={handleConfirmChangeType}
+      />
+      <ListItemEditDialog
+        item={editingItem}
+        isOpen={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        onSave={handleSaveItem}
+        lastEditedBy="You"
       />
     </div>
   );

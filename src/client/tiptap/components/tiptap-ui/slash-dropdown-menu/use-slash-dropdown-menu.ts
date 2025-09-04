@@ -322,24 +322,24 @@ const getItemImplementations = () => {
         editor.chain().focus().setHorizontalRule().run()
       },
     },
-            embed_url: {
-          check: (editor: Editor) => isNodeInSchema("embed", editor),
-          action: ({ editor }: { editor: Editor }) => {
-            // Insert empty embed node - user will enter URL in the placeholder
-            editor.chain().focus().setEmbed({ src: '' }).run()
-          },
-        },
-        ai_image: {
-          check: (editor: Editor) => {
-            const hasAiImageNode = isNodeInSchema("aiImage", editor)
-            const hasAiExtensions = isExtensionAvailable(editor, AI_EXTENSIONS)
-            return hasAiImageNode && hasAiExtensions
-          },
-          action: ({ editor }: { editor: Editor }) => {
-            // Insert AI image node with empty prompt
-            editor.chain().focus().setAiImageNode({ prompt: '' }).run()
-          },
-        },
+    embed_url: {
+      check: (editor: Editor) => isNodeInSchema("embedInput", editor),
+      action: ({ editor }: { editor: Editor }) => {
+        // Insert embed input node
+        editor.chain().focus().setEmbedInput().run()
+      },
+    },
+    ai_image: {
+      check: (editor: Editor) => {
+        const hasAiImageNode = isNodeInSchema("aiImage", editor)
+        const hasAiExtensions = isExtensionAvailable(editor, AI_EXTENSIONS)
+        return hasAiImageNode && hasAiExtensions
+      },
+      action: ({ editor }: { editor: Editor }) => {
+        // Insert AI image node with empty prompt
+        editor.chain().focus().setAiImageNode({ prompt: '' }).run()
+      },
+    },
 
     // Upload
     image: {

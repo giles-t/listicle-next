@@ -217,7 +217,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   const renderPromptInput = () => {
     console.log('🔍 DEBUG: renderPromptInput called')
     return (
-    <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+    <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6">
       <span className="text-heading-3 font-heading-3 text-default-font">
         Prompt
       </span>
@@ -280,8 +280,8 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   }
 
   const renderGeneratingState = () => (
-    <div className="flex w-full grow shrink-0 basis-0 flex-col items-center gap-6 px-6 py-6">
-      <div className="flex w-full max-w-[768px] flex-col items-center gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+    <div className="flex w-full grow shrink-0 basis-0 flex-col items-center gap-6">
+      <div className="flex w-full max-w-[768px] flex-col items-center gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6">
         <span className="text-heading-3 font-heading-3 text-default-font">
           Generating image...
         </span>
@@ -299,7 +299,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   )
 
   const renderErrorState = () => (
-    <div className="flex w-full max-w-[768px] flex-col items-start gap-4 rounded-md border border-solid border-red-200 bg-red-50 px-6 py-6 shadow-sm">
+    <div className="flex w-full max-w-[768px] flex-col items-start gap-4 rounded-md border border-solid border-red-200 bg-red-50 px-6 py-6">
       <div className="flex items-center gap-2">
         <FeatherTrash2 className="w-5 h-5 text-red-600" />
         <span className="text-heading-3 font-heading-3 text-red-800">
@@ -334,7 +334,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   )
 
   const renderInlinePreview = () => (
-    <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6 shadow-sm">
+    <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6">
       <span className="text-heading-3 font-heading-3 text-default-font">
         Preview
       </span>
@@ -454,8 +454,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   return (
     <NodeViewWrapper 
-      className={`ai-image-node-wrapper ${selected ? 'ProseMirror-selectednode' : ''}`}
-      data-drag-handle
+      className={`ai-image-node-wrapper my-10 ${selected ? 'ProseMirror-selectednode' : ''}`}
     >
       <div className="ai-image-node-content">
         {renderContent()}

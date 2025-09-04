@@ -62,18 +62,6 @@ export async function POST(request: NextRequest) {
         throw new Error('Failed to create list');
       }
 
-      // Create list items
-      const listItemsData = items.map((item, index) => ({
-        content: item.content,
-        media_url: item.mediaUrl || null,
-        media_type: item.mediaType,
-        alt_text: item.altText || null,
-        sort_order: item.sortOrder || index,
-        list_id: newList.id,
-      }));
-
-      await tx.insert(listItems).values(listItemsData);
-
       return newList;
     });
 

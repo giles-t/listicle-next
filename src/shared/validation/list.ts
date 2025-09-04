@@ -18,7 +18,7 @@ export const createListSchema = z.object({
   description: z.string().max(500, 'Description cannot exceed 500 characters').optional(),
   listType: z.enum(['ordered', 'unordered', 'reversed']).default('ordered'),
   coverImage: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  items: z.array(listItemSchema).min(1, 'List must have at least one item'),
+  items: z.array(listItemSchema).max(0, 'List must have no items when created').default([]),
   isPublished: z.boolean().default(false),
   publicationId: z.string().optional(),
   tags: z.array(z.string()).max(5, 'Cannot have more than 5 tags').optional(),

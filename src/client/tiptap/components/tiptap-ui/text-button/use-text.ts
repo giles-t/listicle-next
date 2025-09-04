@@ -51,7 +51,7 @@ export function canToggleText(
   if (!editor) return false
   if (
     !isNodeInSchema("paragraph", editor) ||
-    isNodeTypeSelected(editor, ["image", "aiImage", "embed"])
+    isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"])
   )
     return false
 

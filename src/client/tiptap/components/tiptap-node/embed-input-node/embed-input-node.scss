@@ -1,13 +1,13 @@
-.ai-image-node-wrapper {
+.embed-input-node-wrapper {
   // Remove any default background
   background: transparent !important;
-  
+
   &.ProseMirror-selectednode {
     > div {
       @apply rounded-xl shadow-[0_0_0_2px_theme(colors.brand-primary)] transition-all duration-150;
     }
     
-    // When input is focused, remove the outer selection shadow
+    // When input field is focused, remove the outer selection shadow
     &:focus-within {
       > div {
         @apply shadow-none;

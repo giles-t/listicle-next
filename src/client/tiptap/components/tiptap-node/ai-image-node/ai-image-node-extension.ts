@@ -16,16 +16,14 @@ declare module '@tiptap/core' {
 
 export const AiImageNode = Node.create<AiImageNodeOptions>({
   name: 'aiImage',
+  group: 'block',
+  atom: true, // Prevent editing inside the node
 
   addOptions() {
     return {
       HTMLAttributes: {},
     }
   },
-
-  group: 'block',
-  
-  atom: true, // Prevent editing inside the node
 
   addAttributes() {
     return {

@@ -77,7 +77,7 @@ export function canSetTextAlign(
   if (!editor || !editor.isEditable) return false
   if (
     !isExtensionAvailable(editor, "textAlign") ||
-    isNodeTypeSelected(editor, ["image", "aiImage", "embed"])
+    isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"])
   )
     return false
 

@@ -74,7 +74,7 @@ export function canToggleList(
   turnInto: boolean = true
 ): boolean {
   if (!editor || !editor.isEditable) return false
-  if (!isNodeInSchema(type, editor) || isNodeTypeSelected(editor, ["image", "aiImage", "embed"]))
+  if (!isNodeInSchema(type, editor) || isNodeTypeSelected(editor, ["image", "aiImage", "embedInput", "embedDisplay"]))
     return false
 
   if (!turnInto) {

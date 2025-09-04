@@ -77,4 +77,78 @@ export async function POST(
   }
 }
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const listId = params.id;
+    if (!listId) {
+      return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const itemId: string | undefined = body?.id;
+    const content: string | undefined = body?.content;
+
+    if (!itemId || typeof itemId !== 'string') {
+      return NextResponse.json({ error: 'Item ID is required' }, { status: 400 });
+    }
+
+    if (content === undefined || typeof content !== 'string') {
+      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
+    }
+
+    // Verify ownership of list
+    const [existingList] = await db
+      .select({ id: lists.id, user_id: lists.user_id })
+      .from(lists)
+      .where(eq(lists.id, listId))
+      .limit(1);
+
+    if (!existingList) {
+      return NextResponse.json({ error: 'List not found' }, { status: 404 });
+    }
+    if (existingList.user_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden: You can only modify your own lists' }, { status: 403 });
+    }
+
+    // Verify the item belongs to this list
+    const [existingItem] = await db
+      .select({ id: listItems.id })
+      .from(listItems)
+      .where(and(eq(listItems.id, itemId), eq(listItems.list_id, listId)))
+      .limit(1);
+
+    if (!existingItem) {
+      return NextResponse.json({ error: 'Item not found in this list' }, { status: 404 });
+    }
+
+    // Update the item
+    const [updated] = await db
+      .update(listItems)
+      .set({ content })
+      .where(eq(listItems.id, itemId))
+      .returning();
+
+    return NextResponse.json({
+      message: 'Item updated',
+      item: updated,
+    }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating list item:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 
