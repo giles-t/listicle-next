@@ -228,7 +228,7 @@ export const FloatingElement = React.forwardRef<
 
       editor.view.dom.addEventListener("blur", handleBlur)
       return () => {
-        editor.view.dom.removeEventListener("blur", handleBlur)
+        editor.view.dom.removeEventListener("blur-sm", handleBlur)
       }
     }, [editor, handleOpenChange, open])
 

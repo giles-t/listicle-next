@@ -24,7 +24,7 @@ const RadioCard = React.forwardRef<HTMLButtonElement, RadioCardProps>(
       <SubframeCore.RadioGroup.Item asChild={true} {...otherProps}>
         <button
           className={SubframeUtils.twClassNames(
-            "group/502d4919 flex w-full cursor-pointer items-center gap-4 rounded-md border border-solid border-neutral-200 bg-default-background px-4 py-3 text-left hover:bg-neutral-50 aria-[checked=true]:border aria-[checked=true]:border-solid aria-[checked=true]:border-brand-200 aria-[checked=true]:bg-brand-50 hover:aria-[checked=true]:bg-brand-50 disabled:cursor-default disabled:border disabled:border-solid disabled:border-neutral-100 disabled:bg-neutral-50 hover:disabled:cursor-default hover:disabled:bg-neutral-50",
+            "group/502d4919 flex w-full cursor-pointer items-center gap-4 rounded-md border border-solid border-neutral-200 bg-default-background px-4 py-3 text-left hover:bg-neutral-50 aria-checked:border aria-checked:border-solid aria-checked:border-brand-200 aria-checked:bg-brand-50 hover:aria-checked:bg-brand-50 disabled:cursor-default disabled:border disabled:border-solid disabled:border-neutral-100 disabled:bg-neutral-50 hover:disabled:cursor-default hover:disabled:bg-neutral-50",
             className
           )}
           ref={ref}
@@ -35,8 +35,8 @@ const RadioCard = React.forwardRef<HTMLButtonElement, RadioCardProps>(
               { hidden: hideRadio }
             )}
           >
-            <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-full border-2 border-solid border-neutral-300 group-aria-[checked=true]/502d4919:border-2 group-aria-[checked=true]/502d4919:border-solid group-aria-[checked=true]/502d4919:border-brand-600 group-disabled/502d4919:border-2 group-disabled/502d4919:border-solid group-disabled/502d4919:border-neutral-300 group-disabled/502d4919:bg-neutral-100">
-              <div className="hidden h-2 w-2 flex-none flex-col items-start gap-2 rounded-full bg-white group-aria-[checked=true]/502d4919:flex group-aria-[checked=true]/502d4919:bg-brand-600 group-disabled/502d4919:bg-neutral-300" />
+            <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-full border-2 border-solid border-neutral-300 group-aria-checked/502d4919:border-2 group-aria-checked/502d4919:border-solid group-aria-checked/502d4919:border-brand-600 group-disabled/502d4919:border-2 group-disabled/502d4919:border-solid group-disabled/502d4919:border-neutral-300 group-disabled/502d4919:bg-neutral-100">
+              <div className="hidden h-2 w-2 flex-none flex-col items-start gap-2 rounded-full bg-white group-aria-checked/502d4919:flex group-aria-checked/502d4919:bg-brand-600 group-disabled/502d4919:bg-neutral-300" />
             </div>
           </div>
           {children ? (

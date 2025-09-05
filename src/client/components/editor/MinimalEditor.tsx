@@ -64,8 +64,8 @@ export function MinimalEditor({
       <EditorContent 
         editor={editor} 
         className={
-          `minimal-editor-content prose prose-sm max-w-none text-default-font font-body focus-within:outline-none ` +
-          `[&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed ` +
+          `minimal-editor-content prose prose-sm max-w-none text-default-font font-body focus-within:outline-hidden ` +
+          `[&_.ProseMirror]:outline-hidden [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed ` +
           `[&_.ProseMirror_.is-empty:first-child:before]:content-[attr(data-placeholder)] [&_.ProseMirror_.is-empty:first-child:before]:text-neutral-400 ` +
           `[&_.ProseMirror_.is-empty:first-child:before]:float-left [&_.ProseMirror_.is-empty:first-child:before]:h-0 [&_.ProseMirror_.is-empty:first-child:before]:pointer-events-none ` +
           `[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ul,&_.ProseMirror_ol]:ml-6 [&_.ProseMirror_ul,&_.ProseMirror_ol]:my-2 [&_.ProseMirror_li]:my-1 ` +

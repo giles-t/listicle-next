@@ -33,7 +33,7 @@ const ContextItem = React.forwardRef<HTMLDivElement, ContextItemProps>(
       <SubframeCore.ContextMenu.Item asChild={true} {...otherProps}>
         <div
           className={SubframeUtils.twClassNames(
-            "group/9358ee78 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-neutral-100 active:bg-neutral-50 data-[highlighted]:bg-neutral-100",
+            "group/9358ee78 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-neutral-100 active:bg-neutral-50 data-highlighted:bg-neutral-100",
             className
           )}
           ref={ref}

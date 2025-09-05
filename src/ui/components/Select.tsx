@@ -29,7 +29,7 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
     >
       <div
         className={SubframeUtils.twClassNames(
-          "group/969e345b flex h-8 w-full cursor-pointer items-center gap-1 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-[highlighted]:bg-brand-50",
+          "group/969e345b flex h-8 w-full cursor-pointer items-center gap-1 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-highlighted:bg-brand-50",
           className
         )}
         ref={ref}
@@ -162,7 +162,7 @@ interface SelectRootProps
   extends React.ComponentProps<typeof SubframeCore.Select.Root> {
   disabled?: boolean;
   error?: boolean;
-  variant?: "outline" | "filled";
+  variant?: "outline-solid" | "filled";
   label?: React.ReactNode;
   placeholder?: React.ReactNode;
   helpText?: React.ReactNode;
@@ -178,7 +178,7 @@ const SelectRoot = React.forwardRef<HTMLDivElement, SelectRootProps>(
     {
       disabled = false,
       error = false,
-      variant = "outline",
+      variant = "outline-solid",
       label,
       placeholder,
       helpText,

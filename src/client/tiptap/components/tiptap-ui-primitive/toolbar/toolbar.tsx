@@ -68,7 +68,7 @@ const useToolbarNavigation = (
 
     return () => {
       toolbar.removeEventListener("focus", handleFocus, true)
-      toolbar.removeEventListener("blur", handleBlur, true)
+      toolbar.removeEventListener("blur-sm", handleBlur, true)
     }
   }, [toolbarRef])
 

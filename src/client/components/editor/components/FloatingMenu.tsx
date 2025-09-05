@@ -78,7 +78,7 @@ export function FloatingMenu({ editor, className }: FloatingMenuProps) {
               setLinkUrl("")
             }
           }}
-          className="px-2 py-1 text-sm border border-neutral-200 rounded flex-1 min-w-48 outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          className="px-2 py-1 text-sm border border-neutral-200 rounded flex-1 min-w-48 outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           autoFocus
         />
         <button

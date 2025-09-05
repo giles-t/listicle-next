@@ -30,7 +30,7 @@ export default function SecuritySettingsPage() {
           <input
             type="password"
             placeholder="Enter current password"
-            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-hidden focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
             defaultValue=""
           />
           <span className="text-caption font-caption text-subtext-color">
@@ -44,7 +44,7 @@ export default function SecuritySettingsPage() {
           <input
             type="password"
             placeholder="Enter new password"
-            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-hidden focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
             defaultValue=""
           />
           <span className="text-caption font-caption text-subtext-color">
@@ -58,7 +58,7 @@ export default function SecuritySettingsPage() {
           <input
             type="password"
             placeholder="Confirm new password"
-            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
+            className="h-12 w-full border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-hidden focus:border-brand-600 focus:ring-1 focus:ring-brand-600"
             defaultValue=""
           />
           <span className="text-caption font-caption text-subtext-color">

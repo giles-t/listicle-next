@@ -55,7 +55,7 @@ const IconWithBackgroundRoot = React.forwardRef<
       {icon ? (
         <SubframeCore.IconWrapper
           className={SubframeUtils.twClassNames(
-            "font-['Inter'] text-[10px] font-[400] leading-[12px] text-brand-800",
+            "font-['Inter'] text-[10px] font-normal leading-[12px] text-brand-800",
             {
               "text-caption font-caption": size === "small",
               "text-body font-body": size === "medium",

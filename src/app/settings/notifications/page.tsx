@@ -231,7 +231,7 @@ export default function NotificationsSettingsPage() {
             </span>
           </div>
           <select
-            className="w-48 h-10 border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-none focus:border-brand-600 focus:ring-1 focus:ring-brand-600 bg-white"
+            className="w-48 h-10 border border-neutral-border rounded-md px-3 text-body font-body text-default-font outline-hidden focus:border-brand-600 focus:ring-1 focus:ring-brand-600 bg-white"
             defaultValue="sunday"
           >
             <option value="sunday">Sunday</option>

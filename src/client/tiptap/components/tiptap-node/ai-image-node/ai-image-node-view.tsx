@@ -407,10 +407,10 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         alt={prompt}
         className="w-full h-auto block rounded-xl"
       />
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-xl">
+      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-4 rounded-b-xl">
         <span className="text-white text-sm italic">"{prompt}"</span>
       </div>
-      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2">
+      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs rounded-full p-2">
         <FeatherImage className="w-4 h-4 text-gray-600" />
       </div>
     </div>
@@ -444,9 +444,9 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         onClick={() => setIsExpanded(true)}
       >
         <div className="flex items-center gap-3">
-          <FeatherSparkles className="w-4 h-4 text-blue-600 flex-shrink-0" />
+          <FeatherSparkles className="w-4 h-4 text-blue-600 shrink-0" />
           <span className="flex-1 text-sm text-gray-900 italic truncate">"{prompt}"</span>
-          <span className="text-xs text-gray-400 flex-shrink-0">Click to edit</span>
+          <span className="text-xs text-gray-400 shrink-0">Click to edit</span>
         </div>
       </div>
     )

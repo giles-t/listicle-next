@@ -40,12 +40,12 @@ export function useFloatingToolbarVisibility(params: {
     const clear = () => {
       hideRef.current = false
     }
-    editor.on("blur", clear)
+    editor.on("blur-sm", clear)
     editor.on("focus", clear)
 
     return () => {
       editor.off("transaction", onTx)
-      editor.off("blur", clear)
+      editor.off("blur-sm", clear)
       editor.off("focus", clear)
     }
   }, [editor])

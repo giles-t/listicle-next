@@ -86,7 +86,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
                 </span>
               ) : null}
               <div
-                className="w-full whitespace-pre-wrap p-0 text-heading-2 font-heading-2 text-default-font outline-none"
+                className="w-full whitespace-pre-wrap p-0 text-heading-2 font-heading-2 text-default-font outline-hidden"
                 contentEditable={!isSubmitting}
                 aria-label="New Item Title"
                 aria-multiline="true"

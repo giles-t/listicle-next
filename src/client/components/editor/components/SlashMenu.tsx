@@ -166,7 +166,7 @@ export function SlashMenu({ items, selectedIndex, onSelect, className }: SlashMe
                   )}
                   onClick={() => onSelect(item)}
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium">
                       {item.title}

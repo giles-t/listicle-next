@@ -30,7 +30,7 @@ const DropdownItem = React.forwardRef<HTMLDivElement, DropdownItemProps>(
       <SubframeCore.DropdownMenu.Item asChild={true} {...otherProps}>
         <div
           className={SubframeUtils.twClassNames(
-            "group/adcae8d6 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-[highlighted]:bg-neutral-100",
+            "group/adcae8d6 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-highlighted:bg-neutral-100",
             className
           )}
           ref={ref}

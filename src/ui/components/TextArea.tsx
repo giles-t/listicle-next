@@ -26,7 +26,7 @@ const Input = React.forwardRef<HTMLTextAreaElement, InputProps>(function Input(
   return (
     <textarea
       className={SubframeUtils.twClassNames(
-        "min-h-[96px] w-full border-none bg-transparent px-2 py-1.5 text-body font-body text-default-font outline-none placeholder:text-neutral-400",
+        "min-h-[96px] w-full border-none bg-transparent px-2 py-1.5 text-body font-body text-default-font outline-hidden placeholder:text-neutral-400",
         className
       )}
       placeholder={placeholder as string}
@@ -39,7 +39,7 @@ const Input = React.forwardRef<HTMLTextAreaElement, InputProps>(function Input(
 interface TextAreaRootProps
   extends React.LabelHTMLAttributes<HTMLLabelElement> {
   error?: boolean;
-  variant?: "outline" | "filled";
+  variant?: "outline-solid" | "filled";
   label?: React.ReactNode;
   helpText?: React.ReactNode;
   children?: React.ReactNode;
@@ -50,7 +50,7 @@ const TextAreaRoot = React.forwardRef<HTMLLabelElement, TextAreaRootProps>(
   function TextAreaRoot(
     {
       error = false,
-      variant = "outline",
+      variant = "outline-solid",
       label,
       helpText,
       children,
