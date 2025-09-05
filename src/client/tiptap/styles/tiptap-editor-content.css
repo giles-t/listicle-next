@@ -1,0 +1,172 @@
+/**
+ * Tiptap Editor Content Styles
+ * Following the official Tiptap documentation approach:
+ * https://tiptap.dev/docs/editor/getting-started/style-editor
+ * 
+ * Using global CSS file with @apply to override existing node styles
+ */
+
+.tiptap {
+  /* Base editor styling */
+  @apply outline-none;
+  
+  /* Paragraphs - using @apply with your exact theme values */
+  p {
+    @apply text-sm leading-5 font-normal first:mt-0;
+    margin: 0;
+  }
+  
+  p:not(:first-child) {
+    @apply mt-5;
+  }
+  
+  /* Headings - using @apply to override existing styles */
+  h1 {
+    @apply text-3xl leading-9 font-medium mt-8 mb-2 first:mt-0;
+  }
+  
+  h2 {
+    @apply text-xl leading-6 font-medium mt-8 mb-2 first:mt-0;
+  }
+  
+  h3 {
+    @apply text-base leading-5 font-medium mt-8 mb-2 first:mt-0;
+  }
+  
+  /* Lists - using @apply to override existing list styles */
+  ul, ol {
+    @apply pl-6 mt-4 mb-4 first:mt-0 last:mb-0;
+  }
+  
+  li {
+    @apply mb-2 last:mb-0;
+  }
+  
+  /* Nested lists */
+  li ul,
+  li ol {
+    @apply mt-2 mb-0;
+  }
+  
+  /* Task lists - using @apply */
+  ul[data-type="taskList"] {
+    @apply list-none pl-0;
+  }
+  
+  ul[data-type="taskList"] li {
+    @apply flex items-start gap-2;
+  }
+  
+  ul[data-type="taskList"] li > label {
+    @apply flex items-center select-none mt-0.5;
+  }
+  
+  ul[data-type="taskList"] li > label > input[type="checkbox"] {
+    @apply w-4 h-4 border border-neutral-200 rounded-sm bg-white cursor-pointer;
+  }
+  
+  ul[data-type="taskList"] li > label > input[type="checkbox"]:checked {
+    @apply bg-blue-600 border-blue-600;
+  }
+  
+  ul[data-type="taskList"] li > div {
+    @apply flex-1 min-w-0;
+  }
+  
+  /* Blockquotes - using @apply */
+  blockquote {
+    @apply mt-6 mb-6 pl-4 border-l-4 border-neutral-200 text-neutral-500 italic first:mt-0 last:mb-0;
+  }
+  
+  blockquote p {
+    @apply mt-0 mb-0;
+  }
+  
+  /* Code blocks - using @apply */
+  pre {
+    @apply mt-6 mb-6 p-4 bg-neutral-100 rounded-lg overflow-x-auto font-mono text-sm leading-5 first:mt-0 last:mb-0;
+  }
+  
+  pre code {
+    @apply bg-transparent p-0 rounded-none text-inherit;
+  }
+  
+  /* Inline code - using @apply */
+  code {
+    @apply font-mono text-sm bg-neutral-100 text-neutral-800 px-1 py-0.5 rounded-sm;
+  }
+  
+  /* Links - using @apply */
+  a {
+    @apply text-blue-600 underline hover:text-blue-700;
+  }
+  
+  /* Horizontal rules - using @apply */
+  hr {
+    @apply my-8 border-0 border-t border-neutral-200;
+  }
+  
+  /* Images - using @apply */
+  img {
+    @apply max-w-full h-auto rounded-lg my-4 first:mt-0 last:mb-0;
+  }
+  
+  /* Text formatting - using @apply */
+  strong {
+    @apply font-medium;
+  }
+  
+  em {
+    @apply italic;
+  }
+  
+  u {
+    @apply underline;
+  }
+  
+  s {
+    @apply line-through;
+  }
+  
+  /* Highlights - using @apply */
+  mark {
+    @apply bg-yellow-200 px-1 py-0.5 rounded-sm;
+  }
+}
+
+/* Dark mode styles - using @apply */
+.dark .tiptap {
+  @apply text-neutral-100;
+  
+  blockquote {
+    @apply border-neutral-600 text-neutral-400;
+  }
+  
+  pre {
+    @apply bg-neutral-800;
+  }
+  
+  code {
+    @apply bg-neutral-800 text-neutral-200;
+  }
+  
+  hr {
+    @apply border-neutral-600;
+  }
+  
+  ul[data-type="taskList"] li > label > input[type="checkbox"] {
+    @apply border-neutral-600 bg-neutral-800;
+  }
+  
+  ul[data-type="taskList"] li > label > input[type="checkbox"]:checked {
+    @apply bg-blue-600 border-blue-600;
+  }
+  
+  mark {
+    @apply bg-yellow-800 text-yellow-100;
+  }
+  
+  a {
+    @apply text-blue-400 hover:text-blue-300;
+  }
+}

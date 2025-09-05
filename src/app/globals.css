@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tiptap global styles with @apply - must be after Tailwind utilities */
+@import '../client/tiptap/styles/tiptap-editor-content.css';
+
 html {
   height: 100vh;
   display: flex;

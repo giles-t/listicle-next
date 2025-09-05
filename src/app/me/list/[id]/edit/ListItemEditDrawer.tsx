@@ -5,6 +5,7 @@ import { Button } from "@/ui/components/Button";
 import { FullscreenDialog } from "@/ui/components/FullscreenDialog";
 import { IconButton } from "@/ui/components/IconButton";
 import { FeatherX } from "@subframe/core";
+import * as Dialog from "@radix-ui/react-dialog";
 import RichTextEditor from "@/client/components/NotionEditor";
 
 type ListItem = {
@@ -60,16 +61,13 @@ export default function ListItemEditDialog({
     <FullscreenDialog 
       open={isOpen} 
       onOpenChange={onOpenChange}
+      title={item.title}
     >
       {/* Header */}
-      <div className="flex w-full items-center justify-between border-b border-solid border-neutral-border px-4 py-4">
+      <div className="container max-w-none w-full py-12">
         <span className="text-heading-2 font-heading-2 text-default-font">
           {item.title}
         </span>
-        <IconButton
-          icon={<FeatherX />}
-          onClick={handleCancel}
-        />
       </div>
       
       {/* Content Area */}

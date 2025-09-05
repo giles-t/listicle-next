@@ -1,0 +1,87 @@
+/* Minimal Editor Styles */
+.minimal-editor-content {
+  /* Base editor container */
+}
+
+.minimal-list-editor {
+  /* Base editor styles that match your design system */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.6;
+  color: rgb(23, 23, 23); /* default-font */
+}
+
+/* Placeholder styles */
+.minimal-list-editor .ProseMirror p.is-empty:first-child:before {
+  content: attr(data-placeholder);
+  color: rgb(163, 163, 163); /* neutral-400 */
+  pointer-events: none;
+  height: 0;
+}
+
+/* Selection styles */
+.minimal-list-editor .ProseMirror-selectednode {
+  outline: 2px solid rgb(37, 99, 235); /* brand-600 */
+  outline-offset: 2px;
+}
+
+/* Drag handle styles */
+.minimal-list-editor .ProseMirror-dropcursor {
+  border-left: 2px solid rgb(37, 99, 235); /* brand-600 */
+  pointer-events: none;
+  position: absolute;
+}
+
+/* AI decoration styles */
+.minimal-list-editor .ai-decoration {
+  background: linear-gradient(90deg, rgb(219, 234, 254) 0%, rgb(147, 197, 253) 100%); /* brand-100 to brand-300 */
+  border-radius: 4px;
+  padding: 2px 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Slash command decoration */
+.tiptap-slash-decoration {
+  background: rgb(239, 246, 255); /* brand-50 */
+  border-radius: 4px;
+  padding: 2px 4px;
+  color: rgb(37, 99, 235); /* brand-600 */
+}
+
+/* Bubble menu positioning */
+.bubble-menu {
+  z-index: 50;
+}
+
+/* Focus styles */
+.minimal-editor-content:focus-within {
+  /* Optional: Add focus ring around entire editor */
+}
+
+/* Custom node styles that extend the existing ones */
+.minimal-list-editor .embed-node {
+  margin: 16px 0;
+}
+
+.minimal-list-editor .image-node {
+  margin: 16px 0;
+}
+
+.minimal-list-editor .ai-image-node {
+  margin: 16px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .minimal-list-editor .ProseMirror {
+    padding: 12px;
+  }
+}

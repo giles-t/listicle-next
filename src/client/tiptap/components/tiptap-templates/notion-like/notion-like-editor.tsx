@@ -36,22 +36,20 @@ import { ImageUploadNode } from "@/src/client/tiptap/components/tiptap-node/imag
 import { EmbedInputNode } from "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node-extension"
 import { EmbedDisplayNode } from "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node-extension"
 import { AiImageNode } from "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node-extension"
-import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/image-node/image-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss"
-import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss"
+// import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { EmojiDropdownMenu } from "@/src/client/tiptap/components/tiptap-ui/emoji-dropdown-menu"
-
 import { SlashDropdownMenu } from "@/src/client/tiptap/components/tiptap-ui/slash-dropdown-menu"
-import { DragContextMenu } from "@/src/client/tiptap/components/tiptap-ui/drag-context-menu"
 import { AiMenu } from "@/src/client/tiptap/components/tiptap-ui/ai-menu"
 
 // --- Contexts ---
@@ -65,7 +63,6 @@ import { TIPTAP_AI_APP_ID } from "@/src/client/tiptap/lib/tiptap-collab-utils"
 import "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor.scss"
 
 // --- Content ---
-import { NotionEditorHeader } from "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor-header"
 import { MobileToolbar } from "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor-mobile-toolbar"
 import { NotionToolbarFloating } from "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor-toolbar-floating"
 
@@ -150,7 +147,6 @@ export function EditorContentArea() {
         cursor: isDragging ? "grabbing" : "auto",
       }}
     >
-      <DragContextMenu />
       <AiMenu />
       <EmojiDropdownMenu />
 
@@ -244,13 +240,80 @@ export function EditorProvider(props: EditorProviderProps) {
       }),
       Typography,
       UiState,
-      // Keep Ai extension for text features, but we'll handle images ourselves
+      // Configure Ai extension to use our custom OpenAI route instead of TipTap cloud
       Ai.configure({
         appId: TIPTAP_AI_APP_ID,
         token: aiToken || undefined,
         autocompletion: false,
         showDecorations: true,
         hideDecorationsOnStreamEnd: false,
+        // Custom resolver that calls our OpenAI API route
+        aiCompletionResolver: async ({ action, text, textOptions, editor, extensionOptions, defaultResolver }) => {
+          try {
+            console.log('🤖 Calling custom AI resolver:', { action, text: text?.substring(0, 100) + '...', textOptions })
+            
+            const response = await fetch('/api/ai-text', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                prompt: text,
+                tone: textOptions?.tone,
+                format: textOptions?.format || 'rich-text',
+                stream: false, // Use completion mode, not streaming
+                model: 'gpt-4o-mini',
+                maxTokens: 1000,
+                temperature: 0.7,
+              }),
+            })
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+              throw new Error(errorData.error || `HTTP ${response.status}`)
+            }
+
+            const data = await response.json()
+            console.log('✅ AI response received:', data.content?.substring(0, 100) + '...')
+            return data.content
+          } catch (error) {
+            console.error('❌ Custom AI resolver error:', error)
+            throw error
+          }
+        },
+        // Add streaming resolver for streaming mode
+        aiStreamResolver: async ({ action, text, textOptions }) => {
+          try {
+            console.log('🤖 Calling custom AI stream resolver:', { action, text: text?.substring(0, 100) + '...', textOptions })
+            
+            const response = await fetch('/api/ai-text', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                prompt: text,
+                tone: textOptions?.tone,
+                format: textOptions?.format || 'rich-text',
+                stream: true,
+                model: 'gpt-4o-mini',
+                maxTokens: 1000,
+                temperature: 0.7,
+              }),
+            })
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+              throw new Error(errorData.error || `HTTP ${response.status}`)
+            }
+
+            // Return the response body directly - it now contains raw text chunks
+            return response.body
+          } catch (error) {
+            console.error('❌ Custom AI stream resolver error:', error)
+            throw error
+          }
+        },
         onError: (error) => {
           console.error('🔍 DEBUG: AI Error:', error)
         },
@@ -265,7 +328,6 @@ export function EditorProvider(props: EditorProviderProps) {
   return (
     <div className="notion-like-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
-        <NotionEditorHeader />
         <EditorContentArea />
       </EditorContext.Provider>
     </div>

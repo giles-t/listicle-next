@@ -1,19 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 
 body {
   --tt-toolbar-height: 44px;
-  --tt-theme-text: var(--tt-gray-light-900);
+  --tt-theme-text: theme('colors.default-font');
 
   .dark & {
-    --tt-theme-text: var(--tt-gray-dark-900);
+    --tt-theme-text: theme('colors.neutral.100');
   }
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: theme('fontFamily.body');
   color: var(--tt-theme-text);
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: theme('fontSize.body.1.fontWeight');
   font-style: normal;
   padding: 0;
   overscroll-behavior-y: none;
@@ -29,7 +29,11 @@ body,
 #root,
 #app {
   height: 100%;
-  background-color: var(--tt-bg-color);
+  background-color: theme('colors.default-background');
+  
+  .dark & {
+    background-color: theme('colors.neutral.950');
+  }
 }
 
 ::-webkit-scrollbar {
@@ -38,12 +42,12 @@ body,
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--tt-scrollbar-color) transparent;
+  scrollbar-color: color-mix(in srgb, theme('colors.neutral.400') 50%, transparent) transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--tt-scrollbar-color);
-  border-radius: 9999px;
+  background-color: color-mix(in srgb, theme('colors.neutral.400') 50%, transparent);
+  border-radius: theme('borderRadius.full');
 }
 
 ::-webkit-scrollbar-track {
@@ -51,7 +55,7 @@ body,
 }
 
 .tiptap.ProseMirror {
-  font-family: "DM Sans", sans-serif;
+  font-family: theme('fontFamily.body');
 }
 
 // Important so the this does not override the editor behaviour
@@ -64,7 +68,7 @@ body,
 }
 
 .notion-like-editor-content {
-  max-width: 768px;
+  max-width: theme('screens.md');
   width: 100%;
   margin: 0 auto;
   height: 100%;
@@ -75,14 +79,14 @@ body,
 
 .notion-like-editor-content .tiptap.ProseMirror.notion-like-editor {
   flex: 1;
-  padding: 3rem 3rem 30vh;
+  padding: theme('spacing.2') 0 theme('spacing.4') 0;
 }
 
-@media screen and (max-width: 480px) {
-  .notion-like-editor-content .tiptap.ProseMirror.notion-like-editor {
-    padding: 1.5rem 1.5rem 30vh;
-  }
-}
+// @media screen and (max-width: 480px) {
+//   .notion-like-editor-content .tiptap.ProseMirror.notion-like-editor {
+//     padding: 0.5rem 0 30vh 0;
+//   }
+// }
 
 // Spinner
 .spinner-container {
@@ -99,12 +103,12 @@ body,
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: theme('spacing.2');
 
     svg {
       animation: spin 1s linear infinite;
-      height: 1.25rem;
-      width: 1.25rem;
+      height: theme('spacing.5');
+      width: theme('spacing.5');
 
       circle {
         opacity: 0.25;
@@ -120,6 +124,8 @@ body,
 
     .spinner-loading-text {
       text-align: center;
+      font-size: theme('fontSize.body.0');
+      color: theme('colors.subtext-color');
     }
   }
 }
