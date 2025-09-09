@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
 import { db } from '@/src/server/db';
-import { lists } from '@/src/server/db/schema';
+import { lists, tags, listToTags } from '@/src/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export async function DELETE(
@@ -83,6 +83,7 @@ export async function GET(
         list_type: lists.list_type,
         cover_image: lists.cover_image,
         is_published: lists.is_published,
+        is_visible: lists.is_visible,
         created_at: lists.created_at,
         updated_at: lists.updated_at,
         published_at: lists.published_at,
@@ -100,13 +101,33 @@ export async function GET(
     const list = listData[0];
 
     // Check if user can access this list
-    // Public published lists can be accessed by anyone
-    // Draft lists can only be accessed by the owner
+    // Visible published lists can be accessed by anyone
+    // Hidden lists (is_visible=false) can only be accessed by the owner or people with direct link
+    // Draft lists (is_published=false) can only be accessed by the owner
     if (!list.is_published && (!user || list.user_id !== user.id)) {
-      return NextResponse.json({ error: 'Forbidden: This list is not public' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden: This list is not published' }, { status: 403 });
+    }
+    
+    // For published lists, check if it's visible or if user is the owner
+    if (list.is_published && !list.is_visible && (!user || list.user_id !== user.id)) {
+      return NextResponse.json({ error: 'Forbidden: This list is hidden' }, { status: 403 });
     }
 
-    return NextResponse.json(list);
+    // Get tags for this list
+    const listTags = await db
+      .select({
+        id: tags.id,
+        name: tags.name,
+        slug: tags.slug,
+      })
+      .from(tags)
+      .innerJoin(listToTags, eq(tags.id, listToTags.tag_id))
+      .where(eq(listToTags.list_id, listId));
+
+    return NextResponse.json({
+      ...list,
+      tags: listTags
+    });
 
   } catch (error) {
     console.error('Error fetching list:', error);
@@ -139,7 +160,7 @@ export async function PUT(
 
     // Check if the list exists and belongs to the authenticated user
     const existingList = await db
-      .select({ id: lists.id, user_id: lists.user_id })
+      .select({ id: lists.id, user_id: lists.user_id, published_at: lists.published_at })
       .from(lists)
       .where(eq(lists.id, listId))
       .limit(1);
@@ -169,6 +190,7 @@ export async function PUT(
         updateData.published_at = new Date();
       }
     }
+    if (body.is_visible !== undefined) updateData.is_visible = body.is_visible;
     if (body.publication_id !== undefined) updateData.publication_id = body.publication_id;
 
     const [updatedList] = await db
@@ -183,6 +205,7 @@ export async function PUT(
     if (!updatedList) {
       return NextResponse.json({ error: 'Failed to update list' }, { status: 500 });
     }
+
 
     return NextResponse.json({
       ...updatedList,

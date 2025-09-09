@@ -14,9 +14,10 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   initialValue: ListType;
   onConfirm: (value: ListType) => void;
+  loading?: boolean;
 };
 
-export default function ChangeListTypeModal({ open, onOpenChange, initialValue, onConfirm }: Props) {
+export default function ChangeListTypeModal({ open, onOpenChange, initialValue, onConfirm, loading = false }: Props) {
   const [value, setValue] = useState<ListType>(initialValue);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
       <div className="flex h-full w-full flex-col items-start gap-6 bg-default-background px-6 py-6">
         <span className="text-heading-3 font-heading-3 text-default-font">Change list type</span>
         <div className="flex w-full flex-col items-start gap-4">
-          <RadioCardGroup className="h-auto w-full flex-none" value={value} onValueChange={(v: ListType) => setValue(v)}>
+          <RadioCardGroup className="h-auto w-full flex-none" value={value} onValueChange={(v: string) => setValue(v as ListType)}>
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4">
               <RadioCardGroup.RadioCard hideRadio={true} value="unordered">
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
@@ -63,10 +64,12 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
           </RadioCardGroup>
         </div>
         <div className="flex w-full items-center justify-end gap-2">
-          <Button variant="neutral-tertiary" onClick={() => onOpenChange(false)}>
+          <Button variant="neutral-tertiary" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={() => onConfirm(value)}>Confirm</Button>
+          <Button onClick={() => onConfirm(value)} loading={loading} disabled={loading}>
+            Confirm
+          </Button>
         </div>
       </div>
     </DialogLayout>

@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "placeholder"> {
@@ -23,7 +23,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <input
       className={SubframeUtils.twClassNames(
-        "h-full w-full border-none bg-transparent text-body font-body text-default-font outline-hidden placeholder:text-neutral-400",
+        "h-full w-full border-none bg-transparent text-body font-body text-default-font outline-none placeholder:text-neutral-400",
         className
       )}
       placeholder={placeholder as string}
@@ -37,7 +37,7 @@ interface TextFieldRootProps
   extends React.LabelHTMLAttributes<HTMLLabelElement> {
   disabled?: boolean;
   error?: boolean;
-  variant?: "outline-solid" | "filled";
+  variant?: "outline" | "filled";
   label?: React.ReactNode;
   helpText?: React.ReactNode;
   icon?: React.ReactNode;
@@ -51,7 +51,7 @@ const TextFieldRoot = React.forwardRef<HTMLLabelElement, TextFieldRootProps>(
     {
       disabled = false,
       error = false,
-      variant = "outline-solid",
+      variant = "outline",
       label,
       helpText,
       icon = null,

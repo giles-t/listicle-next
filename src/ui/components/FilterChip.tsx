@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherStar } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface FilterChipRootProps extends React.HTMLAttributes<HTMLDivElement> {
   selected?: boolean;

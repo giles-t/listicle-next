@@ -43,6 +43,7 @@ export const lists = pgTable('lists', {
   list_type: listTypeEnum('list_type').notNull().default('ordered'),
   cover_image: text('cover_image'),
   is_published: boolean('is_published').notNull().default(false),
+  is_visible: boolean('is_visible').notNull().default(true),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
   published_at: timestamp('published_at'),

@@ -38,13 +38,28 @@ export function useEditorConfig({
   onUpdate,
   aiToken
 }: UseEditorConfigProps) {
+  // Parse content - could be JSON or HTML
+  const parseContent = (contentString: string) => {
+    if (!contentString) return "";
+    
+    try {
+      // Try to parse as JSON first
+      return JSON.parse(contentString);
+    } catch {
+      // If not JSON, treat as HTML
+      return contentString;
+    }
+  };
+
   return useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
-    content,
+    content: parseContent(content),
     onUpdate: ({ editor }) => {
       if (onUpdate) {
-        onUpdate(editor.getHTML())
+        // Store content as JSON for better structure and security
+        const jsonContent = editor.getJSON()
+        onUpdate(JSON.stringify(jsonContent))
       }
     },
     editorProps: {

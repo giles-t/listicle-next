@@ -1,7 +1,8 @@
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 
 /* Tiptap global styles with @apply - must be after Tailwind utilities */
-@import '../client/tiptap/styles/tiptap-editor-content.css' layer(utilities);
+/* @import '../client/tiptap/styles/tiptap-editor-content.css' layer(utilities); */
 
 @config '../../tailwind.config.js';
 
@@ -31,4 +32,10 @@ html {
 
 body {
   flex-grow: 1;
+}
+
+/* Custom list marker sizing to match heading-2 */
+.list-item-heading-2::marker {
+  font-size: theme('fontSize.heading-2.0');
+  font-weight: theme('fontSize.heading-2.1.fontWeight');
 }

@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherPlus } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface IconButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {

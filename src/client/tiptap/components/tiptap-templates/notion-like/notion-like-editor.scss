@@ -10,10 +10,10 @@ body {
 }
 
 body {
-  font-family: theme('fontFamily.body');
+  font-family: Inter;
   color: var(--tt-theme-text);
   font-optical-sizing: auto;
-  font-weight: theme('fontSize.body.1.fontWeight');
+  font-weight: 400;
   font-style: normal;
   padding: 0;
   overscroll-behavior-y: none;
@@ -55,7 +55,7 @@ body,
 }
 
 .tiptap.ProseMirror {
-  font-family: theme('fontFamily.body');
+  font-family: Inter;
 }
 
 // Important so the this does not override the editor behaviour
@@ -124,7 +124,7 @@ body,
 
     .spinner-loading-text {
       text-align: center;
-      font-size: theme('fontSize.body.0');
+      font-size: 14px;
       color: theme('colors.subtext-color');
     }
   }

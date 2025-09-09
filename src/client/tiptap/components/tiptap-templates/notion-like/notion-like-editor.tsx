@@ -36,16 +36,16 @@ import { ImageUploadNode } from "@/src/client/tiptap/components/tiptap-node/imag
 import { EmbedInputNode } from "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node-extension"
 import { EmbedDisplayNode } from "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node-extension"
 import { AiImageNode } from "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node-extension"
-// import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss"
-// import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss"
-// import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
-// import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/image-node/image-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss"
+import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node.scss"
 import "@/src/client/tiptap/components/tiptap-node/embed-input-node/embed-input-node.scss"
-// import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss"
-// import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { EmojiDropdownMenu } from "@/src/client/tiptap/components/tiptap-ui/emoji-dropdown-menu"
@@ -167,13 +167,28 @@ export function EditorProvider(props: EditorProviderProps) {
   // Debug logging
   console.log('EditorProvider aiToken:', aiToken)
 
+  // Parse content - could be JSON or HTML
+  const parseContent = (contentString: string) => {
+    if (!contentString) return "";
+    
+    try {
+      // Try to parse as JSON first
+      return JSON.parse(contentString);
+    } catch {
+      // If not JSON, treat as HTML
+      return contentString;
+    }
+  };
+
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
-    content: content || "",
+    content: parseContent(content || ""),
     onUpdate: ({ editor }) => {
       if (onUpdate) {
-        onUpdate(editor.getHTML())
+        // Store content as JSON for better structure and security
+        const jsonContent = editor.getJSON()
+        onUpdate(JSON.stringify(jsonContent))
       }
     },
     editorProps: {

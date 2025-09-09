@@ -1,0 +1,69 @@
+.tiptap.ProseMirror {
+  --heading-color: var(--tt-gray-light-900);
+  --heading-font-weight: 500;
+
+  .dark & {
+    --heading-color: var(--tt-gray-dark-100);
+  }
+}
+
+/* =====================
+     HEADINGS
+     ===================== */
+.tiptap.ProseMirror {
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-color);
+    font-weight: var(--heading-font-weight);
+    line-height: 1.2;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    margin-top: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  h5 {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  h6 {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
