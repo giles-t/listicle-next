@@ -10,6 +10,8 @@ import * as SubframeUtils from "../utils";
 
 interface RadioCardProps
   extends React.ComponentProps<typeof SubframeCore.RadioGroup.Item> {
+  disabled?: boolean;
+  checked?: boolean;
   hideRadio?: boolean;
   children?: React.ReactNode;
   className?: string;
@@ -17,11 +19,23 @@ interface RadioCardProps
 
 const RadioCard = React.forwardRef<HTMLButtonElement, RadioCardProps>(
   function RadioCard(
-    { hideRadio = false, children, className, ...otherProps }: RadioCardProps,
+    {
+      disabled = false,
+      checked = false,
+      hideRadio = false,
+      children,
+      className,
+      ...otherProps
+    }: RadioCardProps,
     ref
   ) {
     return (
-      <SubframeCore.RadioGroup.Item asChild={true} {...otherProps}>
+      <SubframeCore.RadioGroup.Item
+        checked={checked}
+        disabled={disabled}
+        asChild={true}
+        {...otherProps}
+      >
         <button
           className={SubframeUtils.twClassNames(
             "group/502d4919 flex w-full cursor-pointer items-center gap-4 rounded-md border border-solid border-neutral-200 bg-default-background px-4 py-3 text-left hover:bg-neutral-50 aria-[checked=true]:border aria-[checked=true]:border-solid aria-[checked=true]:border-brand-200 aria-[checked=true]:bg-brand-50 hover:aria-[checked=true]:bg-brand-50 disabled:cursor-default disabled:border disabled:border-solid disabled:border-neutral-100 disabled:bg-neutral-50 hover:disabled:cursor-default hover:disabled:bg-neutral-50",

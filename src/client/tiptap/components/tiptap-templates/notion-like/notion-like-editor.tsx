@@ -110,29 +110,26 @@ export function EditorContentArea() {
   } = useUiEditorState(editor)
 
 
+  // Remove automatic acceptance - let user manually accept/decline
+  // React.useEffect(() => {
+  //   if (!editor) return
 
-  // Selection based effect to handle AI generation acceptance
-  React.useEffect(() => {
-    if (!editor) return
-
-    if (
-      !aiGenerationIsLoading &&
-      aiGenerationIsSelection &&
-      aiGenerationHasMessage
-    ) {
-      editor.chain().focus().aiAccept().run()
-      editor.commands.resetUiState()
-    }
-  }, [
-    aiGenerationHasMessage,
-    aiGenerationIsLoading,
-    aiGenerationIsSelection,
-    editor,
-  ])
+  //   if (
+  //     !aiGenerationIsLoading &&
+  //     aiGenerationIsSelection &&
+  //     aiGenerationHasMessage
+  //   ) {
+  //     editor.chain().focus().aiAccept().run()
+  //     editor.commands.resetUiState()
+  //   }
+  // }, [
+  //   aiGenerationHasMessage,
+  //   aiGenerationIsLoading,
+  //   aiGenerationIsSelection,
+  //   editor,
+  // ])
 
   useScrollToHash()
-
-
 
   if (!editor) {
     return null
@@ -204,7 +201,7 @@ export function EditorProvider(props: EditorProviderProps) {
         },
         link: { openOnClick: false },
         heading: {
-          levels: [2, 3], // Only allow H2 and H3
+          levels: [3, 4], // Only allow H3 (Large Heading) and H4 (Small Heading)
         },
       }),
       HorizontalRule,
@@ -262,6 +259,22 @@ export function EditorProvider(props: EditorProviderProps) {
         autocompletion: false,
         showDecorations: true,
         hideDecorationsOnStreamEnd: false,
+        // Add the required callbacks for UI state management
+        onLoading: (context) => {
+          console.log('🔄 AI Loading started')
+          context.editor.commands.aiGenerationSetIsLoading(true)
+          context.editor.commands.aiGenerationHasMessage(false)
+        },
+        onSuccess: (context) => {
+          console.log('✅ AI Success - response received')
+          context.editor.commands.aiGenerationSetIsLoading(false)
+          context.editor.commands.aiGenerationHasMessage(!!context.response)
+        },
+        onError: (error) => {
+          console.log('❌ AI Error occurred:', error)
+          // We need to get the editor instance from the extension context
+          // The error callback doesn't provide editor context, so we'll handle this in the resolver
+        },
         // Custom resolver that calls our OpenAI API route
         aiCompletionResolver: async ({ action, text, textOptions, editor, extensionOptions, defaultResolver }) => {
           try {
@@ -280,6 +293,7 @@ export function EditorProvider(props: EditorProviderProps) {
                 model: 'gpt-4o-mini',
                 maxTokens: 1000,
                 temperature: 0.7,
+                instructions: 'Only use heading levels 3 and 4. Do not use heading levels 1 or 2. Refer to heading level 3 as "Large Heading" and heading level 4 as "Small Heading".',
               }),
             })
 
@@ -293,11 +307,14 @@ export function EditorProvider(props: EditorProviderProps) {
             return data.content
           } catch (error) {
             console.error('❌ Custom AI resolver error:', error)
+            // Handle error state in the UI
+            editor.commands.aiGenerationSetIsLoading(false)
+            editor.commands.aiGenerationHasMessage(false)
             throw error
           }
         },
         // Add streaming resolver for streaming mode
-        aiStreamResolver: async ({ action, text, textOptions }) => {
+        aiStreamResolver: async ({ action, text, textOptions, editor }) => {
           try {
             console.log('🤖 Calling custom AI stream resolver:', { action, text: text?.substring(0, 100) + '...', textOptions })
             
@@ -314,6 +331,7 @@ export function EditorProvider(props: EditorProviderProps) {
                 model: 'gpt-4o-mini',
                 maxTokens: 1000,
                 temperature: 0.7,
+                instructions: 'Only use heading levels 3 and 4. Do not use heading levels 1 or 2. Refer to heading level 3 as "Large Heading" and heading level 4 as "Small Heading".',
               }),
             })
 
@@ -326,11 +344,13 @@ export function EditorProvider(props: EditorProviderProps) {
             return response.body
           } catch (error) {
             console.error('❌ Custom AI stream resolver error:', error)
+            // Handle error state in the UI
+            if (editor) {
+              editor.commands.aiGenerationSetIsLoading(false)
+              editor.commands.aiGenerationHasMessage(false)
+            }
             throw error
           }
-        },
-        onError: (error) => {
-          console.error('🔍 DEBUG: AI Error:', error)
         },
       }),
     ],

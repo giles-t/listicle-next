@@ -11,6 +11,7 @@ import * as SubframeUtils from "../utils";
 
 interface IconButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  disabled?: boolean;
   variant?:
     | "brand-primary"
     | "brand-secondary"
@@ -32,6 +33,7 @@ interface IconButtonRootProps
 const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
   function IconButtonRoot(
     {
+      disabled = false,
       variant = "neutral-tertiary",
       size = "medium",
       icon = <FeatherPlus />,
@@ -71,6 +73,7 @@ const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
         )}
         ref={ref}
         type={type}
+        disabled={disabled}
         {...otherProps}
       >
         {icon ? (

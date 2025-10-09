@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
-import { DialogLayout } from "@/ui/layouts/DialogLayout";
+import { Dialog } from "@/ui/components/Dialog";
 import { FeatherGlobe } from "@subframe/core";
 import { FeatherLock } from "@subframe/core";
 
@@ -36,8 +36,9 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
   };
 
   return (
-    <DialogLayout open={open} onOpenChange={onOpenChange}>
-      <div className="flex h-full w-144 flex-col items-start bg-default-background mobile:h-full mobile:w-full">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog.Content onInteractOutside={(event) => event.preventDefault()}>
+        <div className="flex h-full w-144 flex-col items-start bg-default-background mobile:h-full mobile:w-full">
         <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-6 py-6">
           <span className="grow shrink-0 basis-0 text-heading-3 font-heading-3 text-default-font">
             Manage list visibility
@@ -100,8 +101,9 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
             Save changes
           </Button>
         </div>
-      </div>
-    </DialogLayout>
+        </div>
+      </Dialog.Content>
+    </Dialog>
   );
 }
 

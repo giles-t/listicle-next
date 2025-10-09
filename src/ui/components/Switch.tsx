@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ThumbProps
   extends React.ComponentProps<typeof SubframeCore.Switch.Thumb> {
@@ -38,12 +38,19 @@ interface SwitchRootProps
 }
 
 const SwitchRoot = React.forwardRef<HTMLDivElement, SwitchRootProps>(
-  function SwitchRoot({ className, ...otherProps }: SwitchRootProps, ref) {
+  function SwitchRoot(
+    { checked = false, className, ...otherProps }: SwitchRootProps,
+    ref
+  ) {
     return (
-      <SubframeCore.Switch.Root asChild={true} {...otherProps}>
+      <SubframeCore.Switch.Root
+        checked={checked}
+        asChild={true}
+        {...otherProps}
+      >
         <div
           className={SubframeUtils.twClassNames(
-            "group/7a464794 flex h-5 w-8 cursor-pointer flex-col items-start justify-center gap-2 rounded-full border border-solid border-neutral-200 bg-neutral-200 px-0.5 py-0.5 aria-checked:border aria-checked:border-solid aria-checked:border-brand-600 aria-checked:bg-brand-600",
+            "group/7a464794 flex h-5 w-8 cursor-pointer flex-col items-start justify-center gap-2 rounded-full border border-solid border-neutral-200 bg-neutral-200 px-0.5 py-0.5 aria-[checked=true]:border aria-[checked=true]:border-solid aria-[checked=true]:border-brand-600 aria-[checked=true]:bg-brand-600",
             className
           )}
           ref={ref}

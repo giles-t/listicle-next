@@ -192,6 +192,10 @@ export async function PUT(
     }
     if (body.is_visible !== undefined) updateData.is_visible = body.is_visible;
     if (body.publication_id !== undefined) updateData.publication_id = body.publication_id;
+    if (body.is_pinned !== undefined) updateData.is_pinned = body.is_pinned;
+    if (body.allow_comments !== undefined) updateData.allow_comments = body.allow_comments;
+    if (body.seo_title !== undefined) updateData.seo_title = body.seo_title;
+    if (body.seo_description !== undefined) updateData.seo_description = body.seo_description;
 
     const [updatedList] = await db
       .update(lists)

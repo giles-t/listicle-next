@@ -14,6 +14,12 @@ export default async function EditList({ params }: { params: { id: string } }) {
       list_type: lists.list_type,
       is_published: lists.is_published,
       is_visible: lists.is_visible,
+      is_pinned: lists.is_pinned,
+      allow_comments: lists.allow_comments,
+      seo_title: lists.seo_title,
+      seo_description: lists.seo_description,
+      cover_image: lists.cover_image,
+      publication_id: lists.publication_id,
     })
     .from(lists)
     .where(eq(lists.id, id))
@@ -52,6 +58,12 @@ export default async function EditList({ params }: { params: { id: string } }) {
       description={row.description}
       items={items}
       categories={listTags}
+      isPinned={row.is_pinned}
+      allowComments={row.allow_comments}
+      seoTitle={row.seo_title || ""}
+      seoDescription={row.seo_description || ""}
+      coverImage={row.cover_image || undefined}
+      publicationId={row.publication_id}
     />
   );
 }

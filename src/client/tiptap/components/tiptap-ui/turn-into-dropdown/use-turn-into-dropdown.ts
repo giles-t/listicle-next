@@ -68,15 +68,15 @@ export const blockTypeOptions = [
   // },
   {
     type: "heading",
-    label: "Heading 2",
-    level: 2 as Level,
-    isActive: (editor: Editor) => editor.isActive("heading", { level: 2 }),
+    label: "Large Heading",
+    level: 3 as Level,
+    isActive: (editor: Editor) => editor.isActive("heading", { level: 3 }),
   },
   {
     type: "heading",
-    label: "Heading 3",
-    level: 3 as Level,
-    isActive: (editor: Editor) => editor.isActive("heading", { level: 3 }),
+    label: "Small Heading",
+    level: 4 as Level,
+    isActive: (editor: Editor) => editor.isActive("heading", { level: 4 }),
   },
   {
     type: "bulletList",

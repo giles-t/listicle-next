@@ -5,7 +5,7 @@ import { Badge } from "@/ui/components/Badge";
 import { Button } from "@/ui/components/Button";
 import { FilterChip } from "@/ui/components/FilterChip";
 import { TextField } from "@/ui/components/TextField";
-import { DialogLayout } from "@/ui/layouts/DialogLayout";
+import { Dialog } from "@/ui/components/Dialog";
 import { FeatherHash } from "@subframe/core";
 import { FeatherSearch } from "@subframe/core";
 
@@ -53,16 +53,16 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
 
   const filteredCategories = POPULAR_CATEGORIES.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    !selectedCategories.some(selected => selected.id === category.id)
+    !selectedCategories.some(selected => selected.name.toLowerCase() === category.name.toLowerCase())
   );
 
   const handleCategoryToggle = (category: Category) => {
     setSelectedCategories(prev => {
-      const isSelected = prev.some(selected => selected.id === category.id);
+      const isSelected = prev.some(selected => selected.name.toLowerCase() === category.name.toLowerCase());
       
       if (isSelected) {
         // Remove category
-        return prev.filter(selected => selected.id !== category.id);
+        return prev.filter(selected => selected.name.toLowerCase() !== category.name.toLowerCase());
       } else {
         // Add category if under limit
         if (prev.length < MAX_CATEGORIES) {
@@ -82,8 +82,9 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
   };
 
   return (
-    <DialogLayout open={open} onOpenChange={onOpenChange}>
-      <div className="flex h-full w-144 flex-col items-start bg-default-background mobile:h-full mobile:w-full">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog.Content onInteractOutside={(event) => event.preventDefault()}>
+        <div className="flex h-full w-144 flex-col items-start bg-default-background mobile:h-full mobile:w-full">
         <div className="flex w-full items-center gap-4 border-b border-solid border-neutral-border px-6 py-6">
           <span className="grow shrink-0 basis-0 text-heading-3 font-heading-3 text-default-font">
             Change categories
@@ -177,8 +178,9 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
             Save changes
           </Button>
         </div>
-      </div>
-    </DialogLayout>
+        </div>
+      </Dialog.Content>
+    </Dialog>
   );
 }
 

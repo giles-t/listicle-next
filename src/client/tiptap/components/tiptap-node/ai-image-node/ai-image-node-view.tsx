@@ -20,11 +20,14 @@ import { FeatherRefreshCw } from '@subframe/core'
 interface AiImageData {
   prompt: string
   style: 'photorealistic' | 'digital_art' | 'comic_book' | 'neon_punk' | 'isometric' | 'line_art' | '3d_model'
-  modelName: 'dall-e-2' | 'dall-e-3'
-  size: '256x256' | '512x512' | '1024x1024'
+  modelName: 'dall-e-3'
+  size: '1024x1024' | '1792x1024' | '1024x1792'
   isGenerating: boolean
   generatedImageSrc: string | null
   error: string | null
+  progress?: number
+  generationMessage?: string
+  revisedPrompt?: string
 }
 
 const IMAGE_STYLES = [
@@ -37,13 +40,30 @@ const IMAGE_STYLES = [
   { value: '3d_model', label: '3D Model' },
 ] as const
 
+const IMAGE_SIZES = [
+  { value: '1024x1024', label: 'Square (1024×1024)' },
+  { value: '1792x1024', label: 'Landscape (1792×1024)' },
+  { value: '1024x1792', label: 'Portrait (1024×1792)' },
+] as const
+
 export function AiImageNodeView({ node, updateAttributes, selected, editor, getPos }: NodeViewProps) {
   const [localPrompt, setLocalPrompt] = useState(node.attrs.prompt || '')
   const [isExpanded, setIsExpanded] = useState(!node.attrs.prompt)
   const [showPreview, setShowPreview] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const { prompt, style, modelName, size, isGenerating, generatedImageSrc, error } = node.attrs as AiImageData
+  const { 
+    prompt, 
+    style, 
+    modelName, 
+    size, 
+    isGenerating, 
+    generatedImageSrc, 
+    error,
+    progress,
+    generationMessage,
+    revisedPrompt
+  } = node.attrs as AiImageData
   
   // Debug logging for initial state
   console.log('🔍 DEBUG: AiImageNodeView rendered with:', {
@@ -74,8 +94,8 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   // No need to monitor AI storage anymore - we handle everything directly
 
-  const handleGenerateImage = useCallback(async () => {
-    console.log('🔍 DEBUG: handleGenerateImage called')
+  const handleGenerateImage = useCallback(async (useStreaming: boolean = true) => {
+    console.log('🔍 DEBUG: handleGenerateImage called with streaming:', useStreaming)
     console.log('🔍 DEBUG: localPrompt:', JSON.stringify(localPrompt))
     
     if (!localPrompt.trim()) {
@@ -92,55 +112,165 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       isGenerating: true,
       generatedImageSrc: null,
       error: null,
+      progress: 0,
+      generationMessage: 'Starting image generation...',
     })
 
-    try {
-      console.log('🚀 DEBUG: Calling our AI image API with:', {
-        prompt: trimmedPrompt,
-        style,
-        modelName,
-        size,
-      })
-      
-      // Call our own API endpoint directly
-      const response = await fetch('/api/ai-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+    if (useStreaming) {
+      // Use fetch with ReadableStream for streaming updates
+      try {
+        const response = await fetch('/api/ai-image?stream=true', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: trimmedPrompt,
+            style,
+            modelName: 'dall-e-3',
+            size,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+
+        const reader = response.body?.getReader()
+        if (!reader) {
+          throw new Error('No response body reader available')
+        }
+
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          
+          if (done) {
+            break
+          }
+
+          buffer += decoder.decode(value, { stream: true })
+          
+          // Process complete SSE messages
+          const messages = buffer.split('\n\n')
+          buffer = messages.pop() || '' // Keep incomplete message in buffer
+          
+          for (const message of messages) {
+            if (message.trim() === '') continue
+            
+            try {
+              // Parse SSE format: "event: eventType\ndata: jsonData"
+              const lines = message.trim().split('\n')
+              let eventType = ''
+              let data = ''
+              
+              for (const line of lines) {
+                if (line.startsWith('event: ')) {
+                  eventType = line.substring(7)
+                } else if (line.startsWith('data: ')) {
+                  data = line.substring(6)
+                }
+              }
+              
+              if (data) {
+                const parsedData = JSON.parse(data)
+                console.log(`📡 Streaming ${eventType || 'message'}:`, parsedData)
+                
+                if (eventType === 'progress') {
+                  updateAttributes({
+                    progress: parsedData.progress || 0,
+                    generationMessage: parsedData.message || 'Generating...',
+                  })
+                } else if (eventType === 'complete') {
+                  updateAttributes({
+                    isGenerating: false,
+                    generatedImageSrc: parsedData.imageUrl,
+                    revisedPrompt: parsedData.revisedPrompt,
+                    progress: 100,
+                    generationMessage: 'Image generated successfully!',
+                    error: null,
+                  })
+
+                  setShowPreview(true)
+                  setIsExpanded(false)
+                  break
+                } else if (eventType === 'error') {
+                  updateAttributes({
+                    isGenerating: false,
+                    error: parsedData.error || 'Image generation failed',
+                    progress: 0,
+                    generationMessage: null,
+                  })
+                  break
+                }
+              }
+            } catch (parseError) {
+              console.error('❌ Error parsing streaming message:', parseError, message)
+            }
+          }
+        }
+
+      } catch (error) {
+        console.error('❌ Error with streaming request:', error)
+        // Fallback to regular API call
+        handleGenerateImage(false)
+      }
+    } else {
+      // Fallback to regular API call
+      try {
+        console.log('🚀 DEBUG: Calling regular AI image API with:', {
           prompt: trimmedPrompt,
           style,
-          modelName,
+          modelName: 'dall-e-3',
           size,
-        }),
-      })
+        })
+        
+        const response = await fetch('/api/ai-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt: trimmedPrompt,
+            style,
+            modelName: 'dall-e-3',
+            size,
+          }),
+        })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        throw new Error(errorData.error || `HTTP ${response.status}`)
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          throw new Error(errorData.error || `HTTP ${response.status}`)
+        }
+
+        const { imageUrl, revisedPrompt: apiRevisedPrompt } = await response.json()
+        console.log('✅ DEBUG: AI image generated successfully:', imageUrl)
+
+        // Update node with the generated image
+        updateAttributes({
+          isGenerating: false,
+          generatedImageSrc: imageUrl,
+          revisedPrompt: apiRevisedPrompt,
+          progress: 100,
+          generationMessage: 'Image generated successfully!',
+          error: null,
+        })
+
+        // Show the preview
+        setShowPreview(true)
+        setIsExpanded(false)
+        
+      } catch (error) {
+        console.error('❌ DEBUG: Error in handleGenerateImage:', error)
+        updateAttributes({
+          isGenerating: false,
+          error: error instanceof Error ? error.message : 'Image generation failed',
+          progress: 0,
+          generationMessage: null,
+        })
       }
-
-      const { imageUrl } = await response.json()
-      console.log('✅ DEBUG: AI image generated successfully:', imageUrl)
-
-      // Update node with the generated image
-      updateAttributes({
-        isGenerating: false,
-        generatedImageSrc: imageUrl,
-        error: null,
-      })
-
-      // Show the preview
-      setShowPreview(true)
-      setIsExpanded(false)
-      
-    } catch (error) {
-      console.error('❌ DEBUG: Error in handleGenerateImage:', error)
-      updateAttributes({
-        isGenerating: false,
-        error: error instanceof Error ? error.message : 'Image generation failed',
-      })
     }
   }, [localPrompt, style, modelName, size, updateAttributes, setShowPreview, setIsExpanded])
 
@@ -171,6 +301,10 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const handleStyleChange = useCallback((value: string) => {
     updateAttributes({ style: value })
+  }, [updateAttributes])
+
+  const handleSizeChange = useCallback((value: string) => {
+    updateAttributes({ size: value })
   }, [updateAttributes])
 
   const handleDiscard = useCallback(() => {
@@ -230,25 +364,41 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
           onKeyDown={handleKeyDown}
         />
       </TextArea>
-      <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:gap-4">
-        <Select
-          className="mobile:h-auto mobile:w-full mobile:flex-none"
-          variant="outline"
-          label=""
-          placeholder="Image Style"
-          helpText=""
-          icon={<FeatherImage />}
-          value={style}
-          onValueChange={handleStyleChange}
-        >
-          <Select.Item value="photorealistic">Photorealistic</Select.Item>
-          <Select.Item value="digital_art">Digital Art</Select.Item>
-          <Select.Item value="comic_book">Comic Book</Select.Item>
-          <Select.Item value="neon_punk">Neon Punk</Select.Item>
-          <Select.Item value="isometric">Isometric</Select.Item>
-          <Select.Item value="line_art">Line Art</Select.Item>
-          <Select.Item value="3d_model">3D Model</Select.Item>
-        </Select>
+      <div className="flex w-full items-center justify-between gap-4 mobile:flex-col mobile:flex-nowrap mobile:gap-4">
+        <div className="flex gap-4 mobile:w-full mobile:flex-col">
+          <Select
+            className="mobile:h-auto mobile:w-full mobile:flex-none"
+            variant="outline-solid"
+            label=""
+            placeholder="Image Style"
+            helpText=""
+            icon={<FeatherImage />}
+            value={style}
+            onValueChange={handleStyleChange}
+          >
+            <Select.Item value="photorealistic">Photorealistic</Select.Item>
+            <Select.Item value="digital_art">Digital Art</Select.Item>
+            <Select.Item value="comic_book">Comic Book</Select.Item>
+            <Select.Item value="neon_punk">Neon Punk</Select.Item>
+            <Select.Item value="isometric">Isometric</Select.Item>
+            <Select.Item value="line_art">Line Art</Select.Item>
+            <Select.Item value="3d_model">3D Model</Select.Item>
+          </Select>
+          
+          <Select
+            className="mobile:h-auto mobile:w-full mobile:flex-none"
+            variant="outline-solid"
+            label=""
+            placeholder="Image Size"
+            helpText=""
+            value={size || '1024x1024'}
+            onValueChange={handleSizeChange}
+          >
+            <Select.Item value="1024x1024">Square (1024×1024)</Select.Item>
+            <Select.Item value="1792x1024">Landscape (1792×1024)</Select.Item>
+            <Select.Item value="1024x1792">Portrait (1024×1792)</Select.Item>
+          </Select>
+        </div>
         <Button
           className="mobile:h-8 mobile:w-full mobile:flex-none"
           icon={<FeatherSparkles />}
@@ -285,13 +435,35 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <span className="text-heading-3 font-heading-3 text-default-font">
           Generating image...
         </span>
+        
+        {/* Progress bar */}
+        {typeof progress === 'number' && progress > 0 && (
+          <div className="w-full max-w-md">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-subtext-color">
+                {generationMessage || 'Generating...'}
+              </span>
+              <span className="text-sm text-subtext-color">
+                {progress}%
+              </span>
+            </div>
+            <div className="w-full bg-neutral-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+        
         <Loader size="medium" />
+        
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="text-body font-body text-subtext-color italic">
             "{prompt}"
           </span>
           <span className="text-caption font-caption text-subtext-color">
-            This may take 10-30 seconds
+            {generationMessage || 'This may take 10-30 seconds'}
           </span>
         </div>
       </div>
@@ -341,10 +513,25 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       <img
         className="flex-none rounded-md"
         src={generatedImageSrc || ''}
-        alt={prompt}
+        alt={revisedPrompt || prompt}
       />
+      
+      {/* Show revised prompt if available */}
+      {revisedPrompt && revisedPrompt !== prompt && (
+        <div className="w-full">
+          <span className="text-heading-3 font-heading-3 text-default-font">
+            OpenAI's Enhanced Prompt
+          </span>
+          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <span className="text-sm text-blue-800 italic">
+              "{revisedPrompt}"
+            </span>
+          </div>
+        </div>
+      )}
+      
       <span className="text-heading-3 font-heading-3 text-default-font">
-        Prompt
+        Your Prompt
       </span>
       <TextArea className="h-auto w-full flex-none" label="" helpText="">
         <TextArea.Input
@@ -354,23 +541,38 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         />
       </TextArea>
       <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:gap-4">
-        <Select
-          className="mobile:h-auto mobile:w-full mobile:flex-none"
-          label=""
-          placeholder="Image Style"
-          helpText=""
-          icon={<FeatherImage />}
-          value={style}
-          onValueChange={handleStyleChange}
-        >
-          <Select.Item value="photorealistic">Photorealistic</Select.Item>
-          <Select.Item value="digital_art">Digital Art</Select.Item>
-          <Select.Item value="comic_book">Comic Book</Select.Item>
-          <Select.Item value="neon_punk">Neon Punk</Select.Item>
-          <Select.Item value="isometric">Isometric</Select.Item>
-          <Select.Item value="line_art">Line Art</Select.Item>
-          <Select.Item value="3d_model">3D Model</Select.Item>
-        </Select>
+        <div className="flex gap-4 mobile:w-full mobile:flex-col">
+          <Select
+            className="mobile:h-auto mobile:w-full mobile:flex-none"
+            label=""
+            placeholder="Image Style"
+            helpText=""
+            icon={<FeatherImage />}
+            value={style}
+            onValueChange={handleStyleChange}
+          >
+            <Select.Item value="photorealistic">Photorealistic</Select.Item>
+            <Select.Item value="digital_art">Digital Art</Select.Item>
+            <Select.Item value="comic_book">Comic Book</Select.Item>
+            <Select.Item value="neon_punk">Neon Punk</Select.Item>
+            <Select.Item value="isometric">Isometric</Select.Item>
+            <Select.Item value="line_art">Line Art</Select.Item>
+            <Select.Item value="3d_model">3D Model</Select.Item>
+          </Select>
+          
+          <Select
+            className="mobile:h-auto mobile:w-full mobile:flex-none"
+            label=""
+            placeholder="Image Size"
+            helpText=""
+            value={size || '1024x1024'}
+            onValueChange={handleSizeChange}
+          >
+            <Select.Item value="1024x1024">Square (1024×1024)</Select.Item>
+            <Select.Item value="1792x1024">Landscape (1792×1024)</Select.Item>
+            <Select.Item value="1024x1792">Portrait (1024×1792)</Select.Item>
+          </Select>
+        </div>
         <div className="flex items-center gap-2">
           <Button
             variant="destructive-tertiary"

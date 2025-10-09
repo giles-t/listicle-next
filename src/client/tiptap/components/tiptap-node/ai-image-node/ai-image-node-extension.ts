@@ -69,6 +69,34 @@ export const AiImageNode = Node.create<AiImageNodeOptions>({
           'data-generated-image-src': attributes.generatedImageSrc,
         } : {},
       },
+      error: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-error'),
+        renderHTML: attributes => attributes.error ? {
+          'data-error': attributes.error,
+        } : {},
+      },
+      progress: {
+        default: 0,
+        parseHTML: element => parseInt(element.getAttribute('data-progress') || '0'),
+        renderHTML: attributes => ({
+          'data-progress': attributes.progress || 0,
+        }),
+      },
+      generationMessage: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-generation-message'),
+        renderHTML: attributes => attributes.generationMessage ? {
+          'data-generation-message': attributes.generationMessage,
+        } : {},
+      },
+      revisedPrompt: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-revised-prompt'),
+        renderHTML: attributes => attributes.revisedPrompt ? {
+          'data-revised-prompt': attributes.revisedPrompt,
+        } : {},
+      },
     }
   },
 

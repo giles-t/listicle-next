@@ -19,6 +19,7 @@ import { TypeIcon } from "@/src/client/tiptap/components/tiptap-icons/type-icon"
 import { AtSignIcon } from "@/src/client/tiptap/components/tiptap-icons/at-sign-icon"
 import { SmilePlusIcon } from "@/src/client/tiptap/components/tiptap-icons/smile-plus-icon"
 import { LinkIcon } from "@/src/client/tiptap/components/tiptap-icons/link-icon"
+import { TrashIcon } from "@/src/client/tiptap/components/tiptap-icons/trash-icon"
 
 // --- Lib ---
 import {
@@ -35,6 +36,7 @@ import type { SuggestionItem } from "@/src/client/tiptap/components/tiptap-ui-ut
 import { addEmojiTrigger } from "@/src/client/tiptap/components/tiptap-ui/emoji-trigger-button"
 import { addMentionTrigger } from "@/src/client/tiptap/components/tiptap-ui/mention-trigger-button"
 import { AI_EXTENSIONS } from "@/src/client/tiptap/components/tiptap-ui/ai-ask-button/use-ai-ask"
+import { deleteNode, canDeleteNode } from "@/src/client/tiptap/components/tiptap-ui/delete-node-button/use-delete-node"
 
 export interface SlashMenuConfig {
   enabledItems?: SlashMenuItemType[]
@@ -77,17 +79,17 @@ const texts = {
   //   badge: HeadingOneIcon,
   //   group: "Style",
   // },
-  heading_2: {
-    title: "Heading 2",
-    subtext: "Key section heading",
-    aliases: ["h2", "heading2", "subheading"],
-    badge: HeadingTwoIcon,
+  heading_3: {
+    title: "Large Heading",
+    subtext: "Main section heading",
+    aliases: ["h3", "heading3", "large", "big heading"],
+    badge: HeadingThreeIcon,
     group: "Style",
   },
-  heading_3: {
-    title: "Heading 3",
-    subtext: "Subsection and group heading",
-    aliases: ["h3", "heading3", "subheading"],
+  heading_4: {
+    title: "Small Heading",
+    subtext: "Subsection heading",
+    aliases: ["h4", "heading4", "small", "small heading"],
     badge: HeadingThreeIcon,
     group: "Style",
   },
@@ -180,6 +182,15 @@ const texts = {
     badge: ImageIcon,
     group: "Upload",
   },
+
+  // Actions
+  delete_node: {
+    title: "Delete",
+    subtext: "Delete the current node",
+    aliases: ["delete", "remove", "trash"],
+    badge: TrashIcon,
+    group: "Actions",
+  },
 }
 
 export type SlashMenuItemType = keyof typeof texts
@@ -262,16 +273,16 @@ const getItemImplementations = () => {
     //     editor.chain().focus().toggleHeading({ level: 1 }).run()
     //   },
     // },
-    heading_2: {
-      check: (editor: Editor) => isNodeInSchema("heading", editor),
-      action: ({ editor }: { editor: Editor }) => {
-        editor.chain().focus().toggleHeading({ level: 2 }).run()
-      },
-    },
     heading_3: {
       check: (editor: Editor) => isNodeInSchema("heading", editor),
       action: ({ editor }: { editor: Editor }) => {
         editor.chain().focus().toggleHeading({ level: 3 }).run()
+      },
+    },
+    heading_4: {
+      check: (editor: Editor) => isNodeInSchema("heading", editor),
+      action: ({ editor }: { editor: Editor }) => {
+        editor.chain().focus().toggleHeading({ level: 4 }).run()
       },
     },
     bullet_list: {
@@ -352,6 +363,14 @@ const getItemImplementations = () => {
             type: "imageUpload",
           })
           .run()
+      },
+    },
+
+    // Actions
+    delete_node: {
+      check: (editor: Editor) => canDeleteNode(editor),
+      action: ({ editor }: { editor: Editor }) => {
+        deleteNode(editor)
       },
     },
   }

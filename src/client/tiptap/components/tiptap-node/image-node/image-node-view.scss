@@ -4,6 +4,36 @@
 
 .dark {
   --tiptap-image-handle-bg: var(--tt-brand-color-400);
+
+  .tiptap-image-caption-text {
+    color: var(--tt-color-neutral-300, #d1d5db);
+
+    &:empty::before {
+      color: var(--tt-color-neutral-500, #6b7280);
+    }
+
+    // Only show hover effects when editor is editable
+    .ProseMirror[contenteditable="true"] & {
+      &:hover {
+        background-color: var(--tt-color-neutral-800, #1f2937);
+      }
+    }
+  }
+
+  .tiptap-image-caption-input {
+    color: var(--tt-color-neutral-200, #e5e7eb);
+    border-color: var(--tt-color-neutral-600, #4b5563);
+    background-color: var(--tt-color-neutral-800, #1f2937);
+
+    &:focus {
+      border-color: var(--tt-brand-color-400, #60a5fa);
+      box-shadow: 0 0 0 1px var(--tt-brand-color-400, #60a5fa);
+    }
+
+    &::placeholder {
+      color: var(--tt-color-neutral-500, #6b7280);
+    }
+  }
 }
 
 .tiptap.ProseMirror {
@@ -30,10 +60,15 @@
   }
 
   .tiptap-image-container {
-    cursor: pointer;
+    cursor: default;
     user-select: none;
     flex-direction: column;
     display: flex;
+
+    // Only show pointer cursor when editor is editable
+    .ProseMirror[contenteditable="true"] & {
+      cursor: pointer;
+    }
   }
 
   .tiptap-image-content {
@@ -65,6 +100,61 @@
 
     &.tiptap-image-handle-right {
       right: 4px;
+    }
+  }
+
+  .tiptap-image-caption {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+
+  .tiptap-image-caption-text {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--tt-color-neutral-600, #6b7280);
+    text-align: center;
+    cursor: default;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--tt-radius-xs, 0.25rem);
+    min-height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:empty::before {
+      content: "Add a caption...";
+      color: var(--tt-color-neutral-400, #9ca3af);
+    }
+
+    // Only show text cursor and hover effects when editor is editable
+    .ProseMirror[contenteditable="true"] & {
+      cursor: text;
+      
+      &:hover {
+        background-color: var(--tt-color-neutral-100, #f3f4f6);
+      }
+    }
+  }
+
+  .tiptap-image-caption-input {
+    width: 100%;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--tt-color-neutral-700, #374151);
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--tt-color-neutral-300, #d1d5db);
+    border-radius: var(--tt-radius-xs, 0.25rem);
+    background-color: var(--tt-color-white, #ffffff);
+    outline: none;
+
+    &:focus {
+      border-color: var(--tt-brand-color-500, #3b82f6);
+      box-shadow: 0 0 0 1px var(--tt-brand-color-500, #3b82f6);
+    }
+
+    &::placeholder {
+      color: var(--tt-color-neutral-400, #9ca3af);
     }
   }
 }

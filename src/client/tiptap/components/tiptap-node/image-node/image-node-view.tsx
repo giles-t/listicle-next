@@ -19,7 +19,9 @@ export interface ResizableImageProps
   maxWidth?: number
   align?: "left" | "center" | "right"
   initialWidth?: number
+  caption?: string
   onImageResize?: (width?: number) => void
+  onCaptionChange?: (caption: string) => void
 }
 
 export function ImageNodeView(props: NodeViewProps) {
@@ -32,7 +34,9 @@ export function ImageNodeView(props: NodeViewProps) {
       editor={editor}
       align={node.attrs["data-align"]}
       initialWidth={node.attrs.width}
+      caption={node.attrs.caption || ""}
       onImageResize={(width) => updateAttributes({ width })}
+      onCaptionChange={(caption) => updateAttributes({ caption })}
     />
   )
 }
@@ -45,18 +49,23 @@ export const ResizableImage: React.FC<ResizableImageProps> = ({
   maxWidth = 800,
   align = "left",
   initialWidth,
+  caption = "",
   onImageResize,
+  onCaptionChange,
 }) => {
   const [resizeParams, setResizeParams] = useState<ResizeParams | undefined>(
     undefined
   )
   const [width, setWidth] = useState<number | undefined>(initialWidth)
   const [showHandles, setShowHandles] = useState<boolean>(false)
+  const [localCaption, setLocalCaption] = useState<string>(caption)
+  const [isEditingCaption, setIsEditingCaption] = useState<boolean>(false)
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const leftResizeHandleRef = useRef<HTMLDivElement>(null)
   const rightResizeHandleRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
+  const captionInputRef = useRef<HTMLInputElement>(null)
 
   const windowMouseMoveHandler = React.useCallback(
     (event: MouseEvent): void => {
@@ -170,7 +179,8 @@ export const ResizableImage: React.FC<ResizableImageProps> = ({
   ): void => {
     if (
       event.relatedTarget === leftResizeHandleRef.current ||
-      event.relatedTarget === rightResizeHandleRef.current
+      event.relatedTarget === rightResizeHandleRef.current ||
+      event.relatedTarget === captionInputRef.current
     ) {
       return
     }
@@ -184,6 +194,44 @@ export const ResizableImage: React.FC<ResizableImageProps> = ({
     }
   }
 
+  const handleCaptionClick = (event: React.MouseEvent<HTMLDivElement>): void => {
+    event.stopPropagation()
+    if (editor && editor.isEditable) {
+      setIsEditingCaption(true)
+      setTimeout(() => {
+        captionInputRef.current?.focus()
+      }, 0)
+    }
+  }
+
+  const handleCaptionChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    event.stopPropagation()
+    setLocalCaption(event.target.value)
+  }
+
+  const handleCaptionBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
+    event.stopPropagation()
+    setIsEditingCaption(false)
+    if (onCaptionChange) {
+      onCaptionChange(localCaption)
+    }
+  }
+
+  const handleCaptionKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    // Prevent all key events from bubbling up to the editor
+    event.stopPropagation()
+    
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      captionInputRef.current?.blur()
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      setLocalCaption(caption) // Reset to original
+      setIsEditingCaption(false)
+    }
+  }
+
   useEffect(() => {
     window.addEventListener("mousemove", windowMouseMoveHandler)
     window.addEventListener("mouseup", windowMouseUpHandler)
@@ -193,6 +241,10 @@ export const ResizableImage: React.FC<ResizableImageProps> = ({
       window.removeEventListener("mouseup", windowMouseUpHandler)
     }
   }, [windowMouseMoveHandler, windowMouseUpHandler])
+
+  useEffect(() => {
+    setLocalCaption(caption)
+  }, [caption])
 
   return (
     <NodeViewWrapper
@@ -233,6 +285,32 @@ export const ResizableImage: React.FC<ResizableImageProps> = ({
                 onMouseDown={rightResizeHandleMouseDownHandler}
               />
             </>
+          )}
+        </div>
+
+        {/* Caption */}
+        <div className="tiptap-image-caption">
+          {isEditingCaption ? (
+            <input
+              ref={captionInputRef}
+              type="text"
+              value={localCaption}
+              onChange={handleCaptionChange}
+              onBlur={handleCaptionBlur}
+              onKeyDown={handleCaptionKeyDown}
+              onMouseDown={(e) => e.stopPropagation()}
+              onMouseUp={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+              className="tiptap-image-caption-input"
+              placeholder="Add a caption..."
+            />
+          ) : (
+            <div
+              className="tiptap-image-caption-text"
+              onClick={handleCaptionClick}
+            >
+              {localCaption || (editor && editor.isEditable ? "Add a caption..." : "")}
+            </div>
           )}
         </div>
       </div>

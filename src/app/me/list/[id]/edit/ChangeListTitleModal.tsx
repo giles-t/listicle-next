@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/ui/components/Button";
 import { TextField } from "@/ui/components/TextField";
-import { DialogLayout } from "@/ui/layouts/DialogLayout";
+import { Dialog } from "@/ui/components/Dialog";
 
 type Props = {
   open: boolean;
@@ -47,8 +47,9 @@ export default function ChangeListTitleModal({
   const hasChanges = title.trim() !== initialTitle || (subtitle.trim() || null) !== initialSubtitle;
 
   return (
-    <DialogLayout open={open} onOpenChange={onOpenChange}>
-      <div className="flex h-full w-full flex-col items-start gap-6 px-6 py-6">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog.Content onInteractOutside={(event) => event.preventDefault()}>
+        <div className="flex h-full w-full flex-col items-start gap-6 px-6 py-6">
         <div className="flex w-full flex-col items-start gap-1">
           <span className="text-heading-3 font-heading-3 text-default-font">
             Change title and subtitle
@@ -62,7 +63,7 @@ export default function ChangeListTitleModal({
             className="h-auto w-full flex-none"
             label="Title"
             helpText="The main heading for your listicle"
-            error={!title.trim() ? "Title is required" : undefined}
+            error={!title.trim()}
           >
             <TextField.Input
               placeholder="Enter a catchy title"
@@ -100,7 +101,8 @@ export default function ChangeListTitleModal({
             Save Changes
           </Button>
         </div>
-      </div>
-    </DialogLayout>
+        </div>
+      </Dialog.Content>
+    </Dialog>
   );
 }

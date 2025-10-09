@@ -22,9 +22,14 @@ import ChangeListTypeModal, { type ListType } from "./ChangeListTypeModal";
 import ChangeListTitleModal from "./ChangeListTitleModal";
 import ChangeListCategoriesModal from "./ChangeListCategoriesModal";
 import ChangeListVisibilityModal from "./ChangeListVisibilityModal";
+import ReorderListModal from "./ReorderListModal";
+import MoreSettingsModal from "./MoreSettingsModal";
+import ChangeCoverImageModal from "./ChangeCoverImageModal";
+import AddToPublicationModal from "./AddToPublicationModal";
 import NewListItemForm from "./NewListItemForm";
 import RichTextEditor from "@/client/components/NotionEditor";
 import { StaticContentRenderer } from "@/client/components/StaticContentRenderer";
+import { extractImagesFromListItems } from "@/shared/utils/extract-images";
 import Link from "next/link";
 
 type ListItem = { id: string; title: string; content: string; sort_order: number };
@@ -38,13 +43,38 @@ type Props = {
   description: string | null;
   items: ListItem[];
   categories?: Category[];
+  isPinned?: boolean;
+  allowComments?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  coverImage?: string;
+  publicationId?: string | null;
 };
 
-export default function EditListClient({ listId, listType: initialType, isPublished, isVisible, title: initialTitle, description: initialDescription, items: initialItems, categories: initialCategories = [] }: Props) {
+export default function EditListClient({ 
+  listId, 
+  listType: initialType, 
+  isPublished, 
+  isVisible, 
+  title: initialTitle, 
+  description: initialDescription, 
+  items: initialItems, 
+  categories: initialCategories = [],
+  isPinned: initialIsPinned = false,
+  allowComments: initialAllowComments = false,
+  seoTitle: initialSeoTitle = "",
+  seoDescription: initialSeoDescription = "",
+  coverImage: initialCoverImage,
+  publicationId: initialPublicationId = null
+}: Props) {
   const [isChangeTypeOpen, setIsChangeTypeOpen] = useState(false);
   const [isChangeTitleOpen, setIsChangeTitleOpen] = useState(false);
   const [isChangeCategoriesOpen, setIsChangeCategoriesOpen] = useState(false);
   const [isChangeVisibilityOpen, setIsChangeVisibilityOpen] = useState(false);
+  const [isReorderOpen, setIsReorderOpen] = useState(false);
+  const [isMoreSettingsOpen, setIsMoreSettingsOpen] = useState(false);
+  const [isChangeCoverImageOpen, setIsChangeCoverImageOpen] = useState(false);
+  const [isAddToPublicationOpen, setIsAddToPublicationOpen] = useState(false);
   const [listType, setListType] = useState<ListType>(initialType);
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -55,15 +85,34 @@ export default function EditListClient({ listId, listType: initialType, isPublis
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [isSavingCategories, setIsSavingCategories] = useState(false);
   const [isSavingVisibility, setIsSavingVisibility] = useState(false);
+  const [isSavingReorder, setIsSavingReorder] = useState(false);
+  const [isSavingItem, setIsSavingItem] = useState(false);
   const [items, setItems] = useState<ListItem[]>(initialItems);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
+  // More settings state
+  const [isPinned, setIsPinned] = useState(initialIsPinned);
+  const [allowComments, setAllowComments] = useState(initialAllowComments);
+  const [seoTitle, setSeoTitle] = useState(initialSeoTitle);
+  const [seoDescription, setSeoDescription] = useState(initialSeoDescription);
+  const [coverImage, setCoverImage] = useState(initialCoverImage);
+  const [publicationId, setPublicationId] = useState(initialPublicationId);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [isSavingCoverImage, setIsSavingCoverImage] = useState(false);
+  const [isSavingPublication, setIsSavingPublication] = useState(false);
   // NewListItemForm now manages its own open/close state
 
   const openChangeType = () => setIsChangeTypeOpen(true);
   const openChangeTitle = () => setIsChangeTitleOpen(true);
   const openChangeCategories = () => setIsChangeCategoriesOpen(true);
   const openChangeVisibility = () => setIsChangeVisibilityOpen(true);
+  const openReorder = () => setIsReorderOpen(true);
+  const openMoreSettings = () => setIsMoreSettingsOpen(true);
+  const openChangeCoverImage = () => setIsChangeCoverImageOpen(true);
+  const openAddToPublication = () => setIsAddToPublicationOpen(true);
+  
+  // Extract available images from list items
+  const availableImages = extractImagesFromListItems(items);
   
   const handleEditItem = (item: ListItem) => {
     setEditingItemId(item.id);
@@ -79,6 +128,8 @@ export default function EditListClient({ listId, listType: initialType, isPublis
     if (!editingItemId) return;
     
     try {
+      if (isSavingItem) return;
+      setIsSavingItem(true);
       const res = await fetch(`/api/lists/${listId}/items`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -94,6 +145,8 @@ export default function EditListClient({ listId, listType: initialType, isPublis
       toast.success("Item updated");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to update item");
+    } finally {
+      setIsSavingItem(false);
     }
   };
   
@@ -195,6 +248,97 @@ export default function EditListClient({ listId, listType: initialType, isPublis
     }
   };
 
+  const handleConfirmReorder = async (reorderedItems: ListItem[]) => {
+    if (!listId) return;
+    try {
+      setIsSavingReorder(true);
+      const res = await fetch(`/api/lists/${listId}/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ items: reorderedItems.map(item => ({ id: item.id, sort_order: item.sort_order })) }),
+      });
+      if (!res.ok) throw new Error("Failed to reorder list items");
+      setItems(reorderedItems);
+      setIsReorderOpen(false);
+      toast.success("List items reordered successfully");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to reorder list items");
+    } finally {
+      setIsSavingReorder(false);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    if (!listId) return;
+    try {
+      setIsSavingSettings(true);
+      const res = await fetch(`/api/lists/${listId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ 
+          is_pinned: isPinned,
+          allow_comments: allowComments,
+          seo_title: seoTitle,
+          seo_description: seoDescription
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update settings");
+      
+      setIsMoreSettingsOpen(false);
+      toast.success("Settings updated successfully");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update settings");
+    } finally {
+      setIsSavingSettings(false);
+    }
+  };
+
+  const handleConfirmChangeCoverImage = async (imageUrl: string) => {
+    if (!listId) return;
+    try {
+      setIsSavingCoverImage(true);
+      const res = await fetch(`/api/lists/${listId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ cover_image: imageUrl }),
+      });
+      if (!res.ok) throw new Error("Failed to update cover image");
+      
+      setCoverImage(imageUrl);
+      setIsChangeCoverImageOpen(false);
+      toast.success("Cover image updated successfully");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update cover image");
+    } finally {
+      setIsSavingCoverImage(false);
+    }
+  };
+
+  const handleConfirmAddToPublication = async (newPublicationId: string) => {
+    if (!listId) return;
+    try {
+      setIsSavingPublication(true);
+      const res = await fetch(`/api/lists/${listId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ publication_id: newPublicationId }),
+      });
+      if (!res.ok) throw new Error("Failed to update publication");
+      
+      setPublicationId(newPublicationId);
+      setIsAddToPublicationOpen(false);
+      toast.success("List added to publication successfully");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to add to publication");
+    } finally {
+      setIsSavingPublication(false);
+    }
+  };
+
   const renderItemContent = (item: ListItem) => {
     const isEditing = editingItemId === item.id;
     
@@ -208,10 +352,10 @@ export default function EditListClient({ listId, listType: initialType, isPublis
             className="w-full"
           />
           <div className="flex items-center gap-2">
-            <Button size="small" onClick={handleSaveItem}>
+            <Button size="small" onClick={handleSaveItem} loading={isSavingItem}>
               Save
             </Button>
-            <Button variant="neutral-secondary" size="small" onClick={handleCancelEdit}>
+            <Button variant="neutral-secondary" size="small" onClick={handleCancelEdit} disabled={isSavingItem}>
               Cancel
             </Button>
           </div>
@@ -228,7 +372,7 @@ export default function EditListClient({ listId, listType: initialType, isPublis
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-start bg-default-background">
+    <div className="flex h-full w-full flex-col items-start bg-default-background text-lg page-scalable">
       <div className="flex w-full items-center gap-2 border-b border-solid border-neutral-border px-4 py-3">
         <div className="flex grow shrink-0 basis-0 items-center gap-2">
           <Link href="/me/lists">
@@ -256,14 +400,14 @@ export default function EditListClient({ listId, listType: initialType, isPublis
                   <DropdownMenu.DropdownItem icon={<FeatherList />} onClick={openChangeType}>
                     Change list type
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherListRestart />}>Reorder List</DropdownMenu.DropdownItem>
+                  <DropdownMenu.DropdownItem icon={<FeatherListRestart />} onClick={openReorder}>Reorder List</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={openChangeTitle}>Change title / subtitle</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherTag />} onClick={openChangeCategories}>Change category</DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherImage />}>Change cover image</DropdownMenu.DropdownItem>
+                  <DropdownMenu.DropdownItem icon={<FeatherImage />} onClick={openChangeCoverImage}>Change cover image</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherEye />} onClick={openChangeVisibility}>Manage list visibility</DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherFilePlus />}>Add to publication</DropdownMenu.DropdownItem>
+                  <DropdownMenu.DropdownItem icon={<FeatherFilePlus />} onClick={openAddToPublication}>Add to publication</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownDivider />
-                  <DropdownMenu.DropdownItem icon={<FeatherSettings2 />}>More settings</DropdownMenu.DropdownItem>
+                  <DropdownMenu.DropdownItem icon={<FeatherSettings2 />} onClick={openMoreSettings}>More settings</DropdownMenu.DropdownItem>
                 </DropdownMenu>
               </SubframeCore.DropdownMenu.Content>
             </SubframeCore.DropdownMenu.Portal>
@@ -274,9 +418,9 @@ export default function EditListClient({ listId, listType: initialType, isPublis
       <div className="container max-w-none flex w-full flex-col items-start gap-12 bg-default-background py-12">
         <div className="flex w-full flex-col items-center gap-8 px-4">
           <div className="flex w-full max-w-[768px] flex-col items-start gap-4">
-            <h1 className="w-full text-heading-1 font-heading-1 text-default-font sm:text-4xl lg:text-5xl font-bold">{title}</h1>
+            <h1 className="w-full text-heading-1 font-heading-1 text-default-font font-bold">{title}</h1>
             {description ? (
-              <span className="w-full text-heading-3 font-heading-3 text-subtext-color">{description}</span>
+              <span className="w-full description-text">{description}</span>
             ) : null}
           </div>
         </div>
@@ -285,10 +429,10 @@ export default function EditListClient({ listId, listType: initialType, isPublis
             {listType === "unordered" ? (
               <ul className="list-disc list-outside w-full">
                 {items.map((item) => (
-                  <li key={item.id} className="mb-4 list-item-heading-2">
+                  <li key={item.id} className="mb-4 list-item-marker">
                     <div className="flex items-center justify-between w-full mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</span>
+                        <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                         {editingItemId === item.id && (
                           <Badge variant="brand">Editing</Badge>
                         )}
@@ -311,10 +455,10 @@ export default function EditListClient({ listId, listType: initialType, isPublis
             ) : listType === "reversed" ? (
               <ol className="list-decimal list-outside w-full" reversed>
                 {items.map((item) => (
-                    <li key={item.id} className="mb-4 list-item-heading-2">
+                    <li key={item.id} className="mb-4 list-item-marker">
                       <div className="flex items-center justify-between w-full mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-heading-2 font-heading-2 text-default-font">{item.title}</span>
+                          <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                           {editingItemId === item.id && (
                             <Badge variant="brand">Editing</Badge>
                           )}
@@ -337,10 +481,10 @@ export default function EditListClient({ listId, listType: initialType, isPublis
             ) : (
               <ol className="list-decimal list-outside w-full">
                 {items.map((item) => (
-                    <li key={item.id} className="mb-4 list-item-heading-2">
+                    <li key={item.id} className="mb-4 list-item-marker">
                       <div className="flex items-center justify-between w-full mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-heading-2 font-heading-2 text-default-font">{item.title}</span>
+                          <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                           {editingItemId === item.id && (
                             <Badge variant="brand">Editing</Badge>
                           )}
@@ -400,6 +544,43 @@ export default function EditListClient({ listId, listType: initialType, isPublis
         initialIsVisible={visibleState}
         onConfirm={handleConfirmChangeVisibility}
         loading={isSavingVisibility}
+      />
+      <ReorderListModal
+        open={isReorderOpen}
+        onOpenChange={setIsReorderOpen}
+        items={items}
+        onConfirm={handleConfirmReorder}
+        loading={isSavingReorder}
+      />
+      <MoreSettingsModal
+        open={isMoreSettingsOpen}
+        onOpenChange={setIsMoreSettingsOpen}
+        isPinned={isPinned}
+        onPinnedChange={setIsPinned}
+        allowComments={allowComments}
+        onAllowCommentsChange={setAllowComments}
+        seoTitle={seoTitle}
+        onSeoTitleChange={setSeoTitle}
+        seoDescription={seoDescription}
+        onSeoDescriptionChange={setSeoDescription}
+        onSave={handleSaveSettings}
+        loading={isSavingSettings}
+      />
+      <ChangeCoverImageModal
+        open={isChangeCoverImageOpen}
+        onOpenChange={setIsChangeCoverImageOpen}
+        currentCoverImage={coverImage}
+        availableImages={availableImages}
+        onConfirm={handleConfirmChangeCoverImage}
+        loading={isSavingCoverImage}
+      />
+
+      <AddToPublicationModal
+        open={isAddToPublicationOpen}
+        onOpenChange={setIsAddToPublicationOpen}
+        currentPublicationId={publicationId}
+        onConfirm={handleConfirmAddToPublication}
+        loading={isSavingPublication}
       />
     </div>
   );

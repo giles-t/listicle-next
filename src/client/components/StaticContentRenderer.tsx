@@ -20,6 +20,9 @@ import { EmbedDisplayNode } from "@/src/client/tiptap/components/tiptap-node/emb
 import { ImageUploadNode } from "@/src/client/tiptap/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { AiImageNode } from "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node-extension";
 
+// Import image node styles for caption display
+import "@/src/client/tiptap/components/tiptap-node/image-node/image-node-view.scss";
+
 // Declare Iframely global
 declare global {
   interface Window {
@@ -35,7 +38,7 @@ const displayExtensions = [
       width: 2,
     },
     heading: {
-      levels: [2, 3], // Only allow H2 and H3
+      levels: [3, 4], // Only allow H3 and H4
     },
   }),
   HorizontalRule,

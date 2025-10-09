@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { DialogLayout } from "@/ui/layouts/DialogLayout";
+import { Dialog } from "@/ui/components/Dialog";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
 import { Button } from "@/ui/components/Button";
@@ -27,8 +27,9 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
   }, [open, initialValue]);
 
   return (
-    <DialogLayout open={open} onOpenChange={onOpenChange}>
-      <div className="flex h-full w-full flex-col items-start gap-6 bg-default-background px-6 py-6">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog.Content onInteractOutside={(event) => event.preventDefault()}>
+        <div className="flex h-full w-full flex-col items-start gap-6 bg-default-background px-6 py-6">
         <span className="text-heading-3 font-heading-3 text-default-font">Change list type</span>
         <div className="flex w-full flex-col items-start gap-4">
           <RadioCardGroup className="h-auto w-full flex-none" value={value} onValueChange={(v: string) => setValue(v as ListType)}>
@@ -71,8 +72,9 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
             Confirm
           </Button>
         </div>
-      </div>
-    </DialogLayout>
+        </div>
+      </Dialog.Content>
+    </Dialog>
   );
 }
 

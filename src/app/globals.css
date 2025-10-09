@@ -34,8 +34,40 @@ body {
   flex-grow: 1;
 }
 
-/* Custom list marker sizing to match heading-2 */
-.list-item-heading-2::marker {
-  font-size: theme('fontSize.heading-2.0');
-  font-weight: theme('fontSize.heading-2.1.fontWeight');
+/* Page-level text scaling - override Tailwind text classes with em units */
+.page-scalable {
+  /* Main title */
+  h1 {
+    font-size: 2.5em !important;
+    line-height: 1.1 !important;
+  }
+  
+  /* List item titles */
+  h2 {
+    font-size: 1.5em !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Description text - same size as body text */
+  .description-text {
+    font-size: 1em !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Custom list marker sizing to match list item text styling */
+  .list-item-marker::marker {
+    font-size: 1.5em !important;
+    font-weight: bold !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Override responsive text classes */
+  .sm\\:text-4xl,
+  .lg\\:text-5xl,
+  .sm\\:text-2xl,
+  .lg\\:text-3xl,
+  .sm\\:text-xl,
+  .lg\\:text-2xl {
+    font-size: inherit !important;
+  }
 }
