@@ -149,18 +149,23 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {recentLists.length > 0 ? (
             <div className="flex w-full flex-wrap items-start gap-4">
               {recentLists.map((list) => (
-                <ListicleCard
+                <Link
                   key={list.id}
-                  image={list.cover_image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"}
-                  category="List" // TODO: Add category support
-                  title={list.title}
-                  description={list.description || ""}
-                  author={profile.name}
-                  views={formatNumber(list.viewsCount)}
-                  likes={formatNumber(list.likesCount)}
-                  comments={formatNumber(list.commentsCount)}
-                  date={list.published_at ? formatDistanceToNow(new Date(list.published_at), { addSuffix: true }) : "Draft"}
-                />
+                  href={`/@${username}/${list.slug}`}
+                  className="w-full hover:opacity-90 transition-opacity"
+                >
+                  <ListicleCard
+                    image={list.cover_image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"}
+                    category="List" // TODO: Add category support
+                    title={list.title}
+                    description={list.description || ""}
+                    author={profile.name}
+                    views={formatNumber(list.viewsCount)}
+                    likes={formatNumber(list.likesCount)}
+                    comments={formatNumber(list.commentsCount)}
+                    date={list.published_at ? formatDistanceToNow(new Date(list.published_at), { addSuffix: true }) : "Draft"}
+                  />
+                </Link>
               ))}
             </div>
           ) : (

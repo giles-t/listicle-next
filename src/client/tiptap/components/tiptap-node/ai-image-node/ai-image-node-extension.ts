@@ -9,7 +9,16 @@ export interface AiImageNodeOptions {
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     aiImageNode: {
-      setAiImageNode: (options?: { prompt?: string; style?: string; modelName?: string; size?: string }) => ReturnType
+      setAiImageNode: (options?: { 
+        prompt?: string
+        modelName?: string
+        size?: string
+        quality?: string
+        background?: string
+        moderation?: string
+        outputFormat?: string
+        outputCompression?: number
+      }) => ReturnType
     }
   }
 }
@@ -34,26 +43,57 @@ export const AiImageNode = Node.create<AiImageNodeOptions>({
           'data-prompt': attributes.prompt,
         }),
       },
-      style: {
-        default: 'photorealistic',
-        parseHTML: element => element.getAttribute('data-style'),
-        renderHTML: attributes => ({
-          'data-style': attributes.style,
-        }),
-      },
       modelName: {
-        default: 'dall-e-3',
+        default: 'gpt-image-1',
         parseHTML: element => element.getAttribute('data-model-name'),
         renderHTML: attributes => ({
           'data-model-name': attributes.modelName,
         }),
       },
       size: {
-        default: '1024x1024',
+        default: 'auto',
         parseHTML: element => element.getAttribute('data-size'),
         renderHTML: attributes => ({
           'data-size': attributes.size,
         }),
+      },
+      quality: {
+        default: 'auto',
+        parseHTML: element => element.getAttribute('data-quality'),
+        renderHTML: attributes => ({
+          'data-quality': attributes.quality,
+        }),
+      },
+      background: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-background'),
+        renderHTML: attributes => attributes.background ? {
+          'data-background': attributes.background,
+        } : {},
+      },
+      moderation: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-moderation'),
+        renderHTML: attributes => attributes.moderation ? {
+          'data-moderation': attributes.moderation,
+        } : {},
+      },
+      outputFormat: {
+        default: 'png',
+        parseHTML: element => element.getAttribute('data-output-format'),
+        renderHTML: attributes => ({
+          'data-output-format': attributes.outputFormat,
+        }),
+      },
+      outputCompression: {
+        default: null,
+        parseHTML: element => {
+          const val = element.getAttribute('data-output-compression')
+          return val ? parseInt(val) : null
+        },
+        renderHTML: attributes => attributes.outputCompression ? {
+          'data-output-compression': attributes.outputCompression,
+        } : {},
       },
       isGenerating: {
         default: false,
@@ -66,7 +106,7 @@ export const AiImageNode = Node.create<AiImageNodeOptions>({
         default: null,
         parseHTML: element => element.getAttribute('data-generated-image-src'),
         renderHTML: attributes => attributes.generatedImageSrc ? {
-          'data-generated-image-src': attributes.generatedImageSrc,
+          'data-generated-image-src': attributes.generatedImageSrc, // Blob storage URL
         } : {},
       },
       error: {

@@ -46,8 +46,8 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
         </div>
         <div className="flex w-full flex-col items-start gap-6 px-6 py-6">
           <RadioCardGroup className="h-auto w-full flex-none" value={selectedVisibility} onValueChange={setSelectedVisibility}>
-            <div className="flex w-full flex-col items-start gap-4">
-              <RadioCardGroup.RadioCard value="visible">
+            <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4">
+              <RadioCardGroup.RadioCard hideRadio={true} value="visible" checked={selectedVisibility === "visible"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground
                     size="medium"
@@ -64,7 +64,7 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
                   </div>
                 </div>
               </RadioCardGroup.RadioCard>
-              <RadioCardGroup.RadioCard value="hidden">
+              <RadioCardGroup.RadioCard hideRadio={true} value="hidden" checked={selectedVisibility === "hidden"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground
                     variant="neutral"

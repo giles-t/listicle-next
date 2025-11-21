@@ -1,7 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/server/supabase";
-import { getUserById } from "@/server/db/queries/users";
+import { getUserById } from "@/server/db/queries/profiles";
 import { ProfileForm } from "./ProfileForm";
 
 interface Profile {

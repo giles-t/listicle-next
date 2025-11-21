@@ -20,10 +20,9 @@ export default function AuthCallback() {
           throw error;
         }
 
-        if (session?.user) {
-          toast.success('Successfully signed in!');
-          router.push('/dashboard');
-        } else {
+        let authenticatedUser = session?.user;
+
+        if (!authenticatedUser) {
           // If no session, try to exchange the code/tokens from URL params
           const url = new URL(window.location.href);
           const code = url.searchParams.get('code');
@@ -36,8 +35,7 @@ export default function AuthCallback() {
             }
 
             if (data.session?.user) {
-              toast.success('Successfully signed in!');
-              router.push('/dashboard');
+              authenticatedUser = data.session.user;
             } else {
               throw new Error('Failed to create session');
             }
@@ -45,6 +43,12 @@ export default function AuthCallback() {
             throw new Error('No authentication code found');
           }
         }
+
+        // User profile is automatically created by database trigger
+        // No manual sync needed
+
+        toast.success('Successfully signed in!');
+        router.push('/dashboard');
       } catch (error) {
         console.error('Auth callback error:', error);
         toast.error('Authentication failed. Please try again.');

@@ -34,7 +34,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
         <div className="flex w-full flex-col items-start gap-4">
           <RadioCardGroup className="h-auto w-full flex-none" value={value} onValueChange={(v: string) => setValue(v as ListType)}>
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4">
-              <RadioCardGroup.RadioCard hideRadio={true} value="unordered">
+              <RadioCardGroup.RadioCard hideRadio={true} value="unordered" checked={value === "unordered"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground variant="neutral" size="medium" icon={<FeatherList />} square={true} />
                   <div className="flex flex-col items-start">
@@ -43,7 +43,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
                   </div>
                 </div>
               </RadioCardGroup.RadioCard>
-              <RadioCardGroup.RadioCard hideRadio={true} value="ordered">
+              <RadioCardGroup.RadioCard hideRadio={true} value="ordered" checked={value === "ordered"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground variant="neutral" size="medium" icon={<FeatherListOrdered />} square={true} />
                   <div className="flex grow shrink-0 basis-0 flex-col items-start">
@@ -52,7 +52,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
                   </div>
                 </div>
               </RadioCardGroup.RadioCard>
-              <RadioCardGroup.RadioCard hideRadio={true} value="reversed">
+              <RadioCardGroup.RadioCard hideRadio={true} value="reversed" checked={value === "reversed"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground variant="neutral" size="medium" icon={<FeatherListStart />} square={true} />
                   <div className="flex grow shrink-0 basis-0 flex-col items-start">

@@ -20,8 +20,19 @@ import { EmbedDisplayNode } from "@/src/client/tiptap/components/tiptap-node/emb
 import { ImageUploadNode } from "@/src/client/tiptap/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { AiImageNode } from "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node-extension";
 
-// Import image node styles for caption display
+// Import tiptap editor content styles for proper typography and layout
+import "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor.scss";
+// Import node-specific styles to match editor display
+import "@/src/client/tiptap/components/tiptap-node/paragraph-node/paragraph-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/list-node/list-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/heading-node/heading-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/blockquote-node/blockquote-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/code-block-node/code-block-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/image-node/image-node.scss";
 import "@/src/client/tiptap/components/tiptap-node/image-node/image-node-view.scss";
+import "@/src/client/tiptap/components/tiptap-node/ai-image-node/ai-image-node.scss";
+import "@/src/client/tiptap/components/tiptap-node/embed-display-node/embed-display-node.scss";
 
 // Declare Iframely global
 declare global {
@@ -167,7 +178,7 @@ interface StaticContentRendererProps {
  */
 export function StaticContentRenderer({ 
   content, 
-  className = "tiptap ProseMirror max-w-none py-2",
+  className = "tiptap ProseMirror max-w-none",
   emptyMessage = "No content",
   errorMessage = "Content could not be displayed"
 }: StaticContentRendererProps) {

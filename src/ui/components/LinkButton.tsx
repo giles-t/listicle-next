@@ -5,11 +5,12 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface LinkButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  disabled?: boolean;
   variant?: "brand" | "neutral" | "inverse";
   size?: "large" | "medium" | "small";
   icon?: React.ReactNode;
@@ -22,6 +23,7 @@ interface LinkButtonRootProps
 const LinkButtonRoot = React.forwardRef<HTMLButtonElement, LinkButtonRootProps>(
   function LinkButtonRoot(
     {
+      disabled = false,
       variant = "neutral",
       size = "medium",
       icon = null,
@@ -42,12 +44,13 @@ const LinkButtonRoot = React.forwardRef<HTMLButtonElement, LinkButtonRootProps>(
         )}
         ref={ref}
         type={type}
+        disabled={disabled}
         {...otherProps}
       >
         {icon ? (
           <SubframeCore.IconWrapper
             className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-disabled/a4ee726a:group-hover/a4ee726a:text-neutral-400",
+              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400",
               {
                 "text-caption font-caption": size === "small",
                 "text-heading-3 font-heading-3": size === "large",
@@ -64,7 +67,7 @@ const LinkButtonRoot = React.forwardRef<HTMLButtonElement, LinkButtonRootProps>(
         {children ? (
           <span
             className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-hover/a4ee726a:underline group-disabled/a4ee726a:text-neutral-400 group-disabled/a4ee726a:group-hover/a4ee726a:text-neutral-400 group-disabled/a4ee726a:group-hover/a4ee726a:no-underline",
+              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-hover/a4ee726a:underline group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:no-underline",
               {
                 "text-caption font-caption": size === "small",
                 "text-heading-3 font-heading-3": size === "large",
@@ -81,7 +84,7 @@ const LinkButtonRoot = React.forwardRef<HTMLButtonElement, LinkButtonRootProps>(
         {iconRight ? (
           <SubframeCore.IconWrapper
             className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-disabled/a4ee726a:group-hover/a4ee726a:text-neutral-400",
+              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400",
               {
                 "text-caption font-caption": size === "small",
                 "text-heading-3 font-heading-3": size === "large",

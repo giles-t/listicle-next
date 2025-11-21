@@ -1,9 +1,5 @@
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
-
-/* Tiptap global styles with @apply - must be after Tailwind utilities */
-/* @import '../client/tiptap/styles/tiptap-editor-content.css' layer(utilities); */
-
 @config '../../tailwind.config.js';
 
 /*

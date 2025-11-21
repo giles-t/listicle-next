@@ -21,12 +21,20 @@ interface LoginModalProps {
 function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { signInWithMagicLink } = useAuth();
 
   const handleEmailSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (email) {
-      await signInWithMagicLink(email);
-      setShowConfirmation(true);
+    if (email && !isLoading) {
+      setIsLoading(true);
+      try {
+        await signInWithMagicLink(email);
+        setShowConfirmation(true);
+      } catch (error) {
+        // Error is handled by useAuth hook
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -148,8 +156,9 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
                 className="h-10 w-full flex-none"
                 size="large"
                 onClick={handleEmailSubmit}
+                disabled={isLoading || !email.trim()}
               >
-                Continue
+                {isLoading ? 'Sending...' : 'Continue'}
               </Button>
             </div>
             <div className="flex flex-wrap items-start gap-2">

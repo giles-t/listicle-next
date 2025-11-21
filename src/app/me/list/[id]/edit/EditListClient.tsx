@@ -28,6 +28,7 @@ import ChangeCoverImageModal from "./ChangeCoverImageModal";
 import AddToPublicationModal from "./AddToPublicationModal";
 import NewListItemForm from "./NewListItemForm";
 import RichTextEditor from "@/client/components/NotionEditor";
+// import { StaticContentRenderer } from "@/server/components/StaticContentRenderer";
 import { StaticContentRenderer } from "@/client/components/StaticContentRenderer";
 import { extractImagesFromListItems } from "@/shared/utils/extract-images";
 import Link from "next/link";
@@ -49,6 +50,8 @@ type Props = {
   seoDescription?: string;
   coverImage?: string;
   publicationId?: string | null;
+  slug: string;
+  username: string;
 };
 
 export default function EditListClient({ 
@@ -65,7 +68,9 @@ export default function EditListClient({
   seoTitle: initialSeoTitle = "",
   seoDescription: initialSeoDescription = "",
   coverImage: initialCoverImage,
-  publicationId: initialPublicationId = null
+  publicationId: initialPublicationId = null,
+  slug,
+  username
 }: Props) {
   const [isChangeTypeOpen, setIsChangeTypeOpen] = useState(false);
   const [isChangeTitleOpen, setIsChangeTitleOpen] = useState(false);
@@ -100,6 +105,7 @@ export default function EditListClient({
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isSavingCoverImage, setIsSavingCoverImage] = useState(false);
   const [isSavingPublication, setIsSavingPublication] = useState(false);
+  const [isSavingPublish, setIsSavingPublish] = useState(false);
   // NewListItemForm now manages its own open/close state
 
   const openChangeType = () => setIsChangeTypeOpen(true);
@@ -339,8 +345,31 @@ export default function EditListClient({
     }
   };
 
+  const handlePublish = async () => {
+    if (!listId) return;
+    try {
+      setIsSavingPublish(true);
+      const newPublishedState = !publishedState;
+      const res = await fetch(`/api/lists/${listId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ is_published: newPublishedState }),
+      });
+      if (!res.ok) throw new Error(`Failed to ${newPublishedState ? "publish" : "unpublish"} list`);
+      
+      setPublishedState(newPublishedState);
+      toast.success(`List ${newPublishedState ? "published" : "unpublished"} successfully`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status");
+    } finally {
+      setIsSavingPublish(false);
+    }
+  };
+
   const renderItemContent = (item: ListItem) => {
     const isEditing = editingItemId === item.id;
+    const hasContent = item.content && item.content.trim() !== '';
     
     if (isEditing) {
       return (
@@ -363,6 +392,24 @@ export default function EditListClient({
       );
     }
     
+    if (!hasContent) {
+      return (
+        <div className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-neutral-border rounded-lg p-8 bg-neutral-50 hover:bg-neutral-100 transition-colors">
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-subheader-3 font-subheader-3 text-neutral-400">No details added yet</span>
+            <Button
+              variant="neutral-secondary"
+              size="small"
+              icon={<FeatherEdit2 />}
+              onClick={() => handleEditItem(item)}
+            >
+              Add details
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <StaticContentRenderer 
         content={item.content} 
@@ -372,7 +419,7 @@ export default function EditListClient({
   };
 
   return (
-    <div className="flex h-full w-full flex-col items-start bg-default-background text-lg page-scalable">
+    <div className="flex h-full w-full flex-col items-start bg-default-background page-scalable text-lg">
       <div className="flex w-full items-center gap-2 border-b border-solid border-neutral-border px-4 py-3">
         <div className="flex grow shrink-0 basis-0 items-center gap-2">
           <Link href="/me/lists">
@@ -386,6 +433,16 @@ export default function EditListClient({
           <Badge variant={publishedState ? "success" : "neutral"}>{publishedState ? "Published" : "Draft"}</Badge>
         </div>
         <div className="flex grow shrink-0 basis-0 items-center justify-end gap-2">
+          {publishedState && (
+            <Link href={`/@${username}/${slug}`} target="_blank">
+              <Button
+                variant="neutral-secondary"
+                icon={<FeatherEye />}
+              >
+                View
+              </Button>
+            </Link>
+          )}
           <SubframeCore.DropdownMenu.Root>
             <SubframeCore.DropdownMenu.Trigger asChild={true}>
               <Button
@@ -412,7 +469,9 @@ export default function EditListClient({
               </SubframeCore.DropdownMenu.Content>
             </SubframeCore.DropdownMenu.Portal>
           </SubframeCore.DropdownMenu.Root>
-          <Button onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}>Publish</Button>
+          <Button onClick={handlePublish} loading={isSavingPublish}>
+            {publishedState ? "Unpublish" : "Publish"}
+          </Button>
         </div>
       </div>
       <div className="container max-w-none flex w-full flex-col items-start gap-12 bg-default-background py-12">
@@ -427,10 +486,10 @@ export default function EditListClient({
         <div className="flex w-full flex-col items-center gap-8 px-4">
           <div className="flex w-full max-w-[768px] flex-col items-start gap-4">
             {listType === "unordered" ? (
-              <ul className="list-disc list-outside w-full">
+              <ul className="list-disc list-outside w-full flex flex-col gap-12">
                 {items.map((item) => (
-                  <li key={item.id} className="mb-4 list-item-marker">
-                    <div className="flex items-center justify-between w-full mb-2">
+                  <li key={item.id} className="list-item-marker">
+                    <div className="flex items-center justify-between w-full mb-4">
                       <div className="flex items-center gap-2">
                         <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                         {editingItemId === item.id && (
@@ -453,15 +512,15 @@ export default function EditListClient({
                 ))}
               </ul>
             ) : listType === "reversed" ? (
-              <ol className="list-decimal list-outside w-full" reversed>
+              <ol className="list-decimal list-outside w-full flex flex-col gap-12" reversed>
                 {items.map((item) => (
-                    <li key={item.id} className="mb-4 list-item-marker">
-                      <div className="flex items-center justify-between w-full mb-2">
+                    <li key={item.id} className="list-item-marker">
+                      <div className="flex items-center justify-between w-full mb-4">
                         <div className="flex items-center gap-2">
                           <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                           {editingItemId === item.id && (
                             <Badge variant="brand">Editing</Badge>
-                          )}
+                          )}  
                         </div>
                         {editingItemId !== item.id && (
                           <Button
@@ -479,10 +538,10 @@ export default function EditListClient({
                   ))}
               </ol>
             ) : (
-              <ol className="list-decimal list-outside w-full">
+              <ol className="list-decimal list-outside w-full flex flex-col gap-12">
                 {items.map((item) => (
-                    <li key={item.id} className="mb-4 list-item-marker">
-                      <div className="flex items-center justify-between w-full mb-2">
+                    <li key={item.id} className="list-item-marker">
+                      <div className="flex items-center justify-between w-full mb-4">
                         <div className="flex items-center gap-2">
                           <h2 className="text-heading-2 font-heading-2 text-default-font font-bold">{item.title}</h2>
                           {editingItemId === item.id && (

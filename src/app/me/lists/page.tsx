@@ -1,6 +1,6 @@
 import { createClient } from "@/src/server/supabase";
 import { db } from "@/src/server/db";
-import { lists as listsTable, users } from "@/src/server/db/schema";
+import { lists as listsTable, profiles } from "@/src/server/db/schema";
 import { eq } from "drizzle-orm";
 import UserListsClient, { type UserList as UserListType, type UserProfileLite } from "./UserListsClient";
 
@@ -12,7 +12,7 @@ export default async function UserLists() {
     return null;
   }
 
-  const [profileRow] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+  const [profileRow] = await db.select().from(profiles).where(eq(profiles.id, user.id)).limit(1);
 
   const rows = await db
     .select({

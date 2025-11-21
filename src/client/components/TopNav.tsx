@@ -44,56 +44,17 @@ export function TopNav() {
   const pathname = usePathname();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
   const { user, signOut } = useAuth();
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Hide TopNav on specific routes
-  const shouldHide = pathname === '/create' || pathname.startsWith('/me/list/');
+  const shouldHide = pathname === '/create' || pathname.startsWith('/me/list/') || pathname === '/onboarding';
 
-  // Debounced profile fetching
-  useEffect(() => {
-    // Clear any existing timeout
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
-    // Set up debounced fetch
-    debounceTimeout.current = setTimeout(async () => {
-      if (!user) {
-        setProfile(null);
-        return;
-      }
-
-      setProfileLoading(true);
-      try {
-        const response = await fetch('/api/profile', {
-          credentials: 'include',
-        });
-        
-        if (response.ok) {
-          const profileData = await response.json();
-          setProfile(profileData);
-        } else if (response.status === 404) {
-          // Profile doesn't exist yet
-          setProfile(null);
-        }
-      } catch (error) {
-        console.error('Failed to fetch profile:', error);
-        setProfile(null);
-      } finally {
-        setProfileLoading(false);
-      }
-    }, 300); // 300ms debounce delay
-
-    // Cleanup timeout on unmount
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [user]);
+  // Extract profile data from user metadata (fast, no API call needed)
+  const profile = user ? {
+    username: user.user_metadata?.username,
+    name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+    avatar: user.user_metadata?.avatar || null,
+  } : null;
 
   const handleNewClick = () => {
     if (!user) {
@@ -135,7 +96,7 @@ export function TopNav() {
   // Get the appropriate profile link
   const getProfileLink = () => {
     if (profile?.username) {
-      return `/@${profile.username}`;
+      return `/profile/${profile.username}`;
     } else {
       return "/settings/profile";
     }
@@ -203,9 +164,9 @@ export function TopNav() {
                 <SubframeCore.DropdownMenu.Trigger asChild={true}>
                   <Avatar 
                     image={profile?.avatar || undefined}
-                    className={profileLoading && !profile ? "animate-pulse" : ""}
+                    className=""
                   >
-                    {profileLoading && !profile ? (
+                    {!profile?.username ? (
                       <div className="w-full h-full bg-gray-200 animate-pulse rounded-full" />
                     ) : (
                       profile?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"
@@ -220,36 +181,6 @@ export function TopNav() {
                     asChild={true}
                   >
                     <DropdownMenu>
-                      {profileLoading ? (
-                        <>
-                          <SubframeCore.DropdownMenu.Item asChild disabled>
-                            <div className="w-full px-3 pt-1">
-                              <SkeletonText size="subheader" />
-                            </div>
-                          </SubframeCore.DropdownMenu.Item>
-                          <SubframeCore.DropdownMenu.Item asChild disabled>
-                            <div className="w-full px-3 pt-1">
-                              <SkeletonText size="subheader" />
-                            </div>
-                          </SubframeCore.DropdownMenu.Item>
-                          <SubframeCore.DropdownMenu.Item asChild disabled>
-                            <div className="w-full px-3 pt-1">
-                              <SkeletonText size="subheader" />
-                            </div>
-                          </SubframeCore.DropdownMenu.Item>
-                          <SubframeCore.DropdownMenu.Item asChild disabled>
-                            <div className="w-full px-3 pt-1">
-                              <SkeletonText size="subheader" />
-                            </div>
-                          </SubframeCore.DropdownMenu.Item>
-                          <SubframeCore.DropdownMenu.Item asChild disabled>
-                            <div className="w-full px-3 py-1">
-                              <SkeletonText size="subheader" />
-                            </div>
-                          </SubframeCore.DropdownMenu.Item>
-                        </>
-                      ) : (
-                        <>
                           <Link className="w-full" href={getProfileLink()}>
                             <DropdownMenu.DropdownItem 
                               icon={<FeatherUser />}
@@ -277,8 +208,6 @@ export function TopNav() {
                           >
                             Log out
                           </DropdownMenu.DropdownItem>
-                        </>
-                      )}
                     </DropdownMenu>
                   </SubframeCore.DropdownMenu.Content>
                 </SubframeCore.DropdownMenu.Portal>

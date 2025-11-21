@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/server/supabase';
-import { updateUserProfile } from '@/server/db/queries/users';
+import { updateUserProfile } from '@/server/db/queries/profiles';
 import { profileFormSchema, type ProfileFormData } from '@/shared/validation/user';
 
 export async function updateProfile(formData: FormData) {
@@ -42,21 +42,42 @@ export async function updateProfile(formData: FormData) {
 
   try {
     // Update user profile directly in database
+    console.log('Updating profile for user:', user.id, 'with data:', profileData);
+    
     const updatedUser = await updateUserProfile(user.id, {
       username: profileData.username,
-      name: profileData.displayName,
-      bio: profileData.bio || undefined,
-      location: profileData.location || undefined,
-      website: profileData.website || undefined,
-      twitter: profileData.twitter || undefined,
-      linkedin: profileData.linkedin || undefined,
-      instagram: profileData.instagram || undefined,
-      youtube: profileData.youtube || undefined,
-      github: profileData.github || undefined,
+      name: profileData.displayName ?? undefined,
+      bio: profileData.bio ?? undefined,
+      location: profileData.location ?? undefined,
+      website: profileData.website ?? undefined,
+      twitter: profileData.twitter ?? undefined,
+      linkedin: profileData.linkedin ?? undefined,
+      instagram: profileData.instagram ?? undefined,
+      youtube: profileData.youtube ?? undefined,
+      github: profileData.github ?? undefined,
     });
 
+    console.log('Update result:', updatedUser);
+
     if (!updatedUser) {
-      throw new Error('Failed to update profile');
+      console.error('No user returned from update - profile may not exist in database');
+      return {
+        error: 'Profile not found. Please sign out and sign in again to create your profile.',
+      };
+    }
+
+    // Sync critical fields to auth metadata
+    try {
+      await supabase.auth.updateUser({
+        data: {
+          username: profileData.username,
+          name: profileData.displayName ?? undefined,
+        }
+      });
+      console.log('Synced metadata to auth.users');
+    } catch (metadataError) {
+      console.error('Failed to sync metadata (non-critical):', metadataError);
+      // Don't fail the request if metadata sync fails
     }
 
     // Revalidate the settings page
@@ -68,6 +89,9 @@ export async function updateProfile(formData: FormData) {
     };
   } catch (error) {
     console.error('Profile update error:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', error.message, error.stack);
+    }
     return {
       error: error instanceof Error ? error.message : 'Failed to update profile',
     };

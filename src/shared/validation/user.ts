@@ -74,15 +74,15 @@ export const profileFormSchema = z.object({
     .min(3, 'Username must be at least 3 characters')
     .max(30, 'Username cannot exceed 30 characters')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
-  displayName: z.string().min(2, 'Display name must be at least 2 characters').max(50, 'Display name cannot exceed 50 characters'),
-  bio: z.string().max(160, 'Bio cannot exceed 160 characters').optional(),
-  location: z.string().max(100, 'Location cannot exceed 100 characters').optional().or(z.literal('')),
-  website: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  twitter: z.string().max(15, 'Twitter username cannot exceed 15 characters').regex(/^[a-zA-Z0-9_]*$/, 'Twitter username can only contain letters, numbers, and underscores').optional().or(z.literal('')),
-  linkedin: z.string().max(30, 'LinkedIn username cannot exceed 30 characters').regex(/^[a-zA-Z0-9-]*$/, 'LinkedIn username can only contain letters, numbers, and hyphens').optional().or(z.literal('')),
-  instagram: z.string().max(30, 'Instagram username cannot exceed 30 characters').regex(/^[a-zA-Z0-9_.]*$/, 'Instagram username can only contain letters, numbers, dots, and underscores').optional().or(z.literal('')),
-  youtube: z.string().max(100, 'YouTube channel name cannot exceed 100 characters').optional().or(z.literal('')),
-  github: z.string().max(39, 'GitHub username cannot exceed 39 characters').regex(/^[a-zA-Z0-9-]*$/, 'GitHub username can only contain letters, numbers, and hyphens').optional().or(z.literal('')),
+  displayName: z.string().min(2, 'Display name must be at least 2 characters').max(50, 'Display name cannot exceed 50 characters').nullable().optional(),
+  bio: z.string().max(160, 'Bio cannot exceed 160 characters').nullable().optional(),
+  location: z.string().max(100, 'Location cannot exceed 100 characters').nullable().optional().or(z.literal('')),
+  website: z.string().url('Please enter a valid URL').nullable().optional().or(z.literal('')),
+  twitter: z.string().max(15, 'Twitter username cannot exceed 15 characters').regex(/^[a-zA-Z0-9_]*$/, 'Twitter username can only contain letters, numbers, and underscores').nullable().optional().or(z.literal('')),
+  linkedin: z.string().max(30, 'LinkedIn username cannot exceed 30 characters').regex(/^[a-zA-Z0-9-]*$/, 'LinkedIn username can only contain letters, numbers, and hyphens').nullable().optional().or(z.literal('')),
+  instagram: z.string().max(30, 'Instagram username cannot exceed 30 characters').regex(/^[a-zA-Z0-9_.]*$/, 'Instagram username can only contain letters, numbers, dots, and underscores').nullable().optional().or(z.literal('')),
+  youtube: z.string().max(100, 'YouTube channel name cannot exceed 100 characters').nullable().optional().or(z.literal('')),
+  github: z.string().max(39, 'GitHub username cannot exceed 39 characters').regex(/^[a-zA-Z0-9-]*$/, 'GitHub username can only contain letters, numbers, and hyphens').nullable().optional().or(z.literal('')),
 });
 
 export type ProfileFormData = z.infer<typeof profileFormSchema>; 

@@ -10,5 +10,8 @@ export default async function Dashboard() {
     redirect('/');
   }
 
+  // Onboarding check is handled by middleware
+  // If user reaches here, they've completed onboarding
+
   return <DashboardClient user={user} />;
 } 

@@ -101,6 +101,7 @@ export async function updateSession(request: NextRequest) {
     '/dashboard',
     '/create',
     '/settings',
+    '/me',
     '/lists/drafts',
   ];
 
@@ -113,6 +114,23 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
+  }
+
+  // Check if authenticated user needs onboarding (only on protected routes)
+  // This check is fast - just reading from user.user_metadata (already in memory, no DB call)
+  if (user && isProtectedRoute) {
+    // Check if username is in metadata (indicates onboarding is complete)
+    // This is O(1) - just reading a property from the user object
+    const hasUsername = user.user_metadata?.username;
+    
+    if (!hasUsername) {
+      // User needs onboarding - redirect to onboarding page
+      const url = request.nextUrl.clone();
+      url.pathname = '/onboarding';
+      // Preserve the original path as a redirect parameter so we can send them back after onboarding
+      url.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

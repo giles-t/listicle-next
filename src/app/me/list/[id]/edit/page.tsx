@@ -1,5 +1,5 @@
 import { db } from "@/src/server/db";
-import { listItems, lists, tags, listToTags } from "@/src/server/db/schema";
+import { listItems, lists, tags, listToTags, profiles } from "@/src/server/db/schema";
 import { asc, desc, eq } from "drizzle-orm";
 import EditListClient from "./EditListClient";
 import { notFound } from "next/navigation";
@@ -11,6 +11,7 @@ export default async function EditList({ params }: { params: { id: string } }) {
       id: lists.id,
       title: lists.title,
       description: lists.description,
+      slug: lists.slug,
       list_type: lists.list_type,
       is_published: lists.is_published,
       is_visible: lists.is_visible,
@@ -20,8 +21,11 @@ export default async function EditList({ params }: { params: { id: string } }) {
       seo_description: lists.seo_description,
       cover_image: lists.cover_image,
       publication_id: lists.publication_id,
+      user_id: lists.user_id,
+      username: profiles.username,
     })
     .from(lists)
+    .innerJoin(profiles, eq(lists.user_id, profiles.id))
     .where(eq(lists.id, id))
     .limit(1);
 
@@ -64,6 +68,8 @@ export default async function EditList({ params }: { params: { id: string } }) {
       seoDescription={row.seo_description || ""}
       coverImage={row.cover_image || undefined}
       publicationId={row.publication_id}
+      slug={row.slug}
+      username={row.username}
     />
   );
 }

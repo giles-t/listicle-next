@@ -5,14 +5,15 @@ import { relations } from 'drizzle-orm';
 export const listTypeEnum = pgEnum('list_type', ['ordered', 'unordered', 'reversed']);
 export const mediaTypeEnum = pgEnum('media_type', ['image', 'tweet', 'youtube', 'none']);
 export const publicationRoleEnum = pgEnum('publication_role', ['admin', 'editor', 'writer']);
-export const reactionTypeEnum = pgEnum('reaction_type', ['like', 'love', 'celebrate', 'insightful', 'curious']);
 
-// Users table
-export const users = pgTable('users', {
-  id: text('id').primaryKey(), // Supabase Auth UUID
+// Profiles table - contains public user data only
+// Email and auth data remain in auth.users
+// Foreign key to auth.users is set up in migration SQL
+// If a profile exists, it means the user has completed onboarding (username is required)
+export const profiles = pgTable('profiles', {
+  id: text('id').primaryKey(), // Supabase Auth UUID - references auth.users(id)
   username: varchar('username', { length: 30 }).notNull().unique(),
   name: varchar('name', { length: 50 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
   avatar: text('avatar'),
   bio: text('bio'),
   location: varchar('location', { length: 100 }),
@@ -26,12 +27,13 @@ export const users = pgTable('users', {
   updated_at: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Users relations
-export const usersRelations = relations(users, ({ many }) => ({
+// Profiles relations
+export const profilesRelations = relations(profiles, ({ many }) => ({
   lists: many(lists),
   comments: many(comments),
   reactions: many(reactions),
   publicationMembers: many(publicationMembers),
+  bookmarks: many(bookmarks),
 }));
 
 // Lists table
@@ -51,20 +53,21 @@ export const lists = pgTable('lists', {
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
   published_at: timestamp('published_at'),
-  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   publication_id: uuid('publication_id').references(() => publications.id),
 });
 
 // Lists relations
 export const listsRelations = relations(lists, ({ one, many }) => ({
-  user: one(users, {
+  user: one(profiles, {
     fields: [lists.user_id],
-    references: [users.id],
+    references: [profiles.id],
   }),
   items: many(listItems),
   comments: many(comments),
   reactions: many(reactions),
   tags: many(listToTags),
+  bookmarks: many(bookmarks),
   publication: one(publications, {
     fields: [lists.publication_id],
     references: [publications.id],
@@ -93,6 +96,7 @@ export const listItemsRelations = relations(listItems, ({ one, many }) => ({
   }),
   comments: many(comments),
   reactions: many(reactions),
+  bookmarks: many(bookmarks),
 }));
 
 // Tags table
@@ -135,7 +139,7 @@ export const comments = pgTable('comments', {
   content: text('content').notNull(),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
-  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
   list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
   parent_id: uuid('parent_id'),
@@ -143,9 +147,9 @@ export const comments = pgTable('comments', {
 
 // Comments relations
 export const commentsRelations = relations(comments, ({ one, many }) => ({
-  user: one(users, {
+  user: one(profiles, {
     fields: [comments.user_id],
-    references: [users.id],
+    references: [profiles.id],
   }),
   list: one(lists, {
     fields: [comments.list_id],
@@ -166,20 +170,20 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 // Reactions table
 export const reactions = pgTable('reactions', {
   id: uuid('id').defaultRandom().primaryKey(),
-  reaction_type: reactionTypeEnum('reaction_type').notNull(),
+  emoji: varchar('emoji', { length: 10 }).notNull(), // Store emoji character (supports multi-byte emojis)
   created_at: timestamp('created_at').defaultNow().notNull(),
-  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
   list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
 }, (t) => ({
-  unique_reaction: uniqueIndex('unique_reaction_idx').on(t.user_id, t.list_id, t.list_item_id, t.reaction_type),
+  unique_reaction: uniqueIndex('unique_reaction_idx').on(t.user_id, t.list_id, t.list_item_id, t.emoji),
 }));
 
 // Reactions relations
 export const reactionsRelations = relations(reactions, ({ one }) => ({
-  user: one(users, {
+  user: one(profiles, {
     fields: [reactions.user_id],
-    references: [users.id],
+    references: [profiles.id],
   }),
   list: one(lists, {
     fields: [reactions.list_id],
@@ -215,7 +219,7 @@ export const publicationMembers = pgTable('publication_members', {
   role: publicationRoleEnum('role').notNull().default('writer'),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
-  user_id: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   publication_id: uuid('publication_id').notNull().references(() => publications.id, { onDelete: 'cascade' }),
 }, (t) => ({
   unique_member: uniqueIndex('unique_member_idx').on(t.user_id, t.publication_id),
@@ -223,12 +227,40 @@ export const publicationMembers = pgTable('publication_members', {
 
 // Publication members relations
 export const publicationMembersRelations = relations(publicationMembers, ({ one }) => ({
-  user: one(users, {
+  user: one(profiles, {
     fields: [publicationMembers.user_id],
-    references: [users.id],
+    references: [profiles.id],
   }),
   publication: one(publications, {
     fields: [publicationMembers.publication_id],
     references: [publications.id],
+  }),
+}));
+
+// Bookmarks table
+export const bookmarks = pgTable('bookmarks', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
+}, (t) => ({
+  // Note: Unique constraints are handled via partial unique indexes in the migration
+  // to properly handle NULL values for list_item_id
+}));
+
+// Bookmarks relations
+export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
+  user: one(profiles, {
+    fields: [bookmarks.user_id],
+    references: [profiles.id],
+  }),
+  list: one(lists, {
+    fields: [bookmarks.list_id],
+    references: [lists.id],
+  }),
+  listItem: one(listItems, {
+    fields: [bookmarks.list_item_id],
+    references: [listItems.id],
   }),
 })); 

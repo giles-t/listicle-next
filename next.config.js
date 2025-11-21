@@ -11,16 +11,42 @@ const nextConfig = {
 
   // Image optimization
   images: {
-    domains: [
-      'images.unsplash.com',
-      'img.youtube.com',
-      'pbs.twimg.com',
-      'res.cloudinary.com',
-      'cdn.example.com', // Replace with your CDN domain
+    // Use remotePatterns for better security (Next.js 12.3+)
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+        pathname: '/storage/v1/object/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.public.blob.vercel-storage.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
     // Commented out for development
     // contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
