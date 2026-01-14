@@ -138,21 +138,21 @@ export function ItemEngagementBar({
             icon={<FeatherEye />}
             onClick={() => {}}
           >
-            {viewsCount}
+            {String(viewsCount ?? 0)}
           </Button>
           <Button
             variant="neutral-tertiary"
             icon={<FeatherSmile />}
             onClick={() => {}}
           >
-            {displayReactionsCount}
+            {String(displayReactionsCount ?? 0)}
           </Button>
           <Button
             variant="neutral-tertiary"
             icon={<FeatherMessageCircle />}
             onClick={handleComment}
           >
-            {commentsCount}
+            {String(commentsCount ?? 0)}
           </Button>
         </div>
         <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,7 @@ import { toast } from "@subframe/core";
 
 import { Avatar } from "@/ui/components/Avatar";
 import { Button } from "@/ui/components/Button";
-import { FeatherUpload } from "@subframe/core";
+import { FeatherUpload, FeatherLoader, FeatherCheck } from "@subframe/core";
 import { TextField } from "@/ui/components/TextField";
 import { TextArea } from "@/ui/components/TextArea";
 import { FeatherGlobe } from "@subframe/core";
@@ -19,6 +19,8 @@ import { FeatherYoutube } from "@subframe/core";
 import { FeatherGithub } from "@subframe/core";
 import { profileFormSchema, ProfileFormData } from "@/shared/validation/user";
 import { updateProfile, uploadAvatar } from "./actions";
+import { checkUsernameAvailability } from "@/src/app/onboarding/check-username";
+import { useAuth } from "@/client/hooks/use-auth";
 
 // Utility functions to extract usernames from URLs
 const extractTwitterUsername = (url: string): string => {
@@ -87,11 +89,14 @@ interface ProfileFormProps {
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const router = useRouter();
+  const { refreshSession } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
 
-  const form = useForm({
-    // resolver: zodResolver(profileFormSchema),
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: profile?.username || '',
       displayName: profile?.name || '',
@@ -106,17 +111,62 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, watch } = form;
+  const { register, handleSubmit, formState: { errors }, watch, setError, clearErrors } = form;
+  
+  const username = watch('username');
 
-  const onSubmit = async (data: any) => {
+  // Debounced username availability check
+  useEffect(() => {
+    // Skip if username is the same as the original profile username
+    if (username === profile?.username) {
+      setIsCheckingUsername(false);
+      setUsernameAvailable(null);
+      clearErrors('username');
+      return;
+    }
+
+    // Skip if username is too short or empty
+    if (!username || username.trim().length < 3) {
+      setIsCheckingUsername(false);
+      setUsernameAvailable(null);
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    setUsernameAvailable(null);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const result = await checkUsernameAvailability(username);
+        setIsCheckingUsername(false);
+        
+        if (!result.available) {
+          setUsernameAvailable(false);
+          setError('username', {
+            type: 'manual',
+            message: result.error || 'This username is not available',
+          });
+        } else {
+          setUsernameAvailable(true);
+          clearErrors('username');
+        }
+      } catch (error) {
+        setIsCheckingUsername(false);
+        console.error('Error checking username:', error);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [username, profile?.username, setError, clearErrors]);
+
+  const onSubmit = async (data: ProfileFormData) => {
     setIsSaving(true);
     
     try {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (value) {
-          formData.append(key, String(value));
-        }
+        // Always append all fields, even if empty (use empty string for null/undefined)
+        formData.append(key, value != null ? String(value) : '');
       });
 
       const result = await updateProfile(formData);
@@ -125,6 +175,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         toast.error(result.error);
       } else {
         toast.success(result.message || 'Profile updated successfully!');
+        // Refresh auth session to update TopNav username/name immediately
+        await refreshSession();
         router.refresh();
       }
     } catch (error) {
@@ -147,15 +199,22 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
       const result = await uploadAvatar(formData);
       
-      if (result.error) {
+      if (result?.error) {
+        console.error('Avatar upload error:', result.error);
         toast.error(result.error);
-      } else {
+      } else if (result?.success) {
         toast.success(result.message || 'Avatar updated successfully!');
+        // Refresh auth session to update TopNav avatar immediately
+        await refreshSession();
         router.refresh();
+      } else {
+        console.error('Unexpected result from uploadAvatar:', result);
+        toast.error('Failed to upload avatar');
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload avatar';
+      toast.error(errorMessage);
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -179,7 +238,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </span>
         <div className="flex w-full flex-col items-start gap-4">
           <span className="text-body-bold font-body-bold text-default-font">
-            Avatar
+            Picture
           </span>
           <div className="flex items-center gap-4">
             <Avatar
@@ -216,8 +275,20 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <TextField
           className="h-auto w-full flex-none"
           label="Username"
-          helpText={errors.username?.message || "This will be your unique identifier on the platform"}
+          helpText={
+            errors.username?.message || 
+            (isCheckingUsername ? "Checking availability..." : 
+             usernameAvailable === true ? "Username is available!" : 
+             "This will be your unique identifier on the platform")
+          }
           error={!!errors.username}
+          iconRight={
+            isCheckingUsername ? (
+              <FeatherLoader className="h-4 w-4 animate-spin text-subtext-color" />
+            ) : usernameAvailable === true ? (
+              <FeatherCheck className="h-4 w-4 text-success-600" />
+            ) : null
+          }
         >
           <TextField.Input
             placeholder="Choose a username"
@@ -342,7 +413,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <div className="flex w-full items-center justify-end gap-2">
         <Button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || isCheckingUsername || usernameAvailable === false}
         >
           {isSaving ? 'Saving...' : 'Save changes'}
         </Button>

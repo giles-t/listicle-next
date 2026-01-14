@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import React, { useState, useEffect, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { TextField } from "../../ui/components/TextField";
 import { FeatherSearch } from "@subframe/core";
 import { Button } from "../../ui/components/Button";
@@ -20,7 +20,6 @@ import LoginModal from "./auth/LoginModal";
 import SignupModal from "./auth/SignupModal";
 import { useAuth } from "../hooks/use-auth";
 import Link from "next/link";
-import { SkeletonText } from "../../ui/components/SkeletonText";
 
 interface UserProfile {
   id: string;
@@ -42,9 +41,17 @@ interface UserProfile {
 
 export function TopNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const { user, signOut } = useAuth();
+
+  // Prevent hydration mismatch by only rendering auth-dependent UI after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Hide TopNav on specific routes
   const shouldHide = pathname === '/create' || pathname.startsWith('/me/list/') || pathname === '/onboarding';
@@ -56,17 +63,50 @@ export function TopNav() {
     avatar: user.user_metadata?.avatar || null,
   } : null;
 
+  // Fetch unread notification count
+  const fetchUnreadCount = useCallback(async () => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/notifications/unread-count');
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadCount(data.count || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching unread count:', err);
+    }
+  }, [user]);
+
+  // Fetch unread count on mount and periodically
+  useEffect(() => {
+    if (user) {
+      fetchUnreadCount();
+      
+      // Refresh every 60 seconds
+      const interval = setInterval(fetchUnreadCount, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user, fetchUnreadCount]);
+
+  // Refetch when returning to the page (visibility change)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        fetchUnreadCount();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user, fetchUnreadCount]);
+
   const handleNewClick = () => {
     if (!user) {
       setIsLoginModalOpen(true);
-    }
-  };
-
-  const handleMyListsClick = () => {
-    if (!user) {
-      setIsLoginModalOpen(true);
-    } else {
-      window.location.href = '/me/lists';
     }
   };
 
@@ -74,8 +114,7 @@ export function TopNav() {
     if (!user) {
       setIsLoginModalOpen(true);
     } else {
-      // TODO: Implement notifications
-      console.log("Show notifications");
+      router.push('/notifications');
     }
   };
 
@@ -130,7 +169,7 @@ export function TopNav() {
         rightSlot={
           <>
             <div className="flex items-center justify-end gap-2">
-              {user ? (
+              {mounted && user ? (
                 <>
                   <Link href="/create">
                     <Button 
@@ -152,14 +191,21 @@ export function TopNav() {
                   </Button>
                 </>
               )}
-              {user && (
-                <IconButton 
-                  icon={<FeatherBell />}
-                  onClick={handleNotificationClick}
-                />
+              {mounted && user && (
+                <div className="relative">
+                  <IconButton 
+                    icon={<FeatherBell />}
+                    onClick={handleNotificationClick}
+                  />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-error-600 px-1.5 text-xs font-medium text-white">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
-            {user ? (
+            {mounted && user ? (
               <SubframeCore.DropdownMenu.Root>
                 <SubframeCore.DropdownMenu.Trigger asChild={true}>
                   <Avatar 
@@ -193,6 +239,18 @@ export function TopNav() {
                               icon={<FeatherList />}
                             >
                               My Lists
+                            </DropdownMenu.DropdownItem>
+                          </Link>
+                          <Link className="w-full" href="/notifications">
+                            <DropdownMenu.DropdownItem 
+                              icon={<FeatherBell />}
+                            >
+                              Notifications
+                              {unreadCount > 0 && (
+                                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-error-600 px-1.5 text-xs font-medium text-white">
+                                  {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
+                              )}
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <Link className="w-full" href="/settings">
@@ -236,4 +294,4 @@ export function TopNav() {
       />
     </>
   );
-} 
+}

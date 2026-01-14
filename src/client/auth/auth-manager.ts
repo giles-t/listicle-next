@@ -62,6 +62,21 @@ class AuthManager {
   isLoading() {
     return this.loading;
   }
+
+  /**
+   * Force refresh the session to get updated user metadata.
+   * Call this after server-side updates to user metadata (e.g., avatar upload).
+   */
+  async refreshSession() {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.refreshSession();
+    if (!error && data.session) {
+      this.user = data.session.user;
+      this.session = data.session;
+      this.notifyListeners();
+    }
+    return { data, error };
+  }
 }
 
 export const authManager = AuthManager.getInstance(); 

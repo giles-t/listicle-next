@@ -5,6 +5,7 @@ import { relations } from 'drizzle-orm';
 export const listTypeEnum = pgEnum('list_type', ['ordered', 'unordered', 'reversed']);
 export const mediaTypeEnum = pgEnum('media_type', ['image', 'tweet', 'youtube', 'none']);
 export const publicationRoleEnum = pgEnum('publication_role', ['admin', 'editor', 'writer']);
+export const notificationTypeEnum = pgEnum('notification_type', ['follow', 'comment', 'reaction_milestone', 'view_milestone']);
 
 // Profiles table - contains public user data only
 // Email and auth data remain in auth.users
@@ -34,6 +35,9 @@ export const profilesRelations = relations(profiles, ({ many }) => ({
   reactions: many(reactions),
   publicationMembers: many(publicationMembers),
   bookmarks: many(bookmarks),
+  followers: many(follows, { relationName: 'following' }),
+  following: many(follows, { relationName: 'follower' }),
+  notifications: many(notifications),
 }));
 
 // Lists table
@@ -53,6 +57,7 @@ export const lists = pgTable('lists', {
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
   published_at: timestamp('published_at'),
+  view_count: integer('view_count').notNull().default(0),
   user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   publication_id: uuid('publication_id').references(() => publications.id),
 });
@@ -85,6 +90,7 @@ export const listItems = pgTable('list_items', {
   sort_order: integer('sort_order').notNull().default(0),
   created_at: timestamp('created_at').defaultNow().notNull(),
   updated_at: timestamp('updated_at').defaultNow().notNull(),
+  view_count: integer('view_count').notNull().default(0),
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
 });
 
@@ -262,5 +268,62 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   listItem: one(listItems, {
     fields: [bookmarks.list_item_id],
     references: [listItems.id],
+  }),
+}));
+
+// Follows table
+export const follows = pgTable('follows', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  follower_id: text('follower_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  following_id: text('following_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  unique_follow: uniqueIndex('unique_follow_idx').on(t.follower_id, t.following_id),
+}));
+
+// Follows relations
+export const followsRelations = relations(follows, ({ one }) => ({
+  follower: one(profiles, {
+    fields: [follows.follower_id],
+    references: [profiles.id],
+    relationName: 'follower',
+  }),
+  following: one(profiles, {
+    fields: [follows.following_id],
+    references: [profiles.id],
+    relationName: 'following',
+  }),
+}));
+
+// Notifications table
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  type: notificationTypeEnum('type').notNull(),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  actor_id: text('actor_id').references(() => profiles.id, { onDelete: 'cascade' }),
+  list_id: uuid('list_id').references(() => lists.id, { onDelete: 'cascade' }),
+  comment_id: uuid('comment_id').references(() => comments.id, { onDelete: 'cascade' }),
+  milestone_count: integer('milestone_count'),
+  is_read: boolean('is_read').notNull().default(false),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Notifications relations
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(profiles, {
+    fields: [notifications.user_id],
+    references: [profiles.id],
+  }),
+  actor: one(profiles, {
+    fields: [notifications.actor_id],
+    references: [profiles.id],
+  }),
+  list: one(lists, {
+    fields: [notifications.list_id],
+    references: [lists.id],
+  }),
+  comment: one(comments, {
+    fields: [notifications.comment_id],
+    references: [comments.id],
   }),
 })); 

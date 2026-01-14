@@ -24,6 +24,7 @@ interface ListicleCardRootProps
   title?: React.ReactNode;
   description?: React.ReactNode;
   author?: React.ReactNode;
+  authorAvatar?: string;
   views?: React.ReactNode;
   likes?: React.ReactNode;
   comments?: React.ReactNode;
@@ -41,6 +42,7 @@ const ListicleCardRoot = React.forwardRef<
     title,
     description,
     author,
+    authorAvatar,
     views,
     likes,
     comments,
@@ -90,9 +92,9 @@ const ListicleCardRoot = React.forwardRef<
             <div className="flex items-center gap-2">
               <Avatar
                 size="small"
-                image="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"
+                image={authorAvatar}
               >
-                TS
+                {typeof author === 'string' ? author.charAt(0).toUpperCase() : 'U'}
               </Avatar>
               <div className="flex flex-col items-start">
                 {author ? (

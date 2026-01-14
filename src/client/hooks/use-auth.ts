@@ -179,6 +179,14 @@ export function useAuth() {
     }
   };
 
+  /**
+   * Force refresh the session to get updated user metadata.
+   * Call this after server-side updates to user metadata (e.g., avatar upload).
+   */
+  const refreshSession = async () => {
+    return authManager.refreshSession();
+  };
+
   return {
     user,
     session,
@@ -189,5 +197,6 @@ export function useAuth() {
     signOut,
     resetPassword,
     updatePassword,
+    refreshSession,
   };
 } 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Button } from "@/ui/components/Button";
 import { SkeletonText } from "@/ui/components/SkeletonText";
@@ -18,16 +18,20 @@ interface ReactionBarProps {
 // Quick access emojis
 const QUICK_EMOJIS = ["😊", "❤️", "👍", "🏆"];
 
+// Helper to create mutation keys (must match context)
+function getMutationKey(targetId: string | null, emoji: string): string {
+  return targetId === null ? `list:${emoji}` : `item:${targetId}:${emoji}`;
+}
+
 export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProps) {
-  const { reactions, isLoading: contextLoading, optimisticUpdate, resetPollInterval } = usePageReactions();
+  const { reactions, isLoading: contextLoading, updatingReactions, startMutation, completeMutation } = usePageReactions();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLDivElement>(null);
   
   // Auto-animate for smooth transitions when reactions are added/removed
   const [animationParent] = useAutoAnimate({
-    duration: 300,
+    duration: 200,
     easing: "ease-out",
   });
 
@@ -43,6 +47,12 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
   const userReactions = useMemo(() => {
     return targetReactions.filter(r => r.userHasReacted).map(r => r.emoji);
   }, [targetReactions]);
+
+  // Check if a specific reaction is currently updating
+  const isReactionUpdating = useCallback((emoji: string) => {
+    const key = getMutationKey(targetId, emoji);
+    return updatingReactions.has(key);
+  }, [targetId, updatingReactions]);
 
   // Close emoji picker when clicking outside
   useEffect(() => {
@@ -70,73 +80,59 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
     }
   }, [showEmojiPicker]);
 
-  const handleReactionClick = async (emoji: string) => {
+  const handleReactionClick = useCallback(async (emoji: string) => {
     if (!userId) {
       console.log("User must be logged in to react");
       return;
     }
 
-    if (isUpdating) return;
+    // Check if this specific reaction is already updating
+    if (isReactionUpdating(emoji)) return;
 
     const isUserReaction = userReactions.includes(emoji);
-    setIsUpdating(true);
+    const action = isUserReaction ? "remove" : "add";
 
-    // Optimistic update for immediate feedback
-    optimisticUpdate(targetId, emoji, isUserReaction ? "remove" : "add");
+    // Start mutation - applies optimistic update immediately
+    startMutation(targetId, emoji, action);
 
     try {
+      let response: Response;
+      
       if (isUserReaction) {
         // Remove reaction
-        const response = await fetch(
+        response = await fetch(
           `/api/lists/${listId}/reactions?emoji=${encodeURIComponent(emoji)}${targetId ? `&targetId=${encodeURIComponent(targetId)}` : ''}`,
-          {
-            method: "DELETE",
-          }
+          { method: "DELETE" }
         );
-
-        if (!response.ok) {
-          console.error("Failed to delete reaction");
-          // Revert optimistic update
-          optimisticUpdate(targetId, emoji, "add");
-        } else {
-          // Reset polling interval so next poll happens in 5s
-          resetPollInterval();
-        }
       } else {
         // Add reaction
-        const response = await fetch(`/api/lists/${listId}/reactions`, {
+        response = await fetch(`/api/lists/${listId}/reactions`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             emoji,
             targetId: targetId || undefined,
           }),
         });
+      }
 
-        if (!response.ok) {
-          console.error("Failed to add reaction");
-          // Revert optimistic update
-          optimisticUpdate(targetId, emoji, "remove");
-            } else {
-          // Reset polling interval so next poll happens in 5s
-          resetPollInterval();
-        }
+      // Complete mutation - will revert if failed
+      completeMutation(targetId, emoji, response.ok, action);
+      
+      if (!response.ok) {
+        console.error(`Failed to ${action} reaction`);
       }
     } catch (error) {
       console.error("Error toggling reaction:", error);
-      // Revert optimistic update
-      optimisticUpdate(targetId, emoji, isUserReaction ? "add" : "remove");
-    } finally {
-      setIsUpdating(false);
+      // Revert on error
+      completeMutation(targetId, emoji, false, action);
     }
-  };
+  }, [userId, userReactions, isReactionUpdating, targetId, listId, startMutation, completeMutation]);
 
-  const handleEmojiSelect = ({ emoji }: { emoji: string }) => {
+  const handleEmojiSelect = useCallback(({ emoji }: { emoji: string }) => {
     handleReactionClick(emoji);
     setShowEmojiPicker(false);
-  };
+  }, [handleReactionClick]);
 
   // Group reactions: quick emojis first, then others
   const quickReactions = useMemo(() => {
@@ -147,7 +143,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
   }, [targetReactions]);
 
   const otherReactions = useMemo(() => {
-    return targetReactions.filter((r) => !QUICK_EMOJIS.includes(r.emoji));
+    return targetReactions.filter((r) => !QUICK_EMOJIS.includes(r.emoji) && r.count > 0);
   }, [targetReactions]);
 
   if (contextLoading) {
@@ -175,71 +171,78 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
 
   return (
     <div className="flex w-full items-start rounded-md border border-solid border-neutral-border px-2 py-2 relative">
-      <div ref={animationParent} className="flex items-center gap-1 flex-wrap">
-        {/* Quick access emoji buttons */}
-        {quickReactions.map((reaction) => {
-          const isUserReaction = reaction.userHasReacted;
-          const showCount = reaction.count > 0;
+      <div className="flex items-center gap-1 flex-wrap">
+        {/* Animated container for reactions only */}
+        <div ref={animationParent} className="contents">
+          {/* Quick access emoji buttons */}
+          {quickReactions.map((reaction) => {
+            const isUserReaction = reaction.userHasReacted;
+            const showCount = reaction.count > 0;
+            const isUpdating = isReactionUpdating(reaction.emoji);
 
-          return (
-            <Button
-              key={reaction.emoji}
-              variant="neutral-tertiary"
-              size="small"
-              onClick={() => handleReactionClick(reaction.emoji)}
-              disabled={isUpdating}
-              className={`transition-all py-3.5 ${
-                isUserReaction 
-                  ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
-                  : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="text-xl">{reaction.emoji}</span>
-                {showCount && (
+            return (
+              <Button
+                key={reaction.emoji}
+                variant="neutral-tertiary"
+                size="small"
+                onClick={() => handleReactionClick(reaction.emoji)}
+                disabled={!userId}
+                className={`py-3.5 transition-colors duration-150 ${
+                  isUserReaction 
+                    ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
+                    : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
+                } ${isUpdating ? "opacity-70" : ""}`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="text-xl">{reaction.emoji}</span>
+                  {showCount && (
+                    <NumberFlow 
+                      value={reaction.count}
+                      transformTiming={{ duration: 250, easing: "ease-out" }}
+                      className={`text-sm font-medium tabular-nums ${
+                        isUserReaction ? "text-brand-700 dark:text-brand-300" : ""
+                      }`}
+                    />
+                  )}
+                </span>
+              </Button>
+            );
+          })}
+
+          {/* Other reactions - only show if they have counts */}
+          {otherReactions.map((reaction) => {
+            const isUserReaction = reaction.userHasReacted;
+            const isUpdating = isReactionUpdating(reaction.emoji);
+
+            return (
+              <Button
+                key={reaction.emoji}
+                variant="neutral-tertiary"
+                size="small"
+                onClick={() => handleReactionClick(reaction.emoji)}
+                disabled={!userId}
+                className={`py-3.5 transition-colors duration-150 ${
+                  isUserReaction 
+                    ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
+                    : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
+                } ${isUpdating ? "opacity-70" : ""}`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="text-xl">{reaction.emoji}</span>
                   <NumberFlow 
                     value={reaction.count}
-                    className={`text-sm font-medium ${
+                    transformTiming={{ duration: 250, easing: "ease-out" }}
+                    className={`text-sm font-medium tabular-nums ${
                       isUserReaction ? "text-brand-700 dark:text-brand-300" : ""
                     }`}
                   />
-                )}
-              </span>
-            </Button>
-          );
-        })}
+                </span>
+              </Button>
+            );
+          })}
+        </div>
 
-        {/* Other reactions */}
-        {otherReactions.map((reaction) => {
-          const isUserReaction = reaction.userHasReacted;
-
-          return (
-            <Button
-              key={reaction.emoji}
-              variant="neutral-tertiary"
-              size="small"
-              onClick={() => handleReactionClick(reaction.emoji)}
-              disabled={isUpdating}
-              className={`py-3.5 transition-all ${
-                isUserReaction 
-                  ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
-                  : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="text-xl">{reaction.emoji}</span>
-                <NumberFlow 
-                  value={reaction.count}
-                  className={`text-sm font-medium ${
-                    isUserReaction ? "text-brand-700 dark:text-brand-300" : ""
-                  }`}
-                />
-              </span>
-            </Button>
-          );
-        })}
-
-        {/* Add emoji button */}
+        {/* Add emoji button - OUTSIDE animated container to prevent jumping */}
         <div className="relative" ref={emojiButtonRef}>
           <Button
             className="py-3.5 !bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
@@ -247,14 +250,14 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
             size="small"
             icon={<FeatherPlus />}
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            disabled={isUpdating || !userId}
+            disabled={!userId}
           />
 
           {/* Emoji Picker Popover */}
           {showEmojiPicker && (
             <div
               ref={emojiPickerRef}
-              className="absolute top-full left-0 mt-2 z-50 shadow-lg rounded-lg border border-neutral-border"
+              className="absolute top-full left-0 mt-2 z-50 shadow-lg rounded-lg border border-neutral-border animate-in fade-in-0 zoom-in-95 duration-150"
             >
               <EmojiPicker.Root 
                 className="isolate flex h-[368px] w-fit flex-col bg-white dark:bg-neutral-900 rounded-lg"

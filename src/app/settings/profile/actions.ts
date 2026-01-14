@@ -2,7 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/server/supabase';
+import { put } from '@vercel/blob';
+import sharp from 'sharp';
+import { createClient, supabaseAdmin } from '@/server/supabase';
 import { updateUserProfile } from '@/server/db/queries/profiles';
 import { profileFormSchema, type ProfileFormData } from '@/shared/validation/user';
 
@@ -14,18 +16,18 @@ export async function updateProfile(formData: FormData) {
     redirect('/');
   }
 
-  // Extract form data
+  // Extract form data (convert null to empty string for optional fields)
   const rawFormData = {
-    username: formData.get('username') as string,
-    displayName: formData.get('displayName') as string,
-    bio: formData.get('bio') as string,
-    location: formData.get('location') as string,
-    website: formData.get('website') as string,
-    twitter: formData.get('twitter') as string,
-    linkedin: formData.get('linkedin') as string,
-    instagram: formData.get('instagram') as string,
-    youtube: formData.get('youtube') as string,
-    github: formData.get('github') as string,
+    username: (formData.get('username') as string) || '',
+    displayName: (formData.get('displayName') as string) || '',
+    bio: (formData.get('bio') as string) || '',
+    location: (formData.get('location') as string) || '',
+    website: (formData.get('website') as string) || '',
+    twitter: (formData.get('twitter') as string) || '',
+    linkedin: (formData.get('linkedin') as string) || '',
+    instagram: (formData.get('instagram') as string) || '',
+    youtube: (formData.get('youtube') as string) || '',
+    github: (formData.get('github') as string) || '',
   };
 
   // Validate form data
@@ -66,10 +68,10 @@ export async function updateProfile(formData: FormData) {
       };
     }
 
-    // Sync critical fields to auth metadata
+    // Sync critical fields to auth metadata using admin client (avoids session warning)
     try {
-      await supabase.auth.updateUser({
-        data: {
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        user_metadata: {
           username: profileData.username,
           name: profileData.displayName ?? undefined,
         }
@@ -99,63 +101,94 @@ export async function updateProfile(formData: FormData) {
 }
 
 export async function uploadAvatar(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/');
-  }
-
-  const file = formData.get('avatar') as File;
-  
-  if (!file) {
-    return {
-      error: 'No file provided',
-    };
-  }
-
-  // Validate file type and size
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  const maxSize = 2 * 1024 * 1024; // 2MB
-
-  if (!allowedTypes.includes(file.type)) {
-    return {
-      error: 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.',
-    };
-  }
-
-  if (file.size > maxSize) {
-    return {
-      error: 'File too large. Maximum size is 2MB.',
-    };
-  }
-
   try {
-    // Upload to Supabase storage
-    const fileName = `${user.id}-${Date.now()}.${file.name.split('.').pop()}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: true,
-      });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (uploadError) {
-      throw uploadError;
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return {
+        error: 'Authentication required',
+      };
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(fileName);
+    const file = formData.get('avatar') as File;
+    
+    if (!file) {
+      return {
+        error: 'No file provided',
+      };
+    }
 
-    // Update profile with new avatar URL directly in database
+    // Validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        error: 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.',
+      };
+    }
+
+    if (file.size > maxSize) {
+      return {
+        error: 'File too large. Maximum size is 2MB.',
+      };
+    }
+
+    console.log('Processing avatar upload:', {
+      fileSize: file.size,
+      fileType: file.type,
+      userId: user.id,
+    });
+
+    // Process image with sharp (optimize and resize for avatars)
+    const imageBuffer = Buffer.from(await file.arrayBuffer());
+    const processedBuffer = await sharp(imageBuffer)
+      .resize(400, 400, { 
+        fit: 'cover', // Crop to square
+        position: 'center',
+        withoutEnlargement: true 
+      })
+      .webp({ quality: 85 })
+      .toBuffer();
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const fileName = `avatars/${user.id}/${timestamp}-${randomSuffix}.webp`;
+
+    // Upload to Vercel Blob Storage
+    const blob = await put(fileName, processedBuffer, {
+      access: 'public',
+      contentType: 'image/webp',
+    });
+
+    console.log('Avatar uploaded successfully to Vercel Blob:', blob.url);
+
+    // Update profile with new avatar URL
     const updatedUser = await updateUserProfile(user.id, {
-      avatar: publicUrl,
+      avatar: blob.url,
     });
 
     if (!updatedUser) {
-      throw new Error('Failed to update profile with avatar');
+      console.error('Failed to update profile with avatar URL');
+      return {
+        error: 'Failed to update profile with avatar',
+      };
+    }
+
+    // Sync avatar to auth metadata using admin client (avoids session warning)
+    try {
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        user_metadata: {
+          avatar: blob.url,
+        }
+      });
+      console.log('Synced avatar to auth.users metadata');
+    } catch (metadataError) {
+      console.error('Failed to sync avatar metadata (non-critical):', metadataError);
+      // Don't fail the request if metadata sync fails
     }
 
     // Revalidate the settings page
@@ -164,12 +197,18 @@ export async function uploadAvatar(formData: FormData) {
     return {
       success: true,
       message: 'Avatar updated successfully!',
-      avatarUrl: publicUrl,
+      avatarUrl: blob.url,
     };
   } catch (error) {
     console.error('Avatar upload error:', error);
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : typeof error === 'string'
+      ? error
+      : 'Failed to upload avatar';
+    
     return {
-      error: error instanceof Error ? error.message : 'Failed to upload avatar',
+      error: errorMessage,
     };
   }
 } 

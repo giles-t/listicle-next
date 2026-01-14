@@ -15,6 +15,8 @@ import { EmptyItemContent } from "./EmptyItemContent";
 import { ReactionBarWrapper } from "./ReactionBarWrapper";
 import { PageContent } from "./PageContent";
 import { createClient } from "@/src/server/supabase";
+import { ViewTracker, ListViewTracker } from "./ViewTracker";
+import { getListViewCount, getItemViewCounts } from "@/src/server/db/queries/views";
 
 interface ViewListPageProps {
   params: Promise<{ username: string; slug: string }>;
@@ -80,6 +82,12 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
   const itemIds = items.map(item => item.id);
   const itemsStats = await getListItemsStats(itemIds);
 
+  // Fetch view counts from Redis
+  const [listViewCount, itemViewCounts] = await Promise.all([
+    getListViewCount(list.id),
+    getItemViewCounts(itemIds),
+  ]);
+
   // Fetch bookmarked items for current user (if authenticated)
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -87,7 +95,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
     ? await getBookmarkedListItems(user.id, list.id, itemIds)
     : new Set<string>();
 
-  const viewsCount = 0; // TODO: Implement views tracking
+  const viewsCount = listViewCount;
   const reactionsCount = list.likesCount ?? 0; // Now counts all reactions, not just likes
   const commentsCount = list.commentsCount ?? 0;
   const readTime = Math.max(1, Math.ceil(items.length * 0.5));
@@ -112,6 +120,10 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
 
   return (
     <PageContent listId={list.id}>
+      {/* View Tracking Components */}
+      <ListViewTracker listId={list.id} />
+      <ViewTracker listId={list.id} itemIds={itemIds} />
+      
       <article className="flex h-full w-full flex-col items-start bg-default-background page-scalable text-lg">
         {/* Header Section */}
         <div className="container max-w-none flex w-full flex-col items-start gap-8 bg-default-background py-12">
@@ -161,7 +173,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
             {list.list_type === 'unordered' ? (
               <ul className="list-disc list-outside w-full flex flex-col gap-12">
                 {items.map((item) => (
-                  <li key={item.id} className="list-item-marker">
+                  <li key={item.id} className="list-item-marker" data-item-id={item.id}>
                     <h2 className="text-heading-2 font-heading-2 text-default-font font-bold mb-4">
                       {item.title}
                     </h2>
@@ -176,7 +188,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
                       <ItemEngagementBar
                         listId={list.id}
                         itemId={item.id}
-                        viewsCount={itemsStats[item.id]?.viewsCount ?? 0}
+                        viewsCount={itemViewCounts[item.id] ?? 0}
                         reactionsCount={itemsStats[item.id]?.reactionsCount ?? 0}
                         commentsCount={itemsStats[item.id]?.commentsCount ?? 0}
                         initialBookmarked={bookmarkedItems.has(item.id)}
@@ -188,7 +200,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
             ) : list.list_type === 'reversed' ? (
               <ol className="list-decimal list-outside w-full flex flex-col gap-12" reversed>
                 {items.map((item) => (
-                  <li key={item.id} className="list-item-marker">
+                  <li key={item.id} className="list-item-marker" data-item-id={item.id}>
                     <h2 className="text-heading-2 font-heading-2 text-default-font font-bold mb-4">
                       {item.title}
                     </h2>
@@ -203,7 +215,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
                       <ItemEngagementBar
                         listId={list.id}
                         itemId={item.id}
-                        viewsCount={itemsStats[item.id]?.viewsCount ?? 0}
+                        viewsCount={itemViewCounts[item.id] ?? 0}
                         reactionsCount={itemsStats[item.id]?.reactionsCount ?? 0}
                         commentsCount={itemsStats[item.id]?.commentsCount ?? 0}
                         initialBookmarked={bookmarkedItems.has(item.id)}
@@ -215,7 +227,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
             ) : (
               <ol className="list-decimal list-outside w-full flex flex-col gap-12">
                 {items.map((item) => (
-                  <li key={item.id} className="list-item-marker">
+                  <li key={item.id} className="list-item-marker" data-item-id={item.id}>
                     <h2 className="text-heading-2 font-heading-2 text-default-font font-bold mb-4">
                       {item.title}
                     </h2>
@@ -230,7 +242,7 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
                       <ItemEngagementBar
                         listId={list.id}
                         itemId={item.id}
-                        viewsCount={itemsStats[item.id]?.viewsCount ?? 0}
+                        viewsCount={itemViewCounts[item.id] ?? 0}
                         reactionsCount={itemsStats[item.id]?.reactionsCount ?? 0}
                         commentsCount={itemsStats[item.id]?.commentsCount ?? 0}
                         initialBookmarked={bookmarkedItems.has(item.id)}

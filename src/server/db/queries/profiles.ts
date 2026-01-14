@@ -1,5 +1,5 @@
 import { db } from '../index';
-import { profiles, lists, reactions, comments } from '../schema';
+import { profiles, lists, reactions, comments, follows } from '../schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
 
 export interface CreateUserData {
@@ -142,13 +142,25 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     .innerJoin(lists, eq(comments.list_id, lists.id))
     .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
 
+  // Get followers count (people following this user)
+  const [followersResult] = await db
+    .select({ count: count() })
+    .from(follows)
+    .where(eq(follows.following_id, userId));
+
+  // Get following count (people this user is following)
+  const [followingResult] = await db
+    .select({ count: count() })
+    .from(follows)
+    .where(eq(follows.follower_id, userId));
+
   return {
     listsCount: listsCountResult?.count || 0,
     totalViews: 0, // TODO: Implement views tracking
     totalLikes: likesResult?.count || 0,
     totalComments: commentsResult?.count || 0,
-    followersCount: 0, // TODO: Implement follow system
-    followingCount: 0, // TODO: Implement follow system
+    followersCount: followersResult?.count || 0,
+    followingCount: followingResult?.count || 0,
   };
 }
 
@@ -196,8 +208,16 @@ export async function isFollowing(
   currentUserId: string,
   profileUserId: string
 ): Promise<boolean> {
-  // TODO: Implement follow system
-  return false;
+  const [result] = await db
+    .select({ id: follows.id })
+    .from(follows)
+    .where(and(
+      eq(follows.follower_id, currentUserId),
+      eq(follows.following_id, profileUserId)
+    ))
+    .limit(1);
+
+  return !!result;
 }
 
 /**

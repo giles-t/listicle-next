@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByUsername } from '@/server/db/queries/profiles';
+import { followUser, unfollowUser, isFollowing } from '@/server/db/queries/follows';
 import { ApiError } from '@/server/api-error';
 import { createClient } from '@/server/supabase';
 
@@ -34,12 +35,13 @@ export async function POST(
       throw ApiError.badRequest('Cannot follow yourself');
     }
 
-    // TODO: Implement follow system
-    // For now, return a placeholder response
+    // Follow the user
+    const result = await followUser(currentUser.id, targetUser.id);
+
     return NextResponse.json({
       success: true,
-      message: 'Follow functionality coming soon',
-      isFollowing: false,
+      isFollowing: true,
+      alreadyFollowing: result.alreadyFollowing,
     });
 
   } catch (error) {
@@ -84,12 +86,13 @@ export async function DELETE(
       throw ApiError.notFound('User not found');
     }
 
-    // TODO: Implement unfollow system
-    // For now, return a placeholder response
+    // Unfollow the user
+    const result = await unfollowUser(currentUser.id, targetUser.id);
+
     return NextResponse.json({
       success: true,
-      message: 'Unfollow functionality coming soon',
       isFollowing: false,
+      wasFollowing: result.wasFollowing,
     });
 
   } catch (error) {
@@ -106,4 +109,56 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}
+
+/**
+ * GET /api/profile/[username]/follow
+ * Check if the current user is following the target user
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { username: string } }
+) {
+  try {
+    const { username } = params;
+
+    if (!username) {
+      throw ApiError.badRequest('Username is required');
+    }
+
+    // Get current user from Supabase Auth
+    const supabase = await createClient();
+    const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !currentUser) {
+      // Not authenticated - return not following
+      return NextResponse.json({ isFollowing: false });
+    }
+
+    // Get target user profile
+    const targetUser = await getUserByUsername(username);
+    
+    if (!targetUser) {
+      throw ApiError.notFound('User not found');
+    }
+
+    // Check if following
+    const following = await isFollowing(currentUser.id, targetUser.id);
+
+    return NextResponse.json({ isFollowing: following });
+
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error('Check follow status API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

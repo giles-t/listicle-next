@@ -160,6 +160,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     title={list.title}
                     description={list.description || ""}
                     author={profile.name}
+                    authorAvatar={profile.avatar || undefined}
                     views={formatNumber(list.viewsCount)}
                     likes={formatNumber(list.likesCount)}
                     comments={formatNumber(list.commentsCount)}
