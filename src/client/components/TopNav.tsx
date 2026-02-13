@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { TextField } from "../../ui/components/TextField";
-import { FeatherSearch } from "@subframe/core";
-import { Button } from "../../ui/components/Button";
-import { FeatherPlusCircle } from "@subframe/core";
-import { IconButton } from "../../ui/components/IconButton";
 import { FeatherBell } from "@subframe/core";
-import { DropdownMenu } from "../../ui/components/DropdownMenu";
-import { FeatherUser } from "@subframe/core";
-import { FeatherSettings } from "@subframe/core";
-import { FeatherLogOut } from "@subframe/core";
+import { FeatherBookmark } from "@subframe/core";
 import { FeatherList } from "@subframe/core";
+import { FeatherLogOut } from "@subframe/core";
+import { FeatherPlusCircle } from "@subframe/core";
+import { FeatherSearch } from "@subframe/core";
+import { FeatherSettings } from "@subframe/core";
+import { FeatherUser } from "@subframe/core";
 import * as SubframeCore from "@subframe/core";
 import { Avatar } from "../../ui/components/Avatar";
+import { Button } from "../../ui/components/Button";
+import { DropdownMenu } from "../../ui/components/DropdownMenu";
+import { IconButton } from "../../ui/components/IconButton";
 import { TopbarWithSearch } from "../../ui/components/TopbarWithSearch";
 import LoginModal from "./auth/LoginModal";
 import SignupModal from "./auth/SignupModal";
@@ -145,51 +145,41 @@ export function TopNav() {
     return null;
   }
 
+  const handleSearchClick = () => {
+    router.push('/search');
+  };
+
   return (
     <>
       <TopbarWithSearch
         leftSlot={
-          <>
-            <Link href="/">
-              <img
-                className="h-6 flex-none object-cover"
-                src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
-              />
-            </Link>
-            <TextField
-              variant="filled"
-              label=""
-              helpText=""
-              icon={<FeatherSearch />}
-            >
-              <TextField.Input placeholder="Search" />
-            </TextField>
-          </>
+          <Link href="/">
+            <img
+              className="h-6 flex-none object-cover"
+              src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+            />
+          </Link>
         }
         rightSlot={
           <>
             <div className="flex items-center justify-end gap-2">
               {mounted && user ? (
-                <>
-                  <Link href="/create">
-                    <Button 
-                      variant="neutral-tertiary" 
-                      icon={<FeatherPlusCircle />}
-                    >
-                      New
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
+                <Link href="/create">
                   <Button 
                     variant="neutral-tertiary" 
                     icon={<FeatherPlusCircle />}
-                    onClick={handleNewClick}
                   >
                     New
                   </Button>
-                </>
+                </Link>
+              ) : (
+                <Button 
+                  variant="neutral-tertiary" 
+                  icon={<FeatherPlusCircle />}
+                  onClick={handleNewClick}
+                >
+                  New
+                </Button>
               )}
               {mounted && user && (
                 <div className="relative">
@@ -204,6 +194,10 @@ export function TopNav() {
                   )}
                 </div>
               )}
+              <IconButton 
+                icon={<FeatherSearch />}
+                onClick={handleSearchClick}
+              />
             </div>
             {mounted && user ? (
               <SubframeCore.DropdownMenu.Root>
@@ -239,6 +233,13 @@ export function TopNav() {
                               icon={<FeatherList />}
                             >
                               My Lists
+                            </DropdownMenu.DropdownItem>
+                          </Link>
+                          <Link className="w-full" href="/me/bookmarks">
+                            <DropdownMenu.DropdownItem 
+                              icon={<FeatherBookmark />}
+                            >
+                              Bookmarks
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <Link className="w-full" href="/notifications">

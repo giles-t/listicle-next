@@ -2,13 +2,12 @@
 /*
  * Documentation:
  * Context Menu — https://app.subframe.com/7b590a12c74e/library?component=Context+Menu_f8a49f07-fa5b-46c8-9399-cbbf0930cc62
- * Badge — https://app.subframe.com/7b590a12c74e/library?component=Badge_97bdb082-1124-4dd7-a335-b14b822d0157
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherStar } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ContextItemProps
   extends React.ComponentProps<typeof SubframeCore.ContextMenu.Item> {
@@ -33,7 +32,7 @@ const ContextItem = React.forwardRef<HTMLDivElement, ContextItemProps>(
       <SubframeCore.ContextMenu.Item asChild={true} {...otherProps}>
         <div
           className={SubframeUtils.twClassNames(
-            "group/9358ee78 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-neutral-100 active:bg-neutral-50 data-highlighted:bg-neutral-100",
+            "group/9358ee78 flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 hover:bg-neutral-100 active:bg-neutral-50 data-[highlighted]:bg-neutral-100",
             className
           )}
           ref={ref}

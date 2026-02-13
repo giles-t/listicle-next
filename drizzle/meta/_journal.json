@@ -50,6 +50,27 @@
       "when": 1766090565247,
       "tag": "0006_lame_mephisto",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1768418003430,
+      "tag": "0007_funny_zuras",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1769542011764,
+      "tag": "0008_tiny_mach_iv",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1769546229513,
+      "tag": "0009_furry_dreadnoughts",
+      "breakpoints": true
     }
   ]
 }

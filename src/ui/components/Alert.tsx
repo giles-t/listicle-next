@@ -2,13 +2,12 @@
 /*
  * Documentation:
  * Alert — https://app.subframe.com/7b590a12c74e/library?component=Alert_3a65613d-d546-467c-80f4-aaba6a7edcd5
- * Icon Button — https://app.subframe.com/7b590a12c74e/library?component=Icon+Button_af9405b1-8c54-4e01-9786-5aad308224f6
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherInfo } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface AlertRootProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {

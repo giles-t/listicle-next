@@ -7,11 +7,12 @@ import { useAuth } from "@/client/hooks/use-auth";
 
 interface FollowButtonProps {
   username: string;
+  profileUserId: string;
 }
 
-export function FollowButton({ username }: FollowButtonProps) {
-  const { user: currentUser } = useAuth();
-  const { isFollowing, isLoading: followLoading, followUser, unfollowUser } = useFollowUser(username);
+export function FollowButton({ username, profileUserId }: FollowButtonProps) {
+  const { user: currentUser, loading: authLoading } = useAuth();
+  const { isFollowing, isLoading: followLoading, isInitialLoading, followUser, unfollowUser } = useFollowUser(username);
 
   const handleFollowClick = () => {
     if (!currentUser) {
@@ -27,8 +28,17 @@ export function FollowButton({ username }: FollowButtonProps) {
     }
   };
 
-  // Don't show follow button if user is not authenticated or if it's their own profile
-  // Note: We can't check if it's own profile server-side, so we check client-side
+  // Don't render anything while auth is loading to prevent flash
+  if (authLoading) {
+    return null;
+  }
+
+  // Don't show follow button if viewing own profile
+  if (currentUser?.id === profileUserId) {
+    return null;
+  }
+
+  // Show follow button for non-authenticated users (will redirect to auth on click)
   if (!currentUser) {
     return (
       <Button
@@ -40,7 +50,18 @@ export function FollowButton({ username }: FollowButtonProps) {
     );
   }
 
-  // TODO: Add logic to check if viewing own profile and hide button
+  // Wait for initial follow status to load for authenticated users
+  if (isInitialLoading) {
+    return (
+      <Button
+        disabled
+        variant="neutral-secondary"
+      >
+        ...
+      </Button>
+    );
+  }
+
   return (
     <Button
       onClick={handleFollowClick}

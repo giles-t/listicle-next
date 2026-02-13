@@ -2,13 +2,11 @@
 /*
  * Documentation:
  * Topbar — https://app.subframe.com/7b590a12c74e/library?component=Topbar_220cd895-c058-4dcc-bc4d-33ed194639d8
- * Icon Button — https://app.subframe.com/7b590a12c74e/library?component=Icon+Button_af9405b1-8c54-4e01-9786-5aad308224f6
- * Button — https://app.subframe.com/7b590a12c74e/library?component=Button_3b777358-b86b-40af-9327-891efc6826fe
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface NavItemProps extends React.HTMLAttributes<HTMLDivElement> {
   selected?: boolean;

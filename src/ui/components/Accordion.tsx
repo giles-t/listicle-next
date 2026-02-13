@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ChevronProps
   extends React.ComponentProps<typeof SubframeCore.Collapsible.Chevron> {
@@ -85,16 +85,29 @@ interface AccordionRootProps
   extends React.ComponentProps<typeof SubframeCore.Collapsible.Root> {
   trigger?: React.ReactNode;
   children?: React.ReactNode;
+  open?: boolean;
   className?: string;
 }
 
 const AccordionRoot = React.forwardRef<HTMLDivElement, AccordionRootProps>(
   function AccordionRoot(
-    { trigger, children, className, ...otherProps }: AccordionRootProps,
+    {
+      trigger,
+      children,
+      open,
+      className,
+      defaultOpen = false,
+      ...otherProps
+    }: AccordionRootProps,
     ref
   ) {
     return (
-      <SubframeCore.Collapsible.Root asChild={true} {...otherProps}>
+      <SubframeCore.Collapsible.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        asChild={true}
+        {...otherProps}
+      >
         <div
           className={SubframeUtils.twClassNames(
             "group/d2e81e20 flex w-full flex-col items-start rounded-md",

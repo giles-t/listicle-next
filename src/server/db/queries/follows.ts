@@ -1,6 +1,6 @@
 import { db } from '../index';
 import { follows, profiles, notifications } from '../schema';
-import { eq, and, count } from 'drizzle-orm';
+import { eq, and, count, inArray } from 'drizzle-orm';
 
 export interface FollowCounts {
   followersCount: number;
@@ -115,6 +115,10 @@ export interface FollowerInfo {
   followed_at: Date;
 }
 
+export interface FollowerInfoWithStatus extends FollowerInfo {
+  isFollowing: boolean;
+}
+
 /**
  * Get list of followers for a user
  */
@@ -141,6 +145,41 @@ export async function getFollowers(
 }
 
 /**
+ * Get list of followers for a user with follow status for the current user
+ */
+export async function getFollowersWithStatus(
+  userId: string,
+  currentUserId: string | null,
+  limit: number = 50,
+  offset: number = 0
+): Promise<FollowerInfoWithStatus[]> {
+  const followers = await getFollowers(userId, limit, offset);
+
+  if (!currentUserId || followers.length === 0) {
+    return followers.map(f => ({ ...f, isFollowing: false }));
+  }
+
+  // Get who the current user is following among these followers
+  const followerIds = followers.map(f => f.id);
+  const followingStatus = await db
+    .select({ following_id: follows.following_id })
+    .from(follows)
+    .where(
+      and(
+        eq(follows.follower_id, currentUserId),
+        inArray(follows.following_id, followerIds)
+      )
+    );
+
+  const followingSet = new Set(followingStatus.map(f => f.following_id));
+
+  return followers.map(f => ({
+    ...f,
+    isFollowing: followingSet.has(f.id),
+  }));
+}
+
+/**
  * Get list of users that a user is following
  */
 export async function getFollowing(
@@ -163,4 +202,39 @@ export async function getFollowing(
     .offset(offset);
 
   return results;
+}
+
+/**
+ * Get list of users that a user is following with follow status for the current user
+ */
+export async function getFollowingWithStatus(
+  userId: string,
+  currentUserId: string | null,
+  limit: number = 50,
+  offset: number = 0
+): Promise<FollowerInfoWithStatus[]> {
+  const following = await getFollowing(userId, limit, offset);
+
+  if (!currentUserId || following.length === 0) {
+    return following.map(f => ({ ...f, isFollowing: false }));
+  }
+
+  // Get who the current user is following among these users
+  const followingIds = following.map(f => f.id);
+  const followingStatus = await db
+    .select({ following_id: follows.following_id })
+    .from(follows)
+    .where(
+      and(
+        eq(follows.follower_id, currentUserId),
+        inArray(follows.following_id, followingIds)
+      )
+    );
+
+  const followingSet = new Set(followingStatus.map(f => f.following_id));
+
+  return following.map(f => ({
+    ...f,
+    isFollowing: followingSet.has(f.id),
+  }));
 }

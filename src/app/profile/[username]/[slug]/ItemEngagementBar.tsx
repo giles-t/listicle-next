@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/ui/components/Button";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
-import { FeatherBookmark } from "@subframe/core";
 import { FeatherEye } from "@subframe/core";
 import { FeatherFlag } from "@subframe/core";
 import { FeatherLink } from "@subframe/core";
@@ -17,6 +16,9 @@ import * as SubframeCore from "@subframe/core";
 import { ReactionBar } from "./ReactionBar";
 import { usePageReactions } from "./PageReactionsContext";
 import { useAuth } from "@/client/hooks/use-auth";
+import { ReactionsDrawer } from "@/client/components/ReactionsDrawer";
+import { CommentsDrawer } from "@/client/components/CommentsDrawer";
+import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
 
 interface ItemEngagementBarProps {
   listId: string;
@@ -25,6 +27,7 @@ interface ItemEngagementBarProps {
   reactionsCount?: number;
   commentsCount?: number;
   initialBookmarked?: boolean;
+  initialCollectionId?: string | null;
 }
 
 export function ItemEngagementBar({
@@ -32,23 +35,20 @@ export function ItemEngagementBar({
   itemId,
   viewsCount = 0,
   reactionsCount = 0,
-  commentsCount = 0,
+  commentsCount: initialCommentsCount = 0,
   initialBookmarked = false,
+  initialCollectionId,
 }: ItemEngagementBarProps) {
   const { user } = useAuth();
   const { reactions } = usePageReactions();
-  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
-  const [isLoadingBookmark, setIsLoadingBookmark] = useState(false);
+  const [reactionsDrawerOpen, setReactionsDrawerOpen] = useState(false);
+  const [commentsDrawerOpen, setCommentsDrawerOpen] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
 
   // Calculate total reactions count from context
   const itemReactions = reactions.items[itemId] || [];
   const totalReactionsCount = itemReactions.reduce((sum, r) => sum + r.count, 0);
   const displayReactionsCount = totalReactionsCount > 0 ? totalReactionsCount : reactionsCount;
-
-  // Update bookmark state when initialBookmarked prop changes (e.g., after server-side fetch)
-  useEffect(() => {
-    setIsBookmarked(initialBookmarked);
-  }, [initialBookmarked]);
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -75,43 +75,6 @@ export function ItemEngagementBar({
     }
   };
 
-  const handleBookmark = async () => {
-    if (!user) {
-      toast.error('Please log in to bookmark items');
-      return;
-    }
-
-    // Optimistically update the UI
-    const previousState = isBookmarked;
-    const newState = !isBookmarked;
-    setIsBookmarked(newState);
-    
-    try {
-      const response = await fetch(`/api/lists/${listId}/items/${itemId}/bookmark`, {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setIsBookmarked(data.bookmarked);
-        toast.success(data.bookmarked ? 'Item bookmarked' : 'Bookmark removed');
-      } else if (response.status === 401) {
-        // Revert the state
-        setIsBookmarked(previousState);
-        toast.error('Please log in to bookmark items');
-      } else {
-        // Revert the state
-        setIsBookmarked(previousState);
-        toast.error('Failed to update bookmark');
-      }
-    } catch (error) {
-      // Revert the state
-      setIsBookmarked(previousState);
-      console.error('Error toggling bookmark:', error);
-      toast.error('Failed to update bookmark');
-    }
-  };
-
   const handleReport = () => {
     console.log('Report clicked for item:', itemId);
     // TODO: Implement report functionality
@@ -119,20 +82,17 @@ export function ItemEngagementBar({
   };
 
   const handleComment = () => {
-    // Scroll to comments section or open comment modal
-    const commentSection = document.getElementById(`comments-${itemId}`);
-    if (commentSection) {
-      commentSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      // TODO: Open comment modal or scroll to general comments
-      toast.info('Comments feature coming soon!');
-    }
+    setCommentsDrawerOpen(true);
+  };
+
+  const handleCommentAdded = () => {
+    // Could refresh comment count here if needed
   };
 
   return (
     <div className="flex w-full flex-col items-start gap-2">
       <div className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Button
             variant="neutral-tertiary"
             icon={<FeatherEye />}
@@ -143,7 +103,7 @@ export function ItemEngagementBar({
           <Button
             variant="neutral-tertiary"
             icon={<FeatherSmile />}
-            onClick={() => {}}
+            onClick={() => setReactionsDrawerOpen(true)}
           >
             {String(displayReactionsCount ?? 0)}
           </Button>
@@ -156,15 +116,12 @@ export function ItemEngagementBar({
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <IconButton
-            icon={
-              <FeatherBookmark 
-                className={isBookmarked ? "[&_path]:fill-current" : ""}
-              />
-            }
-            onClick={handleBookmark}
-            variant={isBookmarked ? "brand-tertiary" : "neutral-tertiary"}
-            disabled={isLoadingBookmark}
+          <AddBookmarkButton
+            listId={listId}
+            listItemId={itemId}
+            initialBookmarked={initialBookmarked}
+            initialCollectionId={initialCollectionId}
+            size="medium"
           />
           <IconButton
             icon={<FeatherShare2 />}
@@ -198,6 +155,21 @@ export function ItemEngagementBar({
         </div>
       </div>
       <ReactionBar listId={listId} targetId={itemId} userId={user?.id} />
+      <ReactionsDrawer
+        listId={listId}
+        itemId={itemId}
+        open={reactionsDrawerOpen}
+        onOpenChange={setReactionsDrawerOpen}
+        title="Item Reactions"
+      />
+      <CommentsDrawer
+        listId={listId}
+        itemId={itemId}
+        open={commentsDrawerOpen}
+        onOpenChange={setCommentsDrawerOpen}
+        title="Item Comments"
+        onCommentAdded={handleCommentAdded}
+      />
     </div>
   );
 }

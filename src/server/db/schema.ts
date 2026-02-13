@@ -6,6 +6,12 @@ export const listTypeEnum = pgEnum('list_type', ['ordered', 'unordered', 'revers
 export const mediaTypeEnum = pgEnum('media_type', ['image', 'tweet', 'youtube', 'none']);
 export const publicationRoleEnum = pgEnum('publication_role', ['admin', 'editor', 'writer']);
 export const notificationTypeEnum = pgEnum('notification_type', ['follow', 'comment', 'reaction_milestone', 'view_milestone']);
+export const categoryIconEnum = pgEnum('category_icon', [
+  'cpu', 'plane', 'utensils', 'heart', 'briefcase', 'activity', 
+  'film', 'graduation-cap', 'trophy', 'shirt', 'book', 'music',
+  'camera', 'home', 'car', 'gamepad', 'palette', 'globe'
+]);
+export const categoryColorEnum = pgEnum('category_color', ['brand', 'success', 'warning', 'error', 'neutral']);
 
 // Profiles table - contains public user data only
 // Email and auth data remain in auth.users
@@ -35,9 +41,11 @@ export const profilesRelations = relations(profiles, ({ many }) => ({
   reactions: many(reactions),
   publicationMembers: many(publicationMembers),
   bookmarks: many(bookmarks),
+  bookmarkCollections: many(bookmarkCollections),
   followers: many(follows, { relationName: 'following' }),
   following: many(follows, { relationName: 'follower' }),
   notifications: many(notifications),
+  categoryFollows: many(categoryFollows),
 }));
 
 // Lists table
@@ -77,6 +85,7 @@ export const listsRelations = relations(lists, ({ one, many }) => ({
     fields: [lists.publication_id],
     references: [publications.id],
   }),
+  categories: many(listToCategories),
 }));
 
 // List items table
@@ -84,6 +93,7 @@ export const listItems = pgTable('list_items', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 100 }).notNull(),
   content: text('content').notNull(),
+  image: text('image'), // Dedicated preview/thumbnail image
   media_url: text('media_url'),
   media_type: mediaTypeEnum('media_type').notNull().default('none'),
   alt_text: text('alt_text'),
@@ -243,6 +253,26 @@ export const publicationMembersRelations = relations(publicationMembers, ({ one 
   }),
 }));
 
+// Bookmark Collections table
+export const bookmarkCollections = pgTable('bookmark_collections', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+  unique_collection_name: uniqueIndex('unique_collection_name_idx').on(t.user_id, t.name),
+}));
+
+// Bookmark Collections relations
+export const bookmarkCollectionsRelations = relations(bookmarkCollections, ({ one, many }) => ({
+  user: one(profiles, {
+    fields: [bookmarkCollections.user_id],
+    references: [profiles.id],
+  }),
+  bookmarks: many(bookmarks),
+}));
+
 // Bookmarks table
 export const bookmarks = pgTable('bookmarks', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -250,6 +280,7 @@ export const bookmarks = pgTable('bookmarks', {
   user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
   list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
+  collection_id: uuid('collection_id').references(() => bookmarkCollections.id, { onDelete: 'set null' }),
 }, (t) => ({
   // Note: Unique constraints are handled via partial unique indexes in the migration
   // to properly handle NULL values for list_item_id
@@ -268,6 +299,10 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   listItem: one(listItems, {
     fields: [bookmarks.list_item_id],
     references: [listItems.id],
+  }),
+  collection: one(bookmarkCollections, {
+    fields: [bookmarks.collection_id],
+    references: [bookmarkCollections.id],
   }),
 }));
 
@@ -326,4 +361,66 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
     fields: [notifications.comment_id],
     references: [comments.id],
   }),
-})); 
+}));
+
+// Categories table
+export const categories = pgTable('categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: varchar('name', { length: 50 }).notNull().unique(),
+  slug: varchar('slug', { length: 50 }).notNull().unique(),
+  description: text('description'),
+  icon: categoryIconEnum('icon').notNull().default('globe'),
+  color: categoryColorEnum('color').notNull().default('brand'),
+  sort_order: integer('sort_order').notNull().default(0),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Categories relations
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  followers: many(categoryFollows),
+  lists: many(listToCategories),
+}));
+
+// Category follows table (users following categories)
+export const categoryFollows = pgTable('category_follows', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  category_id: uuid('category_id').notNull().references(() => categories.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  unique_category_follow: uniqueIndex('unique_category_follow_idx').on(t.user_id, t.category_id),
+}));
+
+// Category follows relations
+export const categoryFollowsRelations = relations(categoryFollows, ({ one }) => ({
+  user: one(profiles, {
+    fields: [categoryFollows.user_id],
+    references: [profiles.id],
+  }),
+  category: one(categories, {
+    fields: [categoryFollows.category_id],
+    references: [categories.id],
+  }),
+}));
+
+// List to Categories (junction table for list categories)
+export const listToCategories = pgTable('list_to_categories', {
+  list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  category_id: uuid('category_id').notNull().references(() => categories.id, { onDelete: 'cascade' }),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.list_id, t.category_id] }),
+}));
+
+// List to Categories relations
+export const listToCategoriesRelations = relations(listToCategories, ({ one }) => ({
+  list: one(lists, {
+    fields: [listToCategories.list_id],
+    references: [lists.id],
+  }),
+  category: one(categories, {
+    fields: [listToCategories.category_id],
+    references: [categories.id],
+  }),
+}));

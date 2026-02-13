@@ -3,6 +3,7 @@ import { createClient } from '@/src/server/supabase';
 import { db } from '@/src/server/db';
 import { listItems, lists } from '@/src/server/db/schema';
 import { and, asc, desc, eq } from 'drizzle-orm';
+import { extractImagesFromContent } from '@/shared/utils/extract-images';
 
 export async function GET(
   request: NextRequest,
@@ -196,7 +197,12 @@ export async function PUT(
 
     // Build update object
     const updateData: any = {};
-    if (content !== undefined) updateData.content = content;
+    if (content !== undefined) {
+      updateData.content = content;
+      // Automatically extract and save the first image from the content
+      const images = extractImagesFromContent(content);
+      updateData.image = images.length > 0 ? images[0] : null;
+    }
     if (sort_order !== undefined) updateData.sort_order = sort_order;
 
     if (Object.keys(updateData).length === 0) {

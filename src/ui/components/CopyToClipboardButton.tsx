@@ -6,9 +6,9 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherClipboard } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 import { Tooltip } from "./Tooltip";
 
 interface CopyToClipboardButtonRootProps

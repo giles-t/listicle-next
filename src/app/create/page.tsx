@@ -60,9 +60,8 @@ function CreateList() {
       const newList = await response.json();
       toast.success("List created successfully!");
       
-      // TODO: Navigate to the list editing page when it's implemented
-      // For now, navigate back to dashboard
-      router.push('/dashboard');
+      // Navigate to the list editing page
+      router.push(`/me/list/${newList.id}/edit`);
       
     } catch (error) {
       console.error('Error creating list:', error);

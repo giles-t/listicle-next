@@ -5,21 +5,34 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface OptionProps
   extends React.ComponentProps<typeof SubframeCore.RadioGroup.Item> {
   label?: React.ReactNode;
+  disabled?: boolean;
+  checked?: boolean;
   className?: string;
 }
 
 const Option = React.forwardRef<HTMLButtonElement, OptionProps>(function Option(
-  { label, className, ...otherProps }: OptionProps,
+  {
+    label,
+    disabled = false,
+    checked = false,
+    className,
+    ...otherProps
+  }: OptionProps,
   ref
 ) {
   return (
-    <SubframeCore.RadioGroup.Item asChild={true} {...otherProps}>
+    <SubframeCore.RadioGroup.Item
+      checked={checked}
+      disabled={disabled}
+      asChild={true}
+      {...otherProps}
+    >
       <button
         className={SubframeUtils.twClassNames(
           "group/0f804ad9 flex cursor-pointer items-center gap-2 border-none bg-transparent text-left disabled:cursor-default",
@@ -28,8 +41,8 @@ const Option = React.forwardRef<HTMLButtonElement, OptionProps>(function Option(
         ref={ref}
       >
         <div className="flex h-4 items-center gap-2">
-          <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-full border-2 border-solid border-neutral-300 bg-default-background group-active/0f804ad9:border-2 group-active/0f804ad9:border-solid group-active/0f804ad9:border-brand-700 group-aria-checked/0f804ad9:border-2 group-aria-checked/0f804ad9:border-solid group-aria-checked/0f804ad9:border-brand-600 group-disabled/0f804ad9:border-2 group-disabled/0f804ad9:border-solid group-disabled/0f804ad9:border-neutral-200 group-disabled/0f804ad9:bg-neutral-100 group-disabled/0f804ad9:group-active/0f804ad9:border-2 group-disabled/0f804ad9:group-active/0f804ad9:border-solid group-disabled/0f804ad9:group-active/0f804ad9:border-neutral-200">
-            <div className="hidden h-2 w-2 flex-none flex-col items-start gap-2 rounded-full bg-default-background group-aria-checked/0f804ad9:flex group-aria-checked/0f804ad9:bg-brand-600 group-disabled/0f804ad9:bg-neutral-200" />
+          <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-full border-2 border-solid border-neutral-300 bg-default-background group-active/0f804ad9:border-2 group-active/0f804ad9:border-solid group-active/0f804ad9:border-brand-700 group-aria-[checked=true]/0f804ad9:border-2 group-aria-[checked=true]/0f804ad9:border-solid group-aria-[checked=true]/0f804ad9:border-brand-600 group-disabled/0f804ad9:border-2 group-disabled/0f804ad9:border-solid group-disabled/0f804ad9:border-neutral-200 group-disabled/0f804ad9:bg-neutral-100 group-active/0f804ad9:group-disabled/0f804ad9:border-2 group-active/0f804ad9:group-disabled/0f804ad9:border-solid group-active/0f804ad9:group-disabled/0f804ad9:border-neutral-200">
+            <div className="hidden h-2 w-2 flex-none flex-col items-start gap-2 rounded-full bg-default-background group-aria-[checked=true]/0f804ad9:flex group-aria-[checked=true]/0f804ad9:bg-brand-600 group-disabled/0f804ad9:bg-neutral-200" />
           </div>
         </div>
         {label ? (

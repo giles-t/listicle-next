@@ -2,15 +2,11 @@
 /*
  * Documentation:
  * Table — https://app.subframe.com/7b590a12c74e/library?component=Table_142dfde7-d0cc-48a1-a04c-a08ab2252633
- * Badge — https://app.subframe.com/7b590a12c74e/library?component=Badge_97bdb082-1124-4dd7-a335-b14b822d0157
- * Dropdown Menu — https://app.subframe.com/7b590a12c74e/library?component=Dropdown+Menu_99951515-459b-4286-919e-a89e7549b43b
- * Icon Button — https://app.subframe.com/7b590a12c74e/library?component=Icon+Button_af9405b1-8c54-4e01-9786-5aad308224f6
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import { DropdownMenu } from "./DropdownMenu";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   children?: React.ReactNode;
@@ -95,7 +91,7 @@ const HeaderCell = React.forwardRef<HTMLDivElement, HeaderCellProps>(
       <th {...otherProps}>
         <div
           className={SubframeUtils.twClassNames(
-            "flex h-8 w-full items-center gap-1 px-3",
+            "flex h-8 w-full items-center gap-1 px-3 text-left",
             className
           )}
           ref={ref}

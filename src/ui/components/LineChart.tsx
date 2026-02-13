@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface LineChartRootProps
   extends React.ComponentProps<typeof SubframeCore.LineChart> {
@@ -25,12 +25,12 @@ const LineChartRoot = React.forwardRef<
       className={SubframeUtils.twClassNames("h-80 w-full", className)}
       ref={ref}
       colors={[
-        "#3b82f6",
-        "#bfdbfe",
-        "#2563eb",
-        "#93c5fd",
-        "#1d4ed8",
-        "#60a5fa",
+        "#6366f1",
+        "#c7d2fe",
+        "#4f46e5",
+        "#a5b4fc",
+        "#4338ca",
+        "#818cf8",
       ]}
       {...otherProps}
     />

@@ -10,7 +10,7 @@ import { ListActions } from "./ListActions";
 import { EngagementButtons } from "./EngagementButtons";
 import { ItemEngagementBar } from "./ItemEngagementBar";
 import { getListItemsStats } from "@/server/db/queries/list-items";
-import { getBookmarkedListItems } from "@/server/db/queries/bookmarks";
+import { getBookmarkedListItems, getExistingBookmark } from "@/server/db/queries/bookmarks";
 import { EmptyItemContent } from "./EmptyItemContent";
 import { ReactionBarWrapper } from "./ReactionBarWrapper";
 import { PageContent } from "./PageContent";
@@ -91,14 +91,17 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
   // Fetch bookmarked items for current user (if authenticated)
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const bookmarkedItems = user
-    ? await getBookmarkedListItems(user.id, list.id, itemIds)
-    : new Set<string>();
+  
+  // Fetch both list bookmark and item bookmarks in parallel
+  const [bookmarkedItems, listBookmark] = await Promise.all([
+    user ? getBookmarkedListItems(user.id, list.id, itemIds) : Promise.resolve(new Set<string>()),
+    user ? getExistingBookmark(user.id, list.id) : Promise.resolve(null),
+  ]);
 
   const viewsCount = listViewCount;
   const reactionsCount = list.likesCount ?? 0; // Now counts all reactions, not just likes
   const commentsCount = list.commentsCount ?? 0;
-  const readTime = Math.max(1, Math.ceil(items.length * 0.5));
+  const itemsCount = items.length;
 
   // Helper function to check if item content is empty
   const isContentEmpty = (content: any): boolean => {
@@ -144,20 +147,27 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
           <div className="flex w-full max-w-[768px] flex-col items-start gap-4">
             {/* Author & Meta Info */}
             <AuthorInfo
+              username={username}
+              authorUserId={list.user_id}
               authorName={list.author_name}
               authorAvatar={list.author_avatar}
-              readTime={readTime}
+              itemsCount={itemsCount}
               publishedAt={list.published_at}
             />
 
             {/* Stats & Actions Bar */}
             <div className="flex w-full items-center justify-between">
               <EngagementButtons
+                listId={list.id}
                 viewsCount={viewsCount}
                 reactionsCount={reactionsCount}
                 commentsCount={commentsCount}
               />
-              <ListActions listId={list.id} />
+              <ListActions 
+                listId={list.id} 
+                initialBookmarked={!!listBookmark}
+                initialCollectionId={listBookmark?.collection_id}
+              />
             </div>
 
             {/* Reaction Bar */}

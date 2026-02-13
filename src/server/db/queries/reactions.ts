@@ -1,5 +1,5 @@
 import { db } from '@/src/server/db';
-import { reactions } from '@/src/server/db/schema';
+import { reactions, profiles } from '@/src/server/db/schema';
 import { eq, and, sql, desc, isNull, inArray } from 'drizzle-orm';
 import { redis } from '@/src/server/redis';
 
@@ -319,5 +319,49 @@ export async function removeListItemReaction(
   );
 
   return { success: result.length > 0, reaction: result[0] };
+}
+
+/**
+ * Get all reactions for a list/item with user profile details
+ * Used for the reactions drawer to show who reacted with what
+ */
+export async function getReactionsWithProfiles(
+  listId: string,
+  listItemId?: string | null
+) {
+  try {
+    const result = await db
+      .select({
+        id: reactions.id,
+        emoji: reactions.emoji,
+        created_at: reactions.created_at,
+        user: {
+          id: profiles.id,
+          username: profiles.username,
+          name: profiles.name,
+          avatar: profiles.avatar,
+          bio: profiles.bio,
+        },
+      })
+      .from(reactions)
+      .innerJoin(profiles, eq(reactions.user_id, profiles.id))
+      .where(
+        listItemId
+          ? and(
+              eq(reactions.list_id, listId),
+              eq(reactions.list_item_id, listItemId)
+            )
+          : and(
+              eq(reactions.list_id, listId),
+              isNull(reactions.list_item_id)
+            )
+      )
+      .orderBy(desc(reactions.created_at));
+
+    return result;
+  } catch (error) {
+    console.error('[getReactionsWithProfiles] Error:', error);
+    return [];
+  }
 }
 

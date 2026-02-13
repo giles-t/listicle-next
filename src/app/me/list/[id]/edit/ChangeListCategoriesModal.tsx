@@ -6,12 +6,22 @@ import { Button } from "@/ui/components/Button";
 import { FilterChip } from "@/ui/components/FilterChip";
 import { TextField } from "@/ui/components/TextField";
 import { Dialog } from "@/ui/components/Dialog";
-import { FeatherHash } from "@subframe/core";
-import { FeatherSearch } from "@subframe/core";
+import { FeatherHash, FeatherSearch, FeatherLoader } from "@subframe/core";
 
 type Category = {
   id: string;
   name: string;
+};
+
+type APICategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  icon?: string;
+  color?: string;
+  followerCount?: number;
+  listCount?: number;
 };
 
 type Props = {
@@ -22,26 +32,20 @@ type Props = {
   loading?: boolean;
 };
 
-const POPULAR_CATEGORIES: Category[] = [
-  { id: "technology", name: "Technology" },
-  { id: "finance", name: "Finance" },
-  { id: "crypto", name: "Crypto" },
-  { id: "health", name: "Health" },
-  { id: "lifestyle", name: "Lifestyle" },
-  { id: "education", name: "Education" },
-  { id: "travel", name: "Travel" },
-  { id: "food", name: "Food" },
-  { id: "entertainment", name: "Entertainment" },
-  { id: "sports", name: "Sports" },
-  { id: "business", name: "Business" },
-  { id: "science", name: "Science" },
-];
-
 const MAX_CATEGORIES = 3;
 
 function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onConfirm, loading = false }: Props) {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>(initialCategories);
   const [searchQuery, setSearchQuery] = useState("");
+  const [availableCategories, setAvailableCategories] = useState<APICategory[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+
+  // Fetch categories from API when modal opens
+  useEffect(() => {
+    if (open && availableCategories.length === 0) {
+      fetchCategories();
+    }
+  }, [open]);
 
   // Reset selected categories when modal opens
   useEffect(() => {
@@ -51,22 +55,39 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
     }
   }, [open, initialCategories]);
 
-  const filteredCategories = POPULAR_CATEGORIES.filter(category =>
+  const fetchCategories = async () => {
+    setIsLoadingCategories(true);
+    try {
+      const res = await fetch("/api/categories", {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAvailableCategories(data.categories || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
+  const filteredCategories = availableCategories.filter(category =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    !selectedCategories.some(selected => selected.name.toLowerCase() === category.name.toLowerCase())
+    !selectedCategories.some(selected => selected.id === category.id)
   );
 
-  const handleCategoryToggle = (category: Category) => {
+  const handleCategoryToggle = (category: Category | APICategory) => {
     setSelectedCategories(prev => {
-      const isSelected = prev.some(selected => selected.name.toLowerCase() === category.name.toLowerCase());
+      const isSelected = prev.some(selected => selected.id === category.id);
       
       if (isSelected) {
         // Remove category
-        return prev.filter(selected => selected.name.toLowerCase() !== category.name.toLowerCase());
+        return prev.filter(selected => selected.id !== category.id);
       } else {
         // Add category if under limit
         if (prev.length < MAX_CATEGORIES) {
-          return [...prev, category];
+          return [...prev, { id: category.id, name: category.name }];
         }
         return prev;
       }
@@ -135,10 +156,15 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
           
           <div className="flex w-full flex-col items-start gap-2">
             <span className="text-caption-bold font-caption-bold text-subtext-color">
-              {searchQuery ? "Search results" : "Popular categories"}
+              {searchQuery ? "Search results" : "Available categories"}
             </span>
             <div className="flex w-full flex-wrap items-start gap-2">
-              {filteredCategories.length > 0 ? (
+              {isLoadingCategories ? (
+                <div className="flex items-center gap-2 py-4">
+                  <FeatherLoader className="animate-spin" />
+                  <span className="text-body font-body text-subtext-color">Loading categories...</span>
+                </div>
+              ) : filteredCategories.length > 0 ? (
                 filteredCategories.map(category => (
                   <FilterChip
                     key={category.id}
@@ -156,7 +182,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
                 </span>
               ) : (
                 <span className="text-body font-body text-subtext-color">
-                  All popular categories are already selected
+                  All categories are already selected
                 </span>
               )}
             </div>

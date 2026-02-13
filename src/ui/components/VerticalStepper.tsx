@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import { FeatherCheck } from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface StepProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "completed" | "active";

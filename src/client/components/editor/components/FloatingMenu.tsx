@@ -52,10 +52,8 @@ export function FloatingMenu({ editor, className }: FloatingMenuProps) {
   }
   
   const triggerAI = () => {
-    // Use the improve/enhance functionality
-    editor.chain().focus().aiGenerate({
-      action: 'improve',
-    }).run()
+    // Show AI menu for improving selected text
+    editor.chain().focus().aiGenerationShow().run()
   }
 
   if (showLinkInput) {

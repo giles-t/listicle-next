@@ -154,14 +154,14 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
           {QUICK_EMOJIS.map((_, index) => (
             <div
               key={index}
-              className="flex items-center gap-1.5 rounded-md bg-neutral-100 border border-solid border-transparent px-2 py-1 dark:bg-neutral-800"
+              className="flex items-center gap-1.5 rounded-md border border-solid border-transparent px-2 py-1 dark:bg-neutral-800"
             >
               <SkeletonText className="h-5 w-5 rounded-full flex-shrink-0" />
               <SkeletonText className="h-3.5 w-3.5 rounded flex-shrink-0" />
             </div>
           ))}
           {/* Skeleton for add button */}
-          <div className="flex items-center justify-center rounded-md bg-neutral-100 border border-solid border-transparent w-6 h-6 py-3.5 dark:bg-neutral-800">
+          <div className="flex items-center justify-center rounded-md border border-solid border-transparent w-6 h-6 py-3.5 dark:bg-neutral-800">
             <SkeletonText className="h-3.5 w-3.5 rounded" />
           </div>
         </div>
@@ -189,8 +189,8 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
                 disabled={!userId}
                 className={`py-3.5 transition-colors duration-150 ${
                   isUserReaction 
-                    ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
-                    : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
+                    ? "!bg-brand-50 !border !border-transparent hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
+                    : "!border !border-solid !border-transparent hover:!bg-neutral-100 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
                 } ${isUpdating ? "opacity-70" : ""}`}
               >
                 <span className="flex items-center gap-1.5">
@@ -223,8 +223,8 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
                 disabled={!userId}
                 className={`py-3.5 transition-colors duration-150 ${
                   isUserReaction 
-                    ? "!bg-brand-50 !border !border-solid !border-brand-300 hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
-                    : "!bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
+                    ? "!bg-brand-50 !border !border-transparent hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
+                    : " !border !border-solid !border-transparent hover:!bg-neutral-100 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
                 } ${isUpdating ? "opacity-70" : ""}`}
               >
                 <span className="flex items-center gap-1.5">
@@ -245,7 +245,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
         {/* Add emoji button - OUTSIDE animated container to prevent jumping */}
         <div className="relative" ref={emojiButtonRef}>
           <Button
-            className="py-3.5 !bg-neutral-100 !border !border-solid !border-transparent hover:!bg-neutral-200 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
+            className="py-3.5  !border !border-solid !border-transparent hover:!bg-neutral-100 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
             variant="neutral-tertiary"
             size="small"
             icon={<FeatherPlus />}

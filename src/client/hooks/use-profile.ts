@@ -83,6 +83,34 @@ export function useProfile(username: string) {
 export function useFollowUser(username: string) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  // Fetch initial follow status
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      try {
+        setIsInitialLoading(true);
+        const response = await fetch(`/api/profile/${username}/follow`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setIsFollowing(result.isFollowing);
+        }
+      } catch (err) {
+        // Silently fail - user might not be authenticated
+        console.error('Failed to check follow status:', err);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    if (username) {
+      checkFollowStatus();
+    }
+  }, [username]);
 
   const followUser = async () => {
     try {
@@ -137,6 +165,7 @@ export function useFollowUser(username: string) {
   return {
     isFollowing,
     isLoading,
+    isInitialLoading,
     followUser,
     unfollowUser,
   };

@@ -11,7 +11,7 @@ interface DefaultPageLayoutRootProps
 }
 
 const DefaultPageLayoutRoot = React.forwardRef<
-  HTMLElement,
+  HTMLDivElement,
   DefaultPageLayoutRootProps
 >(function DefaultPageLayoutRoot(
   { children, className, ...otherProps }: DefaultPageLayoutRootProps,
@@ -23,7 +23,7 @@ const DefaultPageLayoutRoot = React.forwardRef<
         "flex h-screen w-full flex-col items-center",
         className
       )}
-      ref={ref as any}
+      ref={ref}
       {...otherProps}
     >
       <TopNav />

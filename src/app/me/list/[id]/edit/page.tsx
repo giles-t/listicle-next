@@ -1,5 +1,5 @@
 import { db } from "@/src/server/db";
-import { listItems, lists, tags, listToTags, profiles } from "@/src/server/db/schema";
+import { listItems, lists, categories, listToCategories, profiles } from "@/src/server/db/schema";
 import { asc, desc, eq } from "drizzle-orm";
 import EditListClient from "./EditListClient";
 import { notFound } from "next/navigation";
@@ -42,15 +42,15 @@ export default async function EditList({ params }: { params: { id: string } }) {
     .where(eq(listItems.list_id, row.id))
     .orderBy(row.list_type === "reversed" ? desc(listItems.sort_order) : asc(listItems.sort_order));
 
-  // Fetch tags for this list
-  const listTags = await db
+  // Fetch categories for this list
+  const listCategories = await db
     .select({
-      id: tags.id,
-      name: tags.name,
+      id: categories.id,
+      name: categories.name,
     })
-    .from(tags)
-    .innerJoin(listToTags, eq(tags.id, listToTags.tag_id))
-    .where(eq(listToTags.list_id, row.id));
+    .from(categories)
+    .innerJoin(listToCategories, eq(categories.id, listToCategories.category_id))
+    .where(eq(listToCategories.list_id, row.id));
 
   return (
     <EditListClient
@@ -61,7 +61,7 @@ export default async function EditList({ params }: { params: { id: string } }) {
       title={row.title}
       description={row.description}
       items={items}
-      categories={listTags}
+      categories={listCategories}
       isPinned={row.is_pinned}
       allowComments={row.allow_comments}
       seoTitle={row.seo_title || ""}

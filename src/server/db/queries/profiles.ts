@@ -220,6 +220,93 @@ export async function isFollowing(
   return !!result;
 }
 
+export type SortOption = 'recent' | 'popular' | 'oldest';
+
+export interface PaginatedListsResult {
+  lists: UserListPreview[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+}
+
+/**
+ * Get user's published lists with pagination and sorting
+ */
+export async function getUserLists(
+  userId: string,
+  options: {
+    page?: number;
+    perPage?: number;
+    sort?: SortOption;
+  } = {}
+): Promise<PaginatedListsResult> {
+  const { page = 1, perPage = 10, sort = 'recent' } = options;
+  const offset = (page - 1) * perPage;
+
+  // Get total count
+  const [countResult] = await db
+    .select({ count: count() })
+    .from(lists)
+    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
+
+  const total = countResult?.count || 0;
+
+  // Determine sort order
+  let orderByClause;
+  switch (sort) {
+    case 'popular':
+      orderByClause = sql`(
+        SELECT COUNT(*) FROM ${reactions} 
+        WHERE ${reactions.list_id} = ${lists.id}
+      ) DESC`;
+      break;
+    case 'oldest':
+      orderByClause = sql`${lists.published_at} ASC`;
+      break;
+    case 'recent':
+    default:
+      orderByClause = sql`${lists.published_at} DESC`;
+      break;
+  }
+
+  const userLists = await db
+    .select({
+      id: lists.id,
+      title: lists.title,
+      description: lists.description,
+      slug: lists.slug,
+      cover_image: lists.cover_image,
+      is_published: lists.is_published,
+      created_at: lists.created_at,
+      published_at: lists.published_at,
+      likesCount: sql<number>`(
+        SELECT COUNT(*) FROM ${reactions} 
+        WHERE ${reactions.list_id} = ${lists.id}
+      )`.as('likesCount'),
+      commentsCount: sql<number>`(
+        SELECT COUNT(*) FROM ${comments} 
+        WHERE ${comments.list_id} = ${lists.id}
+      )`.as('commentsCount'),
+    })
+    .from(lists)
+    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)))
+    .orderBy(orderByClause)
+    .limit(perPage)
+    .offset(offset);
+
+  return {
+    lists: userLists.map(list => ({
+      ...list,
+      viewsCount: 0, // TODO: Implement views tracking
+    })),
+    total,
+    page,
+    perPage,
+    totalPages: Math.ceil(total / perPage),
+  };
+}
+
 /**
  * Get a published list by username and slug
  */

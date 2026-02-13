@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { EditorContent } from "@tiptap/react"
+import { EditorContent, EditorContext } from "@tiptap/react"
 import { useEditorConfig } from "./hooks/use-editor-config"
 import { FloatingMenu } from "./components/FloatingMenu"
 import type { MinimalEditorProps } from "./types"
@@ -40,6 +40,12 @@ export function MinimalEditor({
     aiToken,
   })
 
+  // Must call all hooks before any early returns to follow Rules of Hooks
+  const { shouldShow } = useFloatingToolbarVisibility({
+    editor,
+    isSelectionValid,
+  })
+
   React.useEffect(() => {
     if (editor && autoFocus) {
       editor.commands.focus()
@@ -54,41 +60,38 @@ export function MinimalEditor({
     )
   }
 
-  const { shouldShow } = useFloatingToolbarVisibility({
-    editor,
-    isSelectionValid,
-  })
-
   return (
-    <div className={`relative ${className || ""}`}>
-      <EditorContent 
-        editor={editor} 
-        className={
-          `minimal-editor-content prose prose-sm max-w-none text-default-font font-body focus-within:outline-hidden ` +
-          `[&_.ProseMirror]:outline-hidden [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed ` +
-          `[&_.ProseMirror_.is-empty:first-child:before]:content-[attr(data-placeholder)] [&_.ProseMirror_.is-empty:first-child:before]:text-neutral-400 ` +
-          `[&_.ProseMirror_.is-empty:first-child:before]:float-left [&_.ProseMirror_.is-empty:first-child:before]:h-0 [&_.ProseMirror_.is-empty:first-child:before]:pointer-events-none ` +
-          `[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ul,&_.ProseMirror_ol]:ml-6 [&_.ProseMirror_ul,&_.ProseMirror_ol]:my-2 [&_.ProseMirror_li]:my-1 ` +
-          `[&_.ProseMirror_h2]:text-heading-2 [&_.ProseMirror_h2]:font-heading-2 [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:mb-3 ` +
-          `[&_.ProseMirror_h3]:text-heading-3 [&_.ProseMirror_h3]:font-heading-3 [&_.ProseMirror_h3]:mt-5 [&_.ProseMirror_h3]:mb-2 ` +
-          `[&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-neutral-200 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:my-4 ` +
-          `[&_.ProseMirror_blockquote]:text-neutral-600 [&_.ProseMirror_blockquote]:italic ` +
-          `[&_.ProseMirror_code]:bg-neutral-100 [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:py-0.5 [&_.ProseMirror_code]:rounded ` +
-          `[&_.ProseMirror_code]:text-monospace-body [&_.ProseMirror_code]:font-monospace-body ` +
-          `[&_.ProseMirror_pre]:bg-neutral-50 [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-neutral-200 [&_.ProseMirror_pre]:rounded-md ` +
-          `[&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:text-monospace-body [&_.ProseMirror_pre]:font-monospace-body ` +
-          `[&_.ProseMirror_a]:text-brand-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a:hover]:text-brand-700 ` +
-          `[&_.ProseMirror_hr]:border-none [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-neutral-200 [&_.ProseMirror_hr]:my-6`
-        }
-      />
-      
-      {/* Slash Command Menu - using existing SlashDropdownMenu */}
-      <SlashDropdownMenu />
+    <EditorContext.Provider value={{ editor }}>
+      <div className={`relative ${className || ""}`}>
+        <EditorContent 
+          editor={editor} 
+          className={
+            `minimal-editor-content prose prose-sm max-w-none text-default-font font-body focus-within:outline-hidden ` +
+            `[&_.ProseMirror]:outline-hidden [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed ` +
+            `[&_.ProseMirror_.is-empty:first-child:before]:content-[attr(data-placeholder)] [&_.ProseMirror_.is-empty:first-child:before]:text-neutral-400 ` +
+            `[&_.ProseMirror_.is-empty:first-child:before]:float-left [&_.ProseMirror_.is-empty:first-child:before]:h-0 [&_.ProseMirror_.is-empty:first-child:before]:pointer-events-none ` +
+            `[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ul,&_.ProseMirror_ol]:ml-6 [&_.ProseMirror_ul,&_.ProseMirror_ol]:my-2 [&_.ProseMirror_li]:my-1 ` +
+            `[&_.ProseMirror_h2]:text-heading-2 [&_.ProseMirror_h2]:font-heading-2 [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:mb-3 ` +
+            `[&_.ProseMirror_h3]:text-heading-3 [&_.ProseMirror_h3]:font-heading-3 [&_.ProseMirror_h3]:mt-5 [&_.ProseMirror_h3]:mb-2 ` +
+            `[&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-neutral-200 [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:my-4 ` +
+            `[&_.ProseMirror_blockquote]:text-neutral-600 [&_.ProseMirror_blockquote]:italic ` +
+            `[&_.ProseMirror_code]:bg-neutral-100 [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:py-0.5 [&_.ProseMirror_code]:rounded ` +
+            `[&_.ProseMirror_code]:text-monospace-body [&_.ProseMirror_code]:font-monospace-body ` +
+            `[&_.ProseMirror_pre]:bg-neutral-50 [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-neutral-200 [&_.ProseMirror_pre]:rounded-md ` +
+            `[&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:text-monospace-body [&_.ProseMirror_pre]:font-monospace-body ` +
+            `[&_.ProseMirror_a]:text-brand-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a:hover]:text-brand-700 ` +
+            `[&_.ProseMirror_hr]:border-none [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-neutral-200 [&_.ProseMirror_hr]:my-6`
+          }
+        />
+        
+        {/* Slash Command Menu - using existing SlashDropdownMenu */}
+        <SlashDropdownMenu />
 
-      {/* Floating Menu for text selection - using existing FloatingElement */}
-      <FloatingElement shouldShow={shouldShow}>
-        <FloatingMenu editor={editor} />
-      </FloatingElement>
-    </div>
+        {/* Floating Menu for text selection - using existing FloatingElement */}
+        <FloatingElement shouldShow={shouldShow}>
+          <FloatingMenu editor={editor} />
+        </FloatingElement>
+      </div>
+    </EditorContext.Provider>
   )
 }

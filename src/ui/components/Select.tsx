@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
-import * as SubframeCore from "@subframe/core";
 import { FeatherCheck } from "@subframe/core";
 import { FeatherChevronDown } from "@subframe/core";
+import * as SubframeCore from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ItemProps
   extends Omit<React.ComponentProps<typeof SubframeCore.Select.Item>, "value"> {
@@ -29,7 +29,7 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
     >
       <div
         className={SubframeUtils.twClassNames(
-          "group/969e345b flex h-8 w-full cursor-pointer items-center gap-1 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-highlighted:bg-brand-50",
+          "group/969e345b flex h-8 w-full cursor-pointer items-center gap-1 rounded-md px-3 hover:bg-neutral-100 active:bg-neutral-50 data-[highlighted]:bg-brand-50",
           className
         )}
         ref={ref}
@@ -106,30 +106,32 @@ interface TriggerProps
   className?: string;
 }
 
-const Trigger = React.forwardRef<HTMLDivElement, TriggerProps>(function Trigger(
-  { placeholder, icon = null, className, ...otherProps }: TriggerProps,
-  ref
-) {
-  return (
-    <SubframeCore.Select.Trigger asChild={true} {...otherProps}>
-      <div
-        className={SubframeUtils.twClassNames(
-          "flex h-full w-full items-center gap-2 px-3",
-          className
-        )}
-        ref={ref}
-      >
-        {icon ? (
-          <SubframeCore.IconWrapper className="text-body font-body text-neutral-400">
-            {icon}
-          </SubframeCore.IconWrapper>
-        ) : null}
-        <Select.TriggerValue placeholder={placeholder as string} />
-        <FeatherChevronDown className="text-body font-body text-subtext-color" />
-      </div>
-    </SubframeCore.Select.Trigger>
-  );
-});
+const Trigger = React.forwardRef<HTMLButtonElement, TriggerProps>(
+  function Trigger(
+    { placeholder, icon = null, className, ...otherProps }: TriggerProps,
+    ref
+  ) {
+    return (
+      <SubframeCore.Select.Trigger asChild={true} {...otherProps}>
+        <button
+          className={SubframeUtils.twClassNames(
+            "flex h-full w-full items-center gap-2 px-3 text-left",
+            className
+          )}
+          ref={ref}
+        >
+          {icon ? (
+            <SubframeCore.IconWrapper className="text-body font-body text-neutral-400">
+              {icon}
+            </SubframeCore.IconWrapper>
+          ) : null}
+          <Select.TriggerValue placeholder={placeholder as string} />
+          <FeatherChevronDown className="text-body font-body text-subtext-color" />
+        </button>
+      </SubframeCore.Select.Trigger>
+    );
+  }
+);
 
 interface ItemTextProps
   extends React.ComponentProps<typeof SubframeCore.Select.ItemText> {
@@ -162,7 +164,7 @@ interface SelectRootProps
   extends React.ComponentProps<typeof SubframeCore.Select.Root> {
   disabled?: boolean;
   error?: boolean;
-  variant?: "outline-solid" | "filled";
+  variant?: "outline" | "filled";
   label?: React.ReactNode;
   placeholder?: React.ReactNode;
   helpText?: React.ReactNode;
@@ -178,7 +180,7 @@ const SelectRoot = React.forwardRef<HTMLDivElement, SelectRootProps>(
     {
       disabled = false,
       error = false,
-      variant = "outline-solid",
+      variant = "outline",
       label,
       placeholder,
       helpText,

@@ -8,8 +8,8 @@ const classNames = (...classes: (string | undefined | false)[]): string =>
 
 // Icons from your existing implementation
 import { BoldIcon } from "@/src/client/tiptap/components/tiptap-icons/bold-icon"
-import { Heading2Icon } from "@/src/client/tiptap/components/tiptap-icons/heading-two-icon"
-import { Heading3Icon } from "@/src/client/tiptap/components/tiptap-icons/heading-three-icon"
+import { HeadingTwoIcon } from "@/src/client/tiptap/components/tiptap-icons/heading-two-icon"
+import { HeadingThreeIcon } from "@/src/client/tiptap/components/tiptap-icons/heading-three-icon"
 import { ListIcon } from "@/src/client/tiptap/components/tiptap-icons/list-icon"
 import { ListOrderedIcon } from "@/src/client/tiptap/components/tiptap-icons/list-ordered-icon"
 import { BlockquoteIcon } from "@/src/client/tiptap/components/tiptap-icons/blockquote-icon"
@@ -36,14 +36,14 @@ export const useSlashMenuItems = (editor: Editor | null): SlashMenuItem[] => {
       {
         title: "Heading 2",
         description: "Big section heading",
-        icon: Heading2Icon,
+        icon: HeadingTwoIcon,
         command: (editor) => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         group: "Text"
       },
       {
         title: "Heading 3",
         description: "Medium section heading",
-        icon: Heading3Icon,
+        icon: HeadingThreeIcon,
         command: (editor) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
         group: "Text"
       },

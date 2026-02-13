@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
 import { FeatherChevronRight } from "@subframe/core";
+import * as SubframeUtils from "../utils";
 
 interface ItemProps extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode;

@@ -10,7 +10,7 @@ import {
   FeatherList,
   FeatherListRestart,
   FeatherEdit2,
-  FeatherTag,
+  // FeatherTag, // Disabled - categories are now AI-assigned
   FeatherImage,
   FeatherEye,
   FeatherFilePlus,
@@ -19,9 +19,11 @@ import {
   toast,
 } from "@subframe/core";
 import ChangeListTypeModal, { type ListType } from "./ChangeListTypeModal";
-import ChangeListTitleModal from "./ChangeListTitleModal";
-import ChangeListCategoriesModal from "./ChangeListCategoriesModal";
+// Manual category selection disabled - categories are now AI-assigned on publish
+// import ChangeListCategoriesModal from "./ChangeListCategoriesModal";
 import ChangeListVisibilityModal from "./ChangeListVisibilityModal";
+import { MinimalEditor } from "@/client/components/editor";
+import { TextField } from "@/ui/components/TextField";
 import ReorderListModal from "./ReorderListModal";
 import MoreSettingsModal from "./MoreSettingsModal";
 import ChangeCoverImageModal from "./ChangeCoverImageModal";
@@ -73,8 +75,7 @@ export default function EditListClient({
   username
 }: Props) {
   const [isChangeTypeOpen, setIsChangeTypeOpen] = useState(false);
-  const [isChangeTitleOpen, setIsChangeTitleOpen] = useState(false);
-  const [isChangeCategoriesOpen, setIsChangeCategoriesOpen] = useState(false);
+  // const [isChangeCategoriesOpen, setIsChangeCategoriesOpen] = useState(false); // Disabled - AI-assigned
   const [isChangeVisibilityOpen, setIsChangeVisibilityOpen] = useState(false);
   const [isReorderOpen, setIsReorderOpen] = useState(false);
   const [isMoreSettingsOpen, setIsMoreSettingsOpen] = useState(false);
@@ -87,14 +88,23 @@ export default function EditListClient({
   const [publishedState, setPublishedState] = useState(isPublished);
   const [visibleState, setVisibleState] = useState(isVisible);
   const [isSavingType, setIsSavingType] = useState(false);
-  const [isSavingTitle, setIsSavingTitle] = useState(false);
-  const [isSavingCategories, setIsSavingCategories] = useState(false);
+  // const [isSavingCategories, setIsSavingCategories] = useState(false); // Disabled - AI-assigned
   const [isSavingVisibility, setIsSavingVisibility] = useState(false);
   const [isSavingReorder, setIsSavingReorder] = useState(false);
   const [isSavingItem, setIsSavingItem] = useState(false);
   const [items, setItems] = useState<ListItem[]>(initialItems);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState<string>("");
+  
+  // Inline editing state for title
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editingTitleValue, setEditingTitleValue] = useState(initialTitle);
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  
+  // Inline editing state for description
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editingDescriptionValue, setEditingDescriptionValue] = useState(initialDescription || "");
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
   // More settings state
   const [isPinned, setIsPinned] = useState(initialIsPinned);
   const [allowComments, setAllowComments] = useState(initialAllowComments);
@@ -109,8 +119,7 @@ export default function EditListClient({
   // NewListItemForm now manages its own open/close state
 
   const openChangeType = () => setIsChangeTypeOpen(true);
-  const openChangeTitle = () => setIsChangeTitleOpen(true);
-  const openChangeCategories = () => setIsChangeCategoriesOpen(true);
+  // const openChangeCategories = () => setIsChangeCategoriesOpen(true); // Disabled - AI-assigned
   const openChangeVisibility = () => setIsChangeVisibilityOpen(true);
   const openReorder = () => setIsReorderOpen(true);
   const openMoreSettings = () => setIsMoreSettingsOpen(true);
@@ -187,50 +196,101 @@ export default function EditListClient({
     }
   };
 
-  const handleConfirmChangeTitle = async (newTitle: string, newSubtitle: string | null) => {
+  // Inline title editing handlers
+  const handleEditTitle = () => {
+    setEditingTitleValue(title);
+    setIsEditingTitle(true);
+  };
+  
+  const handleCancelEditTitle = () => {
+    setIsEditingTitle(false);
+    setEditingTitleValue(title);
+  };
+  
+  const handleSaveTitle = async () => {
     if (!listId) return;
+    const trimmedTitle = editingTitleValue.trim();
+    if (!trimmedTitle) {
+      toast.error("Title cannot be empty");
+      return;
+    }
     try {
       setIsSavingTitle(true);
       const res = await fetch(`/api/lists/${listId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ title: newTitle, description: newSubtitle }),
+        body: JSON.stringify({ title: trimmedTitle }),
       });
-      if (!res.ok) throw new Error("Failed to update title and subtitle");
+      if (!res.ok) throw new Error("Failed to update title");
       
-      setTitle(newTitle);
-      setDescription(newSubtitle);
-      setIsChangeTitleOpen(false);
-      toast.success("Title and subtitle updated");
+      setTitle(trimmedTitle);
+      setIsEditingTitle(false);
+      toast.success("Title updated");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to update title and subtitle");
+      toast.error(e instanceof Error ? e.message : "Failed to update title");
     } finally {
       setIsSavingTitle(false);
     }
   };
-
-  const handleConfirmChangeCategories = async (newCategories: Category[]) => {
+  
+  // Inline description editing handlers
+  const handleEditDescription = () => {
+    setEditingDescriptionValue(description || "");
+    setIsEditingDescription(true);
+  };
+  
+  const handleCancelEditDescription = () => {
+    setIsEditingDescription(false);
+    setEditingDescriptionValue(description || "");
+  };
+  
+  const handleSaveDescription = async () => {
     if (!listId) return;
     try {
-      setIsSavingCategories(true);
-      const res = await fetch(`/api/lists/${listId}/tags`, {
+      setIsSavingDescription(true);
+      // Convert empty string to null
+      const newDescription = editingDescriptionValue.trim() || null;
+      const res = await fetch(`/api/lists/${listId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ tags: newCategories }),
+        body: JSON.stringify({ description: newDescription }),
       });
-      if (!res.ok) throw new Error("Failed to update categories");
+      if (!res.ok) throw new Error("Failed to update description");
       
-      setCategories(newCategories);
-      setIsChangeCategoriesOpen(false);
-      toast.success("Categories updated");
+      setDescription(newDescription);
+      setIsEditingDescription(false);
+      toast.success("Description updated");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to update categories");
+      toast.error(e instanceof Error ? e.message : "Failed to update description");
     } finally {
-      setIsSavingCategories(false);
+      setIsSavingDescription(false);
     }
   };
+
+  // Manual category selection disabled - categories are now AI-assigned on publish
+  // const handleConfirmChangeCategories = async (newCategories: Category[]) => {
+  //   if (!listId) return;
+  //   try {
+  //     setIsSavingCategories(true);
+  //     const res = await fetch(`/api/lists/${listId}/categories`, {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       credentials: "include",
+  //       body: JSON.stringify({ categoryIds: newCategories.map(c => c.id) }),
+  //     });
+  //     if (!res.ok) throw new Error("Failed to update categories");
+  //     
+  //     setCategories(newCategories);
+  //     setIsChangeCategoriesOpen(false);
+  //     toast.success("Categories updated");
+  //   } catch (e) {
+  //     toast.error(e instanceof Error ? e.message : "Failed to update categories");
+  //   } finally {
+  //     setIsSavingCategories(false);
+  //   }
+  // };
 
   const handleConfirmChangeVisibility = async (isVisible: boolean) => {
     if (!listId) return;
@@ -358,8 +418,19 @@ export default function EditListClient({
       });
       if (!res.ok) throw new Error(`Failed to ${newPublishedState ? "publish" : "unpublish"} list`);
       
+      const data = await res.json();
       setPublishedState(newPublishedState);
+      
+      // Show toast for publish status
       toast.success(`List ${newPublishedState ? "published" : "unpublished"} successfully`);
+      
+      // Show additional toast if auto-categorization was applied
+      if (newPublishedState && data.autoCategorization?.applied) {
+        const categoryNames = data.autoCategorization.categories.map((c: any) => c.name).join(", ");
+        toast.success(`Auto-categorized as: ${categoryNames}`);
+        // Update local categories state
+        setCategories(data.autoCategorization.categories);
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to update publish status");
     } finally {
@@ -458,8 +529,8 @@ export default function EditListClient({
                     Change list type
                   </DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherListRestart />} onClick={openReorder}>Reorder List</DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={openChangeTitle}>Change title / subtitle</DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherTag />} onClick={openChangeCategories}>Change category</DropdownMenu.DropdownItem>
+                  {/* Category selection disabled - categories are now AI-assigned on publish */}
+                  {/* <DropdownMenu.DropdownItem icon={<FeatherTag />} onClick={openChangeCategories}>Change category</DropdownMenu.DropdownItem> */}
                   <DropdownMenu.DropdownItem icon={<FeatherImage />} onClick={openChangeCoverImage}>Change cover image</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherEye />} onClick={openChangeVisibility}>Manage list visibility</DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem icon={<FeatherFilePlus />} onClick={openAddToPublication}>Add to publication</DropdownMenu.DropdownItem>
@@ -476,11 +547,88 @@ export default function EditListClient({
       </div>
       <div className="container max-w-none flex w-full flex-col items-start gap-12 bg-default-background py-12">
         <div className="flex w-full flex-col items-center gap-8 px-4">
-          <div className="flex w-full max-w-[768px] flex-col items-start gap-4">
-            <h1 className="w-full text-heading-1 font-heading-1 text-default-font font-bold">{title}</h1>
-            {description ? (
-              <span className="w-full description-text">{description}</span>
-            ) : null}
+          <div className="flex w-full max-w-[768px] flex-col items-start gap-6">
+            {/* Inline Title Editing */}
+            {isEditingTitle ? (
+              <div className="w-full space-y-3 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <TextField className="w-full">
+                  <TextField.Input
+                    value={editingTitleValue}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingTitleValue(e.target.value)}
+                    placeholder="Enter a title..."
+                    className="text-heading-1 font-heading-1 font-bold"
+                    disabled={isSavingTitle}
+                  />
+                </TextField>
+                <div className="flex items-center gap-2">
+                  <Button size="small" onClick={handleSaveTitle} loading={isSavingTitle}>
+                    Save
+                  </Button>
+                  <Button variant="neutral-secondary" size="small" onClick={handleCancelEditTitle} disabled={isSavingTitle}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between w-full gap-4">
+                <h1 className="text-heading-1 font-heading-1 text-default-font font-bold">{title}</h1>
+                <Button
+                  variant="neutral-tertiary"
+                  size="small"
+                  icon={<FeatherEdit2 />}
+                  onClick={handleEditTitle}
+                >
+                  Edit
+                </Button>
+              </div>
+            )}
+            
+            {/* Inline Description Editing */}
+            {isEditingDescription ? (
+              <div className="w-full space-y-3 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <MinimalEditor
+                  content={editingDescriptionValue}
+                  onUpdate={setEditingDescriptionValue}
+                  placeholder="Add a description..."
+                />
+                <div className="flex items-center gap-2">
+                  <Button size="small" onClick={handleSaveDescription} loading={isSavingDescription}>
+                    Save
+                  </Button>
+                  <Button variant="neutral-secondary" size="small" onClick={handleCancelEditDescription} disabled={isSavingDescription}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : description ? (
+              <div className="flex items-start justify-between w-full gap-4">
+                <div className="flex-1">
+                  <StaticContentRenderer content={description} emptyMessage="" />
+                </div>
+                <Button
+                  variant="neutral-tertiary"
+                  size="small"
+                  icon={<FeatherEdit2 />}
+                  onClick={handleEditDescription}
+                >
+                  Edit
+                </Button>
+              </div>
+            ) : (
+              <div className="w-full flex items-center justify-center gap-3 border-2 border-dashed border-neutral-border rounded-lg p-6 bg-neutral-50 hover:bg-neutral-100 transition-colors">
+                <div className="flex flex-col items-center gap-3">
+                  <span className="text-subheader-3 font-subheader-3 text-neutral-400">No description added yet</span>
+                  <Button
+                    variant="neutral-secondary"
+                    size="small"
+                    icon={<FeatherEdit2 />}
+                    onClick={handleEditDescription}
+                  >
+                    Add description
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex w-full flex-col items-center gap-8 px-4">
@@ -582,21 +730,14 @@ export default function EditListClient({
         onConfirm={handleConfirmChangeType}
         loading={isSavingType}
       />
-      <ChangeListTitleModal
-        open={isChangeTitleOpen}
-        onOpenChange={setIsChangeTitleOpen}
-        initialTitle={title}
-        initialSubtitle={description}
-        onConfirm={handleConfirmChangeTitle}
-        loading={isSavingTitle}
-      />
-      <ChangeListCategoriesModal
+      {/* Category selection modal disabled - categories are now AI-assigned on publish */}
+      {/* <ChangeListCategoriesModal
         open={isChangeCategoriesOpen}
         onOpenChange={setIsChangeCategoriesOpen}
         initialCategories={categories}
         onConfirm={handleConfirmChangeCategories}
         loading={isSavingCategories}
-      />
+      /> */}
       <ChangeListVisibilityModal
         open={isChangeVisibilityOpen}
         onOpenChange={setIsChangeVisibilityOpen}

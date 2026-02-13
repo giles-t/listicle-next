@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
 import { db } from '@/src/server/db';
-import { lists, tags, listToTags } from '@/src/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { lists, tags, listToTags, listToCategories } from '@/src/server/db/schema';
+import { eq, and, count } from 'drizzle-orm';
+import { suggestCategoriesForList } from '@/server/ai/categorize';
 
 export async function DELETE(
   request: NextRequest,
@@ -210,9 +211,52 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update list' }, { status: 500 });
     }
 
+    // Auto-categorize when publishing for the first time
+    let autoCategorization = null;
+    if (body.is_published === true && !existingList[0].published_at) {
+      try {
+        // Check if the list already has categories
+        const [existingCategoryCount] = await db
+          .select({ count: count() })
+          .from(listToCategories)
+          .where(eq(listToCategories.list_id, listId));
+
+        // Only auto-categorize if no categories are set
+        if (existingCategoryCount.count === 0) {
+          console.log(`Auto-categorizing list ${listId} on first publish...`);
+          
+          const result = await suggestCategoriesForList(listId, 3);
+          
+          if (result.suggestions.length > 0) {
+            // Apply the suggested categories
+            await db
+              .insert(listToCategories)
+              .values(
+                result.suggestions.map(suggestion => ({
+                  list_id: listId,
+                  category_id: suggestion.id,
+                }))
+              );
+            
+            autoCategorization = {
+              applied: true,
+              categories: result.suggestions.map(s => ({ id: s.id, name: s.name, slug: s.slug })),
+              reasoning: result.reasoning,
+            };
+            
+            console.log(`Auto-categorized list ${listId} with categories:`, result.suggestions.map(s => s.name));
+          }
+        }
+      } catch (catError) {
+        // Log but don't fail the publish operation
+        console.error('Auto-categorization failed (publish will continue):', catError);
+        autoCategorization = { applied: false, error: 'Auto-categorization failed' };
+      }
+    }
 
     return NextResponse.json({
       ...updatedList,
+      autoCategorization,
       message: 'List updated successfully'
     });
 

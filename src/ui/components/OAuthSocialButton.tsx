@@ -11,6 +11,7 @@ interface OAuthSocialButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   logo?: string;
+  disabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
 }
@@ -22,6 +23,7 @@ const OAuthSocialButtonRoot = React.forwardRef<
   {
     children,
     logo,
+    disabled = false,
     className,
     type = "button",
     ...otherProps
@@ -31,11 +33,12 @@ const OAuthSocialButtonRoot = React.forwardRef<
   return (
     <button
       className={SubframeUtils.twClassNames(
-        "group/f1948f75 flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-4 hover:bg-neutral-50 active:bg-white disabled:cursor-default disabled:bg-white hover:disabled:cursor-default hover:disabled:bg-white active:disabled:cursor-default active:disabled:bg-white",
+        "group/f1948f75 flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-4 text-left hover:bg-neutral-50 active:bg-white disabled:cursor-default disabled:bg-white hover:disabled:cursor-default hover:disabled:bg-white active:disabled:cursor-default active:disabled:bg-white",
         className
       )}
       ref={ref}
       type={type}
+      disabled={disabled}
       {...otherProps}
     >
       {logo ? (
