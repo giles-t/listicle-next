@@ -71,6 +71,8 @@ export interface NotionEditorProps {
   content?: string
   onUpdate?: (content: string) => void
   aiToken?: string | null
+  onBlur?: () => void
+  autoFocus?: boolean
 }
 
 export interface EditorProviderProps {
@@ -78,6 +80,8 @@ export interface EditorProviderProps {
   aiToken: string | null | undefined
   content?: string
   onUpdate?: (content: string) => void
+  onBlur?: () => void
+  autoFocus?: boolean
 }
 
 /**
@@ -159,8 +163,8 @@ export function EditorContentArea() {
  * Component that creates and provides the editor instance
  */
 export function EditorProvider(props: EditorProviderProps) {
-  const { placeholder = "Start writing...", aiToken, content, onUpdate } = props
-  
+  const { placeholder = "Start writing...", aiToken, content, onUpdate, onBlur, autoFocus } = props
+
   // Debug logging
   console.log('EditorProvider aiToken:', aiToken)
 
@@ -187,6 +191,9 @@ export function EditorProvider(props: EditorProviderProps) {
         const jsonContent = editor.getJSON()
         onUpdate(JSON.stringify(jsonContent))
       }
+    },
+    onBlur: () => {
+      if (onBlur) onBlur()
     },
     editorProps: {
       attributes: {
@@ -356,6 +363,14 @@ export function EditorProvider(props: EditorProviderProps) {
     ],
   })
 
+  React.useEffect(() => {
+    if (editor && autoFocus) {
+      // Small delay to ensure editor is fully mounted
+      const id = requestAnimationFrame(() => editor.commands.focus('end'))
+      return () => cancelAnimationFrame(id)
+    }
+  }, [editor, autoFocus])
+
   if (!editor) {
     return <LoadingSpinner />
   }
@@ -377,14 +392,18 @@ export function NotionEditor({
   content,
   onUpdate,
   aiToken,
+  onBlur,
+  autoFocus,
 }: NotionEditorProps) {
   return (
     <AppProvider>
-      <NotionEditorContent 
+      <NotionEditorContent
         placeholder={placeholder}
         content={content}
         onUpdate={onUpdate}
         aiToken={aiToken}
+        onBlur={onBlur}
+        autoFocus={autoFocus}
       />
     </AppProvider>
   )
@@ -393,16 +412,20 @@ export function NotionEditor({
 /**
  * Internal component that handles the editor loading state
  */
-export function NotionEditorContent({ 
-  placeholder, 
-  content, 
+export function NotionEditorContent({
+  placeholder,
+  content,
   onUpdate,
-  aiToken
-}: { 
+  aiToken,
+  onBlur,
+  autoFocus,
+}: {
   placeholder?: string
   content?: string
   onUpdate?: (content: string) => void
   aiToken?: string | null
+  onBlur?: () => void
+  autoFocus?: boolean
 }) {
   return (
     <EditorProvider
@@ -410,6 +433,8 @@ export function NotionEditorContent({
       aiToken={aiToken}
       content={content}
       onUpdate={onUpdate}
+      onBlur={onBlur}
+      autoFocus={autoFocus}
     />
   )
 }

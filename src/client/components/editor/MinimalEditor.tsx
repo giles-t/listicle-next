@@ -29,6 +29,7 @@ export function MinimalEditor({
   content,
   placeholder = "Start writing...",
   onUpdate,
+  onBlur,
   aiToken,
   className,
   autoFocus = false,
@@ -37,6 +38,7 @@ export function MinimalEditor({
     content,
     placeholder,
     onUpdate,
+    onBlur,
     aiToken,
   })
 
@@ -48,7 +50,7 @@ export function MinimalEditor({
 
   React.useEffect(() => {
     if (editor && autoFocus) {
-      editor.commands.focus()
+      editor.commands.focus('end')
     }
   }, [editor, autoFocus])
 
@@ -62,9 +64,9 @@ export function MinimalEditor({
 
   return (
     <EditorContext.Provider value={{ editor }}>
-      <div className={`relative ${className || ""}`}>
-        <EditorContent 
-          editor={editor} 
+      <div className="relative">
+        <EditorContent
+          editor={editor}
           className={
             `minimal-editor-content prose prose-sm max-w-none text-default-font font-body focus-within:outline-hidden ` +
             `[&_.ProseMirror]:outline-hidden [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:text-sm [&_.ProseMirror]:leading-relaxed ` +
@@ -80,7 +82,8 @@ export function MinimalEditor({
             `[&_.ProseMirror_pre]:bg-neutral-50 [&_.ProseMirror_pre]:border [&_.ProseMirror_pre]:border-neutral-200 [&_.ProseMirror_pre]:rounded-md ` +
             `[&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:text-monospace-body [&_.ProseMirror_pre]:font-monospace-body ` +
             `[&_.ProseMirror_a]:text-brand-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_a:hover]:text-brand-700 ` +
-            `[&_.ProseMirror_hr]:border-none [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-neutral-200 [&_.ProseMirror_hr]:my-6`
+            `[&_.ProseMirror_hr]:border-none [&_.ProseMirror_hr]:border-t [&_.ProseMirror_hr]:border-neutral-200 [&_.ProseMirror_hr]:my-6` +
+            (className ? ` ${className}` : ``)
           }
         />
         
