@@ -29,6 +29,7 @@ export interface UseEditorConfigProps {
   content?: string
   placeholder?: string
   onUpdate?: (content: string) => void
+  onBlur?: () => void
   aiToken?: string | null
 }
 
@@ -36,6 +37,7 @@ export function useEditorConfig({
   content = "",
   placeholder = "Start writing...",
   onUpdate,
+  onBlur,
   aiToken
 }: UseEditorConfigProps) {
   // Parse content - could be JSON or HTML
@@ -61,6 +63,9 @@ export function useEditorConfig({
         const jsonContent = editor.getJSON()
         onUpdate(JSON.stringify(jsonContent))
       }
+    },
+    onBlur: () => {
+      if (onBlur) onBlur()
     },
     editorProps: {
       attributes: {

@@ -15,7 +15,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [newItemTitle, setNewItemTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const inputRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLHeadingElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
@@ -81,19 +81,18 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
           <form ref={formRef} className="flex w-full max-w-[768px] flex-col items-start gap-6" onSubmit={handleSubmit}>
             <div className="relative w-full">
               {newItemTitle === "" ? (
-                <span className="pointer-events-none absolute left-0 top-0 text-heading-2 font-heading-2 text-neutral-400">
+                <span className="pointer-events-none absolute left-0 top-0 text-heading-2 font-heading-2 font-bold text-neutral-400">
                   New Item Title
                 </span>
               ) : null}
-              <div
-                className="w-full whitespace-pre-wrap p-0 text-heading-2 font-heading-2 text-default-font outline-hidden"
+              <h2
+                className="w-full whitespace-pre-wrap p-0 m-0 text-heading-2 font-heading-2 text-default-font font-bold outline-hidden"
                 contentEditable={!isSubmitting}
                 aria-label="New Item Title"
-                aria-multiline="true"
                 dir="auto"
                 role="textbox"
                 ref={inputRef}
-                onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+                onKeyDown={(event: React.KeyboardEvent<HTMLHeadingElement>) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
                     if (!isSubmitting) {
@@ -101,11 +100,11 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
                     }
                   }
                 }}
-                onInput={(event: React.FormEvent<HTMLDivElement>) => {
+                onInput={(event: React.FormEvent<HTMLHeadingElement>) => {
                   const text = event.currentTarget.textContent || "";
                   setNewItemTitle(text);
                 }}
-                onPaste={(event: React.ClipboardEvent<HTMLDivElement>) => {
+                onPaste={(event: React.ClipboardEvent<HTMLHeadingElement>) => {
                   event.preventDefault();
                   const text = event.clipboardData
                     .getData("text/plain")

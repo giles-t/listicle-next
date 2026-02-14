@@ -57,6 +57,12 @@ body {
     line-height: 1.2 !important;
   }
   
+  /* Inline editable elements - no visible focus ring */
+  [contenteditable] {
+    outline: none;
+    cursor: text;
+  }
+
   /* Override responsive text classes */
   .sm\\:text-4xl,
   .lg\\:text-5xl,

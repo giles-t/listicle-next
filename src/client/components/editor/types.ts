@@ -3,6 +3,7 @@ export interface MinimalEditorProps {
   content?: string
   placeholder?: string
   onUpdate?: (content: string) => void
+  onBlur?: () => void
   aiToken?: string | null
   className?: string
   autoFocus?: boolean
