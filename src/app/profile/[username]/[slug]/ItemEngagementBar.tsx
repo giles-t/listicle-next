@@ -86,7 +86,7 @@ export function ItemEngagementBar({
   };
 
   const handleCommentAdded = () => {
-    // Could refresh comment count here if needed
+    setCommentsCount(prev => prev + 1);
   };
 
   return (

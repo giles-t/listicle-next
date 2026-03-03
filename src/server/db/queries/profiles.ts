@@ -142,6 +142,12 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     .innerJoin(lists, eq(comments.list_id, lists.id))
     .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
 
+  // Get total views across all user's published lists
+  const [viewsResult] = await db
+    .select({ total: sql<number>`coalesce(sum(${lists.view_count}), 0)::int` })
+    .from(lists)
+    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
+
   // Get followers count (people following this user)
   const [followersResult] = await db
     .select({ count: count() })
@@ -156,7 +162,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
   return {
     listsCount: listsCountResult?.count || 0,
-    totalViews: 0, // TODO: Implement views tracking
+    totalViews: viewsResult?.total || 0,
     totalLikes: likesResult?.count || 0,
     totalComments: commentsResult?.count || 0,
     followersCount: followersResult?.count || 0,
@@ -189,16 +195,14 @@ export async function getUserRecentLists(
         SELECT COUNT(*) FROM ${comments} 
         WHERE ${comments.list_id} = ${lists.id}
       )`.as('commentsCount'),
+      viewsCount: lists.view_count,
     })
     .from(lists)
     .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)))
     .orderBy(desc(lists.published_at))
     .limit(limit);
 
-  return userLists.map(list => ({
-    ...list,
-    viewsCount: 0, // TODO: Implement views tracking
-  }));
+  return userLists;
 }
 
 /**
@@ -288,6 +292,7 @@ export async function getUserLists(
         SELECT COUNT(*) FROM ${comments} 
         WHERE ${comments.list_id} = ${lists.id}
       )`.as('commentsCount'),
+      viewsCount: lists.view_count,
     })
     .from(lists)
     .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)))
@@ -296,10 +301,7 @@ export async function getUserLists(
     .offset(offset);
 
   return {
-    lists: userLists.map(list => ({
-      ...list,
-      viewsCount: 0, // TODO: Implement views tracking
-    })),
+    lists: userLists,
     total,
     page,
     perPage,

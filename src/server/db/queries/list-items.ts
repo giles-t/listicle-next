@@ -12,6 +12,12 @@ export interface ListItemStats {
  * Get stats for a single list item
  */
 export async function getListItemStats(itemId: string): Promise<ListItemStats> {
+  // Get view count from DB
+  const [viewResult] = await db
+    .select({ view_count: listItems.view_count })
+    .from(listItems)
+    .where(eq(listItems.id, itemId));
+
   // Get reactions count
   const [reactionsResult] = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -30,7 +36,7 @@ export async function getListItemStats(itemId: string): Promise<ListItemStats> {
     );
 
   return {
-    viewsCount: 0, // TODO: Implement views tracking
+    viewsCount: viewResult?.view_count || 0,
     reactionsCount: reactionsResult?.count || 0,
     commentsCount: commentsResult?.count || 0,
   };
@@ -69,15 +75,25 @@ export async function getListItemsStats(itemIds: string[]): Promise<Record<strin
     )
     .groupBy(comments.list_item_id);
 
+  // Get view counts for all items
+  const viewResults = await db
+    .select({
+      id: listItems.id,
+      view_count: listItems.view_count,
+    })
+    .from(listItems)
+    .where(inArray(listItems.id, itemIds));
+
   // Build result map
   const statsMap: Record<string, ListItemStats> = {};
   
   for (const itemId of itemIds) {
+    const viewsCount = viewResults.find(v => v.id === itemId)?.view_count || 0;
     const reactionsCount = reactionsResults.find(r => r.list_item_id === itemId)?.count || 0;
     const commentsCount = commentsResults.find(c => c.list_item_id === itemId)?.count || 0;
     
     statsMap[itemId] = {
-      viewsCount: 0, // TODO: Implement views tracking
+      viewsCount,
       reactionsCount,
       commentsCount,
     };

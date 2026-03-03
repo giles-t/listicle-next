@@ -24,8 +24,7 @@ export function EngagementButtons({
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
 
   const handleCommentAdded = () => {
-    // Refresh the comments count - could be more sophisticated with a proper fetch
-    // For now, we just increment optimistically
+    setCommentsCount(prev => prev + 1);
   };
 
   return (

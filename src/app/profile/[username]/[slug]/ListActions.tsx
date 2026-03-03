@@ -37,8 +37,7 @@ export function ListActions({ listId, initialBookmarked, initialCollectionId }: 
   };
 
   const handleReport = () => {
-    console.log('Report clicked');
-    // TODO: Implement report functionality
+    toast.info('Report feature coming soon!');
   };
 
   return (
