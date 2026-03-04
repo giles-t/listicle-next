@@ -19,4 +19,7 @@ export * from './media';
 export * from './metadata';
 
 // Format utilities
-export * from './format'; 
+export * from './format';
+
+// TipTap text utilities
+export * from './tiptap-text'; 

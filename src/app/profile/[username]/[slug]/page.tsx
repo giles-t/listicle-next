@@ -17,6 +17,7 @@ import { PageContent } from "./PageContent";
 import { createClient } from "@/src/server/supabase";
 import { ViewTracker, ListViewTracker } from "./ViewTracker";
 import { getListViewCount, getItemViewCounts } from "@/src/server/db/queries/views";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 
 interface ViewListPageProps {
   params: Promise<{ username: string; slug: string }>;
@@ -32,12 +33,14 @@ export async function generateMetadata({ params }: ViewListPageProps): Promise<M
     };
   }
 
+  const plainDescription = extractPlainText(list.description) || undefined;
+
   return {
     title: list.title,
-    description: list.description || undefined,
+    description: plainDescription,
     openGraph: {
       title: list.title,
-      description: list.description || undefined,
+      description: plainDescription,
       images: list.cover_image ? [list.cover_image] : undefined,
       type: "article",
       authors: [list.author_name],
@@ -46,7 +49,7 @@ export async function generateMetadata({ params }: ViewListPageProps): Promise<M
     twitter: {
       card: "summary_large_image",
       title: list.title,
-      description: list.description || undefined,
+      description: plainDescription,
       images: list.cover_image ? [list.cover_image] : undefined,
     },
   };
@@ -136,9 +139,13 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
               {list.title}
             </h1>
             {list.description && (
-              <p className="w-full description-text text-subtext-color">
-                {list.description}
-              </p>
+              <div className="w-full description-text text-subtext-color">
+                <StaticContentRenderer
+                  content={list.description}
+                  className="tiptap ProseMirror max-w-none text-subtext-color"
+                  emptyMessage=""
+                />
+              </div>
             )}
           </div>
         </div>

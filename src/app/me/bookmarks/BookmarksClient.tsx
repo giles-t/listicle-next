@@ -31,6 +31,7 @@ import * as SubframeCore from "@subframe/core";
 import { toast } from "@subframe/core";
 import { formatRelativeTime, formatShortDate } from "@/shared/utils/date";
 import { formatNumber } from "@/shared/utils/format";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 
 export type BookmarkData = {
   id: string;
@@ -268,7 +269,7 @@ export default function BookmarksClient({
     const title = isListItem ? bookmark.list_item!.title : bookmark.list.title;
     const description = isListItem
       ? `From "${bookmark.list.title}"`
-      : bookmark.list.description;
+      : extractPlainText(bookmark.list.description);
     // For list items, prefer the dedicated image field, then media_url, then list cover
     const image = isListItem
       ? bookmark.list_item!.image || bookmark.list_item!.media_url || bookmark.list.cover_image

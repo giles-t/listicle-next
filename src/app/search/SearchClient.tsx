@@ -16,6 +16,7 @@ import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
 import { useFollowUser } from "@/client/hooks/use-profile";
 import { useAuth } from "@/client/hooks/use-auth";
 import { formatNumber } from "@/shared/utils/format";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { formatDistanceToNow } from "date-fns";
 import {
   FeatherArrowDown,
@@ -774,7 +775,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                   )
                                 : ""
                             }
-                            description={list.description || ""}
+                            description={extractPlainText(list.description)}
                             categories={
                               list.category ? (
                                 <Badge variant="neutral">
@@ -818,7 +819,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                               ) : null
                             }
                             title={list.title}
-                            description={list.description || ""}
+                            description={extractPlainText(list.description)}
                             author={list.author.name}
                             views={formatNumber(list.view_count)}
                             likes={formatNumber(list.likesCount)}

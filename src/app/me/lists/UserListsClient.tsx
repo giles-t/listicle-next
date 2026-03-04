@@ -14,6 +14,7 @@ import { Loader } from "@/ui/components/Loader";
 import * as SubframeCore from "@subframe/core";
 import { FeatherEye, FeatherFileText, FeatherMoreHorizontal, FeatherEdit2, FeatherTrash } from "@subframe/core";
 import { formatRelativeTime, formatShortDate } from "@/shared/utils/date";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { toast } from "@subframe/core";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
@@ -146,7 +147,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
           </div>
           {list.description ? (
             <Link href={editHref} className="text-body font-body text-subtext-color line-clamp-2 cursor-pointer">
-              {list.description}
+              {extractPlainText(list.description)}
             </Link>
           ) : null}
         </div>

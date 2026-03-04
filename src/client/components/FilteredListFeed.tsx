@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { FilterSidebar, type CategoryOption, type SortOption, type TimeFilter, type FeaturedFilter, type ForYouFilter } from "./FilterSidebar";
 import { MobileFilterDrawer } from "./MobileFilterDrawer";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 
 interface ListItem {
   id: string;
@@ -222,7 +223,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
                       image={list.cover_image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"}
                       categories={<Badge>{list.category?.name.toUpperCase() || "UNCATEGORIZED"}</Badge>}
                       title={list.title}
-                      description={list.description || ""}
+                      description={extractPlainText(list.description)}
                       authorName={list.author.name}
                       viewCount={formatNumber(list.view_count)}
                       likeCount={formatNumber(list.likesCount)}
@@ -252,7 +253,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
                       image={list.cover_image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"}
                       category={list.category?.name.toUpperCase() || "UNCATEGORIZED"}
                       title={list.title}
-                      description={list.description || ""}
+                      description={extractPlainText(list.description)}
                       author={list.author.name}
                       views={formatNumber(list.view_count)}
                       likes={formatNumber(list.likesCount)}

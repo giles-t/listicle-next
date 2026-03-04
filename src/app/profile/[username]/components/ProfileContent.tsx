@@ -14,6 +14,7 @@ import { FeatherArrowUpDown, FeatherChevronDown, FeatherChevronLeft, FeatherChev
 import * as SubframeCore from "@subframe/core";
 import { formatDistanceToNow } from "date-fns";
 import { formatNumber } from "@/shared/utils/format";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { FollowButton } from "./FollowButton";
 import { SocialLinks } from "./SocialLinks";
 import { FollowStats } from "./FollowStats";
@@ -263,7 +264,7 @@ export function ProfileContent({
                     title={list.title}
                     authorName={profile.name}
                     publishDate={list.published_at ? formatDistanceToNow(new Date(list.published_at), { addSuffix: true }) : "Draft"}
-                    description={list.description || ""}
+                    description={extractPlainText(list.description)}
                     categories={
                       <Badge variant="neutral" icon={null}>
                         List
@@ -292,7 +293,7 @@ export function ProfileContent({
                   <ListicleCardComponent
                     image={list.cover_image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"}
                     title={list.title}
-                    description={list.description || ""}
+                    description={extractPlainText(list.description)}
                     author={profile.name}
                     views={formatNumber(list.viewsCount)}
                     likes={formatNumber(list.likesCount)}

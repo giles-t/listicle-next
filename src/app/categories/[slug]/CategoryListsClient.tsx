@@ -21,6 +21,7 @@ import {
 import * as SubframeCore from "@subframe/core";
 import { toast } from "@subframe/core";
 import { formatNumber } from "@/shared/utils/format";
+import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { formatDistanceToNow } from "date-fns";
 
 export interface CategoryList {
@@ -330,7 +331,7 @@ export function CategoryListsClient({
                   }
                   category={category.name.toUpperCase()}
                   title={list.title}
-                  description={list.description || ""}
+                  description={extractPlainText(list.description)}
                   author={list.author.name}
                   authorAvatar={list.author.avatar || undefined}
                   views={formatNumber(list.view_count)}
