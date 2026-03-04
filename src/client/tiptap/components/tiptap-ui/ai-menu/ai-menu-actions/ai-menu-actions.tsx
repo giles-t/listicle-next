@@ -6,7 +6,7 @@ import { Button, ButtonGroup } from "@/src/client/tiptap/components/tiptap-ui-pr
 import { RefreshAiIcon } from "@/src/client/tiptap/components/tiptap-icons/refresh-ai-icon"
 import { XIcon } from "@/src/client/tiptap/components/tiptap-icons/x-icon"
 import { CheckIcon } from "@/src/client/tiptap/components/tiptap-icons/check-icon"
-import type { TextOptions } from "@tiptap-pro/extension-ai"
+import type { TextOptions } from "@/src/client/tiptap/extensions/ai-custom"
 import { useUiEditorState } from "@/src/client/tiptap/hooks/use-ui-editor-state"
 
 import "@/src/client/tiptap/components/tiptap-ui/ai-menu/ai-menu-actions/ai-menu-actions.scss"

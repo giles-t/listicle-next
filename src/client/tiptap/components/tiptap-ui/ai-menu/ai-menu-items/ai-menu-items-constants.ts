@@ -1,4 +1,4 @@
-import type { Language } from "@tiptap-pro/extension-ai"
+import type { Language } from "@/src/client/tiptap/extensions/ai-custom"
 
 export const SUPPORTED_LANGUAGES: Array<{
   label: string

@@ -18,7 +18,7 @@ import { Superscript } from "@tiptap/extension-superscript"
 import { Subscript } from "@tiptap/extension-subscript"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Mathematics } from "@tiptap/extension-mathematics"
-import { Ai } from "@tiptap-pro/extension-ai"
+import { AiCustom } from "@/src/client/tiptap/extensions/ai-custom"
 import { UniqueID } from "@tiptap/extension-unique-id"
 import { Emoji, gitHubEmojis } from "@tiptap/extension-emoji"
 
@@ -57,7 +57,6 @@ import { AppProvider } from "@/src/client/tiptap/contexts/app-context"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/src/client/tiptap/lib/tiptap-utils"
-import { TIPTAP_AI_APP_ID } from "@/src/client/tiptap/lib/tiptap-collab-utils"
 
 // --- Styles ---
 import "@/src/client/tiptap/components/tiptap-templates/notion-like/notion-like-editor.scss"
@@ -163,10 +162,7 @@ export function EditorContentArea() {
  * Component that creates and provides the editor instance
  */
 export function EditorProvider(props: EditorProviderProps) {
-  const { placeholder = "Start writing...", aiToken, content, onUpdate, onBlur, autoFocus } = props
-
-  // Debug logging
-  console.log('EditorProvider aiToken:', aiToken)
+  const { placeholder = "Start writing...", content, onUpdate, onBlur, autoFocus } = props
 
   // Parse content - could be JSON or HTML
   const parseContent = (contentString: string) => {
@@ -259,107 +255,7 @@ export function EditorProvider(props: EditorProviderProps) {
       }),
       Typography,
       UiState,
-      // Configure Ai extension to use our custom OpenAI route instead of TipTap cloud
-      Ai.configure({
-        appId: TIPTAP_AI_APP_ID,
-        token: aiToken || undefined,
-        autocompletion: false,
-        showDecorations: true,
-        hideDecorationsOnStreamEnd: false,
-        // Add the required callbacks for UI state management
-        onLoading: (context) => {
-          console.log('🔄 AI Loading started')
-          context.editor.commands.aiGenerationSetIsLoading(true)
-          context.editor.commands.aiGenerationHasMessage(false)
-        },
-        onSuccess: (context) => {
-          console.log('✅ AI Success - response received')
-          context.editor.commands.aiGenerationSetIsLoading(false)
-          context.editor.commands.aiGenerationHasMessage(!!context.response)
-        },
-        onError: (error) => {
-          console.log('❌ AI Error occurred:', error)
-          // We need to get the editor instance from the extension context
-          // The error callback doesn't provide editor context, so we'll handle this in the resolver
-        },
-        // Custom resolver that calls our OpenAI API route
-        aiCompletionResolver: async ({ action, text, textOptions, editor, extensionOptions, defaultResolver }) => {
-          try {
-            console.log('🤖 Calling custom AI resolver:', { action, text: text?.substring(0, 100) + '...', textOptions })
-            
-            const response = await fetch('/api/ai-text', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                prompt: text,
-                tone: textOptions?.tone,
-                format: textOptions?.format || 'rich-text',
-                stream: false, // Use completion mode, not streaming
-                model: 'gpt-4o-mini',
-                maxTokens: 1000,
-                temperature: 0.7,
-                instructions: 'Only use heading levels 3 and 4. Do not use heading levels 1 or 2. Refer to heading level 3 as "Large Heading" and heading level 4 as "Small Heading".',
-              }),
-            })
-
-            if (!response.ok) {
-              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-              throw new Error(errorData.error || `HTTP ${response.status}`)
-            }
-
-            const data = await response.json()
-            console.log('✅ AI response received:', data.content?.substring(0, 100) + '...')
-            return data.content
-          } catch (error) {
-            console.error('❌ Custom AI resolver error:', error)
-            // Handle error state in the UI
-            editor.commands.aiGenerationSetIsLoading(false)
-            editor.commands.aiGenerationHasMessage(false)
-            throw error
-          }
-        },
-        // Add streaming resolver for streaming mode
-        aiStreamResolver: async ({ action, text, textOptions, editor }) => {
-          try {
-            console.log('🤖 Calling custom AI stream resolver:', { action, text: text?.substring(0, 100) + '...', textOptions })
-            
-            const response = await fetch('/api/ai-text', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                prompt: text,
-                tone: textOptions?.tone,
-                format: textOptions?.format || 'rich-text',
-                stream: true,
-                model: 'gpt-4o-mini',
-                maxTokens: 1000,
-                temperature: 0.7,
-                instructions: 'Only use heading levels 3 and 4. Do not use heading levels 1 or 2. Refer to heading level 3 as "Large Heading" and heading level 4 as "Small Heading".',
-              }),
-            })
-
-            if (!response.ok) {
-              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-              throw new Error(errorData.error || `HTTP ${response.status}`)
-            }
-
-            // Return the response body directly - it now contains raw text chunks
-            return response.body
-          } catch (error) {
-            console.error('❌ Custom AI stream resolver error:', error)
-            // Handle error state in the UI
-            if (editor) {
-              editor.commands.aiGenerationSetIsLoading(false)
-              editor.commands.aiGenerationHasMessage(false)
-            }
-            throw error
-          }
-        },
-      }),
+      AiCustom,
     ],
   })
 

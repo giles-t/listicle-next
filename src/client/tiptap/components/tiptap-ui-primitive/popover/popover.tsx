@@ -3,7 +3,13 @@
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "@/src/client/tiptap/lib/tiptap-utils"
-import "@/src/client/tiptap/components/tiptap-ui-primitive/popover/popover.scss"
+
+const popoverClasses =
+  "z-50 outline-none max-h-[var(--radix-popover-content-available-height)] " +
+  "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 " +
+  "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 " +
+  "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 " +
+  "data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2"
 
 function Popover({
   ...props
@@ -28,7 +34,7 @@ function PopoverContent({
       <PopoverPrimitive.Content
         align={align}
         sideOffset={sideOffset}
-        className={cn("tiptap-popover", className)}
+        className={cn(popoverClasses, className)}
         {...props}
       />
     </PopoverPrimitive.Portal>

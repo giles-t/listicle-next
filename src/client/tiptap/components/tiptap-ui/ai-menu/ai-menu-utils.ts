@@ -8,7 +8,7 @@ export function getContextAndInsertAt(editor: Editor) {
   const generatedWith = editor.storage.ai.generatedWith
 
   if (generatedWith && generatedWith.range) {
-    context = editor.storage.ai.response
+    context = editor.storage.ai.response ?? undefined
     insertAt = generatedWith.range
     isSelection = false
   }

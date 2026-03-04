@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import "@/src/client/tiptap/components/tiptap-ui-primitive/avatar/avatar.scss"
+import { cn } from "@/src/client/tiptap/lib/tiptap-utils"
 
 type ImageLoadingStatus = "idle" | "loading" | "loaded" | "error"
 type Size = "default" | "sm" | "lg" | "xl"
@@ -110,16 +111,29 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
       ? ({ "--dynamic-user-color": userColor } as React.CSSProperties)
       : undefined
 
+    const sizeClasses = {
+      default: "w-6 h-6 [&_.tiptap-avatar-fallback]:text-[0.5rem]",
+      sm: "w-5 h-5 [&_.tiptap-avatar-fallback]:text-[0.4375rem]",
+      lg: "w-7 h-7 [&_.tiptap-avatar-fallback]:text-[0.625rem]",
+      xl: "w-9 h-9 [&_.tiptap-avatar-fallback]:text-[0.75rem]",
+    }
+
     return (
       <AvatarContext.Provider value={contextValue}>
         <span
           {...props}
           ref={ref}
-          className={`tiptap-avatar ${className}`}
+          className={cn(
+            "relative inline-flex items-center justify-center align-middle overflow-hidden select-none shrink-0 tiptap-avatar",
+            sizeClasses[size],
+            className
+          )}
           style={style}
           data-size={size}
         >
-          <span className="tiptap-avatar-item">{children}</span>
+          <span className="relative w-full h-full flex items-center justify-center leading-none rounded-full bg-[var(--dynamic-user-color,rgb(229_229_229))] dark:bg-[var(--dynamic-user-color,rgb(70_70_73))] tiptap-avatar-item">
+            {children}
+          </span>
         </span>
       </AvatarContext.Provider>
     )
@@ -147,7 +161,10 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
         {...props}
         ref={ref}
         src={src}
-        className={`tiptap-avatar-image ${className}`}
+        className={cn(
+          "w-full h-full object-cover rounded-full tiptap-avatar-image",
+          className
+        )}
       />
     )
   }
@@ -173,11 +190,19 @@ export const AvatarFallback = React.forwardRef<
 
   return (
     <>
-      <span className={`tiptap-avatar-bg ${className}`} />
+      <span
+        className={cn(
+          "absolute inset-0 rounded-full bg-[var(--dynamic-user-color,rgb(229_229_229))] dark:bg-[var(--dynamic-user-color,rgb(70_70_73))] tiptap-avatar-bg",
+          className
+        )}
+      />
       <span
         {...props}
         ref={ref}
-        className={`tiptap-avatar-fallback ${className}`}
+        className={cn(
+          "relative flex items-center justify-center w-full h-full rounded-full font-semibold text-neutral-600 dark:text-neutral-400 tiptap-avatar-fallback",
+          className
+        )}
       >
         {children}
       </span>
@@ -216,7 +241,10 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
   return (
     <div
       {...props}
-      className={`tiptap-avatar-group ${className}`}
+      className={cn(
+        "inline-flex items-center [&_.tiptap-avatar-image]:border-2 [&_.tiptap-avatar-image]:border-white dark:[&_.tiptap-avatar-image]:border-neutral-800 [&_.tiptap-avatar-fallback]:border-2 [&_.tiptap-avatar-fallback]:border-white dark:[&_.tiptap-avatar-fallback]:border-neutral-800 [&_.tiptap-avatar:not(:first-child)]:-ml-2 tiptap-avatar-group",
+        className
+      )}
       data-max-user-visible={maxVisible}
     >
       {visibleAvatars}

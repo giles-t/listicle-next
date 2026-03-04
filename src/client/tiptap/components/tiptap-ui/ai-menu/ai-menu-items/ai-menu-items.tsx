@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { type Editor } from "@tiptap/react"
-import type { TextOptions } from "@tiptap-pro/extension-ai"
-import { type Language } from "@tiptap-pro/extension-ai"
+import type { TextOptions, Language } from "@/src/client/tiptap/extensions/ai-custom"
 
 // -- Hooks --
 import { useTiptapEditor } from "@/src/client/tiptap/hooks/use-tiptap-editor"

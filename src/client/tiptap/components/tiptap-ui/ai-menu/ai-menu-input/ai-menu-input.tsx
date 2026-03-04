@@ -2,8 +2,7 @@
 
 import * as React from "react"
 
-// Tiptap Core Extensions
-import type { Tone } from "@tiptap-pro/extension-ai"
+import type { Tone } from "@/src/client/tiptap/extensions/ai-custom"
 
 // Icons
 import { MicAiIcon } from "@/src/client/tiptap/components/tiptap-icons/mic-ai-icon"

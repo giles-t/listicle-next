@@ -9,7 +9,7 @@ import { Typography } from "@tiptap/extension-typography"
 import { Highlight } from "@tiptap/extension-highlight"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Color, TextStyle } from "@tiptap/extension-text-style"
-import { Ai } from "@tiptap-pro/extension-ai"
+import { AiCustom } from "@/src/client/tiptap/extensions/ai-custom"
 import { UniqueID } from "@tiptap/extension-unique-id"
 
 // Custom nodes from existing implementation - we'll import these
@@ -23,7 +23,6 @@ import { UiState } from "@/src/client/tiptap/components/tiptap-extension/ui-stat
 
 // Utils
 import { handleImageUpload, MAX_FILE_SIZE } from "@/src/client/tiptap/lib/tiptap-utils"
-import { TIPTAP_AI_APP_ID } from "@/src/client/tiptap/lib/tiptap-collab-utils"
 
 export interface UseEditorConfigProps {
   content?: string
@@ -137,78 +136,7 @@ export function useEditorConfig({
         ],
       }),
       UiState,
-      // AI Configuration
-      Ai.configure({
-        appId: TIPTAP_AI_APP_ID,
-        token: aiToken || undefined,
-        autocompletion: false,
-        showDecorations: true,
-        hideDecorationsOnStreamEnd: false,
-        // Custom resolver that calls our OpenAI API route
-        aiCompletionResolver: async ({ action, text, textOptions }) => {
-          try {
-            const response = await fetch('/api/ai-text', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                prompt: text,
-                tone: textOptions?.tone,
-                format: textOptions?.format || 'rich-text',
-                stream: false,
-                model: 'gpt-4o-mini',
-                maxTokens: 1000,
-                temperature: 0.7,
-              }),
-            })
-
-            if (!response.ok) {
-              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-              throw new Error(errorData.error || `HTTP ${response.status}`)
-            }
-
-            const data = await response.json()
-            return data.content
-          } catch (error) {
-            console.error('❌ Custom AI resolver error:', error)
-            throw error
-          }
-        },
-        // Streaming resolver
-        aiStreamResolver: async ({ action, text, textOptions }) => {
-          try {
-            const response = await fetch('/api/ai-text', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                prompt: text,
-                tone: textOptions?.tone,
-                format: textOptions?.format || 'rich-text',
-                stream: true,
-                model: 'gpt-4o-mini',
-                maxTokens: 1000,
-                temperature: 0.7,
-              }),
-            })
-
-            if (!response.ok) {
-              const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-              throw new Error(errorData.error || `HTTP ${response.status}`)
-            }
-
-            return response.body
-          } catch (error) {
-            console.error('❌ Custom AI stream resolver error:', error)
-            throw error
-          }
-        },
-        onError: (error) => {
-          console.error('🔍 AI Error:', error)
-        },
-      }),
+      AiCustom,
     ],
   })
 }

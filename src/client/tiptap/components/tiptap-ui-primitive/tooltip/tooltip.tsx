@@ -213,7 +213,7 @@ export const TooltipContent = React.forwardRef<
         ...style,
       }}
       {...context.getFloatingProps(props)}
-      className="tiptap-tooltip"
+      className="z-[200] overflow-hidden rounded-md bg-neutral-800 px-2 py-1.5 text-xs font-medium text-white shadow-lg text-center [&_kbd]:inline-block [&_kbd]:text-center [&_kbd]:align-baseline [&_kbd]:font-sans [&_kbd]:capitalize [&_kbd]:text-neutral-400"
     >
       {children}
     </div>

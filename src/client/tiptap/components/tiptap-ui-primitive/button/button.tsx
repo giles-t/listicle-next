@@ -2,19 +2,13 @@
 
 import * as React from "react"
 
-// --- Tiptap UI Primitive ---
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/src/client/tiptap/components/tiptap-ui-primitive/tooltip"
 
-// --- Lib ---
 import { cn, parseShortcutKeys } from "@/src/client/tiptap/lib/tiptap-utils"
-
-import "@/src/client/tiptap/components/tiptap-ui-primitive/button/button-colors.scss"
-import "@/src/client/tiptap/components/tiptap-ui-primitive/button/button-group.scss"
-import "@/src/client/tiptap/components/tiptap-ui-primitive/button/button.scss"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -22,6 +16,48 @@ export interface ButtonProps
   showTooltip?: boolean
   tooltip?: React.ReactNode
   shortcutKeys?: string
+}
+
+const ghostStyles = [
+  "bg-transparent text-neutral-600",
+  "hover:bg-neutral-100 hover:text-neutral-900",
+  "[&_.tiptap-button-icon]:text-neutral-500 hover:[&_.tiptap-button-icon]:text-neutral-700",
+  "[&_.tiptap-button-icon-sub]:text-neutral-400 hover:[&_.tiptap-button-icon-sub]:text-neutral-500",
+  "[&[data-active-state=on]]:bg-neutral-100 [&[data-active-state=on]]:text-neutral-900",
+  "[&[data-active-state=on]_.tiptap-button-icon]:text-brand-600",
+  "[&[data-active-state=on][data-appearance=emphasized]]:bg-brand-50 [&[data-active-state=on][data-appearance=emphasized]_.tiptap-button-icon]:text-brand-600",
+  "[&[data-state=open]]:bg-neutral-100 [&[data-state=open]]:text-neutral-900",
+  "disabled:bg-transparent disabled:text-neutral-400 disabled:[&_.tiptap-button-icon]:text-neutral-400",
+].join(" ")
+
+const primaryStyles = [
+  "bg-brand-600 text-white",
+  "hover:bg-brand-500 hover:text-white",
+  "[&_.tiptap-button-icon]:text-white hover:[&_.tiptap-button-icon]:text-white",
+  "[&_.tiptap-button-icon-sub]:text-neutral-300 hover:[&_.tiptap-button-icon-sub]:text-neutral-200",
+  "disabled:bg-neutral-200 disabled:text-neutral-400 disabled:[&_.tiptap-button-icon]:text-neutral-400",
+].join(" ")
+
+const defaultStyles = [
+  "bg-neutral-50 text-neutral-600",
+  "hover:bg-neutral-100 hover:text-neutral-900",
+  "[&_.tiptap-button-icon]:text-neutral-500 hover:[&_.tiptap-button-icon]:text-neutral-700",
+  "[&_.tiptap-button-icon-sub]:text-neutral-400 hover:[&_.tiptap-button-icon-sub]:text-neutral-500",
+  "[&[data-active-state=on]]:bg-neutral-100 [&[data-active-state=on]]:text-neutral-900",
+  "[&[data-active-state=on]_.tiptap-button-icon]:text-brand-600",
+  "[&[data-state=open]]:bg-neutral-100 [&[data-state=open]]:text-neutral-900",
+  "disabled:bg-neutral-50 disabled:text-neutral-400 disabled:[&_.tiptap-button-icon]:text-neutral-400",
+].join(" ")
+
+function getStyleClasses(dataStyle?: string): string {
+  switch (dataStyle) {
+    case "ghost":
+      return ghostStyles
+    case "primary":
+      return primaryStyles
+    default:
+      return defaultStyles
+  }
 }
 
 export const ShortcutDisplay: React.FC<{ shortcuts: string[] }> = ({
@@ -41,6 +77,21 @@ export const ShortcutDisplay: React.FC<{ shortcuts: string[] }> = ({
   )
 }
 
+const baseClasses = [
+  "flex items-center justify-center",
+  "h-8 min-w-[2rem] gap-1 rounded-lg px-2",
+  "border-none cursor-pointer",
+  "text-sm font-medium leading-tight",
+  "transition-colors duration-150",
+  "focus-visible:outline-none",
+  "[&_.tiptap-button-icon]:w-4 [&_.tiptap-button-icon]:h-4 [&_.tiptap-button-icon]:flex-shrink-0",
+  "[&_.tiptap-button-icon-sub]:w-4 [&_.tiptap-button-icon-sub]:h-4 [&_.tiptap-button-icon-sub]:flex-shrink-0",
+  "[&_.tiptap-button-dropdown-arrows]:w-3 [&_.tiptap-button-dropdown-arrows]:h-3 [&_.tiptap-button-dropdown-arrows]:flex-shrink-0",
+  "[&_.tiptap-button-dropdown-small]:w-2.5 [&_.tiptap-button-dropdown-small]:h-2.5 [&_.tiptap-button-dropdown-small]:flex-shrink-0",
+  "[&_.tiptap-button-text]:px-0.5 [&_.tiptap-button-text]:flex-grow [&_.tiptap-button-text]:text-left [&_.tiptap-button-text]:leading-6",
+  "[&_.tiptap-button-emoji]:w-4 [&_.tiptap-button-emoji]:flex [&_.tiptap-button-emoji]:justify-center",
+].join(" ")
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -59,10 +110,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       [shortcutKeys]
     )
 
+    const dataStyle = (props as Record<string, unknown>)["data-style"] as
+      | string
+      | undefined
+    const styleClasses = getStyleClasses(dataStyle)
+
     if (!tooltip || !showTooltip) {
       return (
         <button
-          className={cn("tiptap-button", className)}
+          className={cn(baseClasses, styleClasses, "tiptap-button", className)}
           ref={ref}
           aria-label={ariaLabel}
           {...props}
@@ -75,7 +131,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Tooltip delay={200}>
         <TooltipTrigger
-          className={cn("tiptap-button", className)}
+          className={cn(baseClasses, styleClasses, "tiptap-button", className)}
           ref={ref}
           aria-label={ariaLabel}
           {...props}
@@ -102,7 +158,12 @@ export const ButtonGroup = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("tiptap-button-group", className)}
+      className={cn(
+        "flex gap-0.5",
+        orientation === "horizontal" ? "flex-row" : "flex-col",
+        "tiptap-button-group",
+        className
+      )}
       data-orientation={orientation}
       role="group"
       {...props}

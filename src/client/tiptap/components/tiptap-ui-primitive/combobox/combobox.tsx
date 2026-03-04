@@ -22,7 +22,10 @@ export const ComboboxList = React.forwardRef<
   return (
     <Ariakit.ComboboxList
       ref={ref}
-      className={cn("tiptap-combobox-list", className)}
+      className={cn(
+        "h-full rounded-[calc(0.375rem+0.5rem+1px)] border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 p-1.5 shadow-md outline-none max-w-64 max-h-[var(--popover-available-height)] overflow-y-auto my-1.5 empty:!hidden tiptap-combobox-list",
+        className
+      )}
       {...props}
     />
   )

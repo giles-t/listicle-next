@@ -4,6 +4,7 @@ import * as React from "react"
 import { Button } from "@/src/client/tiptap/components/tiptap-ui-primitive/button"
 import { MessageSquareIcon } from "@/src/client/tiptap/components/tiptap-icons/message-square-icon"
 import { useIsMobile } from "@/src/client/tiptap/hooks/use-mobile"
+import { cn } from "@/src/client/tiptap/lib/tiptap-utils"
 import "@/src/client/tiptap/components/tiptap-ui-primitive/sidebar/sidebar.scss"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
@@ -22,6 +23,7 @@ type SidebarContext = {
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
+const SidebarSideContext = React.createContext<"left" | "right">("left")
 
 function useSidebar() {
   const context = React.useContext(SidebarContext)
@@ -123,7 +125,10 @@ const SidebarProvider = React.forwardRef<
               ...style,
             } as React.CSSProperties
           }
-          className={`sidebar-wrapper${className ? ` ${className}` : ""}`}
+          className={cn(
+            "flex min-h-svh w-full sidebar-wrapper",
+            className
+          )}
           ref={ref}
           {...props}
         >
@@ -148,32 +153,50 @@ const Sidebar = React.forwardRef<
   ) => {
     const { state } = useSidebar()
 
+    const sidebarClasses =
+      "hidden md:block sidebar"
+    const gapClasses =
+      "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-200 linear data-[collapsible=offcanvas]:w-0 data-[side=right]:rotate-180 sidebar-gap"
+    const containerBase =
+      "fixed top-0 bottom-0 z-10 h-svh w-[var(--sidebar-width)] hidden md:flex transition-all duration-200 linear border-neutral-200 dark:border-neutral-800"
+    const containerSideClasses =
+      "data-[side=left]:left-0 data-[side=left]:border-r data-[side=left]:data-[collapsible=offcanvas]:-left-[var(--sidebar-width)] data-[side=right]:right-0 data-[side=right]:border-l data-[side=right]:data-[collapsible=offcanvas]:-right-[var(--sidebar-width)]"
+    const mainClasses =
+      "flex h-full w-full flex-col bg-neutral-100 dark:bg-neutral-900 sidebar-main"
+
     return (
-      <div
-        ref={ref}
-        className="sidebar"
-        data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
-        data-side={side}
-      >
-        {/* This is what handles the sidebar gap on desktop */}
+      <SidebarSideContext.Provider value={side}>
         <div
-          className="sidebar-gap"
-          data-collapsible={state === "collapsed" ? collapsible : ""}
-          data-side={side}
-        />
-        <div
-          className={`sidebar-container${className ? ` ${className}` : ""}`}
+          ref={ref}
+          className={sidebarClasses}
           data-state={state}
           data-collapsible={state === "collapsed" ? collapsible : ""}
           data-side={side}
-          {...props}
         >
-          <div data-sidebar="sidebar" className="sidebar-main">
-            {children}
+          {/* This is what handles the sidebar gap on desktop */}
+          <div
+            className={gapClasses}
+            data-collapsible={state === "collapsed" ? collapsible : ""}
+            data-side={side}
+          />
+          <div
+            className={cn(
+              "sidebar-container",
+              containerBase,
+              containerSideClasses,
+              className
+            )}
+            data-state={state}
+            data-collapsible={state === "collapsed" ? collapsible : ""}
+            data-side={side}
+            {...props}
+          >
+            <div data-sidebar="sidebar" className={mainClasses}>
+              {children}
+            </div>
           </div>
         </div>
-      </div>
+      </SidebarSideContext.Provider>
     )
   }
 )
@@ -206,17 +229,34 @@ const SidebarRail = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<"button">
 >(({ className, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, state } = useSidebar()
+  const side = React.useContext(SidebarSideContext)
+
+  const railClasses = cn(
+    "absolute top-0 bottom-0 z-20 w-4 -translate-x-1/2 transition-all duration-200 hidden sm:flex",
+    "after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-1/2 after:w-0.5",
+    "hover:after:bg-neutral-200 dark:hover:after:bg-neutral-700",
+    side === "left" && "right-[-1rem] cursor-w-resize",
+    side === "right" && "left-0 cursor-e-resize",
+    side === "left" && state === "collapsed" && "cursor-e-resize",
+    side === "right" && state === "collapsed" && "cursor-w-resize",
+    state === "collapsed" && "translate-x-0 after:left-full",
+    state === "collapsed" && "hover:bg-neutral-100 dark:hover:bg-neutral-900",
+    side === "left" && state === "collapsed" && "right-[-0.5rem]",
+    side === "right" && state === "collapsed" && "left-[-0.5rem]",
+    "sidebar-rail"
+  )
 
   return (
     <button
       ref={ref}
       data-sidebar="rail"
+      data-side={side}
       aria-label="Toggle Sidebar"
       tabIndex={-1}
       onClick={toggleSidebar}
       title="Toggle Sidebar"
-      className={`sidebar-rail${className ? ` ${className}` : ""}`}
+      className={cn(railClasses, className)}
       {...props}
     />
   )
@@ -230,7 +270,10 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-      className={`sidebar-inset${className ? ` ${className}` : ""}`}
+      className={cn(
+        "relative flex w-full flex-1 flex-col sidebar-inset",
+        className
+      )}
       {...props}
     />
   )
@@ -245,7 +288,10 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={`sidebar-header${className ? ` ${className}` : ""}`}
+      className={cn(
+        "flex flex-col gap-2 p-2 sidebar-header",
+        className
+      )}
       {...props}
     />
   )
@@ -260,7 +306,10 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={`sidebar-footer${className ? ` ${className}` : ""}`}
+      className={cn(
+        "flex flex-col gap-2 p-2 sidebar-footer",
+        className
+      )}
       {...props}
     />
   )
@@ -275,7 +324,10 @@ const SidebarContent = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="content"
-      className={`sidebar-content${className ? ` ${className}` : ""}`}
+      className={cn(
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto sidebar-content",
+        className
+      )}
       {...props}
     />
   )

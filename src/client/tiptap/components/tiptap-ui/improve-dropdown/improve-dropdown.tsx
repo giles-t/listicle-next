@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { type Editor } from "@tiptap/react"
-import type { Language, TextOptions, Tone } from "@tiptap-pro/extension-ai"
+import type { Language, TextOptions, Tone } from "@/src/client/tiptap/extensions/ai-custom"
 import { NodeSelection } from "@tiptap/pm/state"
 
 // --- Hooks ---

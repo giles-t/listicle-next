@@ -2,11 +2,21 @@
 
 import * as React from "react"
 import { cn } from "@/src/client/tiptap/lib/tiptap-utils"
-import "@/src/client/tiptap/components/tiptap-ui-primitive/card/card.scss"
 
 const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} className={cn("tiptap-card", className)} {...props} />
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "flex flex-col items-center outline-none relative min-w-0 break-words bg-clip-border",
+          "rounded-xl shadow-lg bg-white border border-neutral-200",
+          "tiptap-card",
+          className
+        )}
+        {...props}
+      />
+    )
   }
 )
 Card.displayName = "Card"
@@ -16,7 +26,14 @@ const CardHeader = React.forwardRef<
   React.ComponentProps<"div">
 >(({ className, ...props }, ref) => {
   return (
-    <div ref={ref} className={cn("tiptap-card-header", className)} {...props} />
+    <div
+      ref={ref}
+      className={cn(
+        "p-1.5 flex-none flex items-center justify-between w-full border-b border-neutral-200",
+        className
+      )}
+      {...props}
+    />
   )
 })
 CardHeader.displayName = "CardHeader"
@@ -24,7 +41,11 @@ CardHeader.displayName = "CardHeader"
 const CardBody = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
   ({ className, ...props }, ref) => {
     return (
-      <div ref={ref} className={cn("tiptap-card-body", className)} {...props} />
+      <div
+        ref={ref}
+        className={cn("p-1.5 flex-1 overflow-y-auto", className)}
+        {...props}
+      />
     )
   }
 )
@@ -40,7 +61,13 @@ const CardItemGroup = React.forwardRef<
     <div
       ref={ref}
       data-orientation={orientation}
-      className={cn("tiptap-card-item-group", className)}
+      className={cn(
+        "relative flex align-middle min-w-max",
+        orientation === "vertical"
+          ? "flex-col justify-center"
+          : "flex-row items-center gap-1",
+        className
+      )}
       {...props}
     />
   )
@@ -54,7 +81,10 @@ const CardGroupLabel = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("tiptap-card-group-label", className)}
+      className={cn(
+        "pt-3 px-2 pb-1 text-xs font-semibold capitalize text-neutral-800 leading-normal",
+        className
+      )}
       {...props}
     />
   )
@@ -66,7 +96,11 @@ const CardFooter = React.forwardRef<
   React.ComponentProps<"div">
 >(({ className, ...props }, ref) => {
   return (
-    <div ref={ref} className={cn("tiptap-card-footer", className)} {...props} />
+    <div
+      ref={ref}
+      className={cn("p-1.5", className)}
+      {...props}
+    />
   )
 })
 CardFooter.displayName = "CardFooter"
