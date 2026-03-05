@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Button } from '@/src/ui/components/Button'
 import { TextArea } from '@/src/ui/components/TextArea'
 import { Select } from '@/src/ui/components/Select'
-import { FeatherSparkles, FeatherImage } from '@subframe/core'
+import { Image, Sparkles } from "lucide-react";
 
 export default function TestAiImagePage() {
   const [prompt, setPrompt] = useState('')
@@ -148,7 +148,7 @@ export default function TestAiImagePage() {
                 <Select
                   value={style}
                   onValueChange={setStyle}
-                  icon={<FeatherImage />}
+                  icon={<Image />}
                 >
                   <Select.Item value="photorealistic">Photorealistic</Select.Item>
                   <Select.Item value="digital_art">Digital Art</Select.Item>
@@ -179,7 +179,7 @@ export default function TestAiImagePage() {
             <Button
               onClick={handleGenerateImage}
               disabled={!prompt.trim() || isGenerating}
-              icon={<FeatherSparkles />}
+              icon={<Sparkles />}
               className="w-full"
             >
               {isGenerating ? 'Generating...' : 'Generate Image'}

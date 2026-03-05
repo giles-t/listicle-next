@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
-import { FeatherAlertTriangle } from "@subframe/core";
+import { AlertTriangle } from "lucide-react";
 
 export default function NotificationsError({
   error,
@@ -17,7 +17,7 @@ export default function NotificationsError({
       <IconWithBackground
         variant="error"
         size="x-large"
-        icon={<FeatherAlertTriangle />}
+        icon={<AlertTriangle />}
         square={false}
       />
       <div className="flex flex-col items-center gap-2">

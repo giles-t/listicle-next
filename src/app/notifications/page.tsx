@@ -6,11 +6,11 @@ import { formatDistanceToNow } from "date-fns";
 import { Avatar } from "@/ui/components/Avatar";
 import { Tabs } from "@/ui/components/Tabs";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
-import { FeatherCheckCheck, FeatherEye, FeatherHeart, FeatherBell, FeatherInbox, FeatherBellOff } from "@subframe/core";
 import { useAuth } from "@/client/hooks/use-auth";
 import { Loader } from "@/ui/components/Loader";
 import { SkeletonText } from "@/ui/components/SkeletonText";
 import { SkeletonCircle } from "@/ui/components/SkeletonCircle";
+import { Bell, BellOff, CheckCheck, Eye, Heart, Inbox } from "lucide-react";
 
 type NotificationType = "follow" | "comment" | "reaction_milestone" | "view_milestone";
 
@@ -113,7 +113,7 @@ function NotificationItem({ notification, username }: { notification: Notificati
             <div className="flex h-2 w-2 flex-none items-start rounded-full bg-brand-primary" />
           )}
           <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-brand-50">
-            <FeatherHeart className="text-body font-body text-brand-primary" />
+            <Heart className="text-body font-body text-brand-primary" />
           </div>
           <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
             <span className={`text-body font-body ${textColor}`}>
@@ -138,7 +138,7 @@ function NotificationItem({ notification, username }: { notification: Notificati
             <div className="flex h-2 w-2 flex-none items-start rounded-full bg-brand-primary" />
           )}
           <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-success-50">
-            <FeatherEye className="text-body font-body text-success-600" />
+            <Eye className="text-body font-body text-success-600" />
           </div>
           <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
             <span className={`text-body font-body ${textColor}`}>
@@ -183,7 +183,7 @@ function EmptyState({ variant }: { variant: "all" | "unread" }) {
         <IconWithBackground
           variant="success"
           size="x-large"
-          icon={<FeatherBellOff />}
+          icon={<BellOff />}
           square={false}
         />
         <div className="flex flex-col items-center gap-2">
@@ -203,7 +203,7 @@ function EmptyState({ variant }: { variant: "all" | "unread" }) {
       <IconWithBackground
         variant="brand"
         size="x-large"
-        icon={<FeatherInbox />}
+        icon={<Inbox />}
         square={false}
       />
       <div className="flex flex-col items-center gap-2">
@@ -326,7 +326,7 @@ export default function NotificationsPage() {
     return (
       <div className="container max-w-none flex h-full w-full flex-col items-center justify-center gap-6 bg-default-background py-24">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-          <FeatherBell className="h-8 w-8 text-neutral-400" />
+          <Bell className="h-8 w-8 text-neutral-400" />
         </div>
         <div className="text-center">
           <h2 className="text-heading-3 font-heading-3 text-default-font mb-2">
@@ -365,7 +365,7 @@ export default function NotificationsPage() {
             {isMarkingRead ? (
               <Loader size="small" />
             ) : (
-              <FeatherCheckCheck className="text-body font-body text-default-font" />
+              <CheckCheck className="text-body font-body text-default-font" />
             )}
             <span className="text-body-bold font-body-bold text-default-font">
               Mark all as read
@@ -387,7 +387,7 @@ export default function NotificationsPage() {
         ) : error ? (
           <div className="flex w-full flex-col items-center justify-center py-20 gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-error-50">
-              <FeatherBell className="h-8 w-8 text-error-600" />
+              <Bell className="h-8 w-8 text-error-600" />
             </div>
             <div className="text-center">
               <h3 className="text-heading-3 font-heading-3 text-default-font mb-1">

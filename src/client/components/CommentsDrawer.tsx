@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { Avatar } from "@/ui/components/Avatar";
 import { Badge } from "@/ui/components/Badge";
@@ -9,19 +11,10 @@ import { TextArea } from "@/ui/components/TextArea";
 import { DrawerLayout } from "@/ui/layouts/DrawerLayout";
 import { Loader } from "@/ui/components/Loader";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
-import {
-  FeatherHeart,
-  FeatherList,
-  FeatherMessageSquare,
-  FeatherMoreHorizontal,
-  FeatherSend,
-  FeatherX,
-  FeatherTrash2,
-} from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useAuth } from "@/client/hooks/use-auth";
+import { Heart, List, MessageSquare, MoreHorizontal, Send, Trash2, X } from "lucide-react";
 
 interface CommentUser {
   id: string;
@@ -128,16 +121,16 @@ function CommentItem({
             </span>
           </div>
           {canDelete && (
-            <SubframeCore.DropdownMenu.Root>
-              <SubframeCore.DropdownMenu.Trigger asChild={true}>
+            <DropdownMenuPrimitive.Root>
+              <DropdownMenuPrimitive.Trigger asChild={true}>
                 <IconButton
                   size="small"
-                  icon={<FeatherMoreHorizontal />}
+                  icon={<MoreHorizontal />}
                   onClick={() => {}}
                 />
-              </SubframeCore.DropdownMenu.Trigger>
-              <SubframeCore.DropdownMenu.Portal>
-                <SubframeCore.DropdownMenu.Content
+              </DropdownMenuPrimitive.Trigger>
+              <DropdownMenuPrimitive.Portal>
+                <DropdownMenuPrimitive.Content
                   side="bottom"
                   align="end"
                   sideOffset={4}
@@ -145,15 +138,15 @@ function CommentItem({
                 >
                   <DropdownMenu>
                     <DropdownMenu.DropdownItem 
-                      icon={<FeatherTrash2 />} 
+                      icon={<Trash2 />} 
                       onClick={() => onDelete(comment.id)}
                     >
                       Delete
                     </DropdownMenu.DropdownItem>
                   </DropdownMenu>
-                </SubframeCore.DropdownMenu.Content>
-              </SubframeCore.DropdownMenu.Portal>
-            </SubframeCore.DropdownMenu.Root>
+                </DropdownMenuPrimitive.Content>
+              </DropdownMenuPrimitive.Portal>
+            </DropdownMenuPrimitive.Root>
           )}
         </div>
         <span className="text-body font-body text-default-font whitespace-pre-wrap">
@@ -342,14 +335,14 @@ export function CommentsDrawer({
         {/* Header */}
         <div className="flex w-full items-center justify-between border-b border-solid border-neutral-border px-6 py-6">
           <div className="flex items-center gap-2">
-            <FeatherMessageSquare className="text-heading-3 font-heading-3 text-default-font" />
+            <MessageSquare className="text-heading-3 font-heading-3 text-default-font" />
             <span className="text-heading-3 font-heading-3 text-default-font">
               {title}
             </span>
             <Badge variant="neutral">{totalCount}</Badge>
           </div>
           <IconButton
-            icon={<FeatherX />}
+            icon={<X />}
             onClick={() => onOpenChange(false)}
           />
         </div>
@@ -359,7 +352,7 @@ export function CommentsDrawer({
           <div className="flex w-full flex-col items-start gap-4 px-6 pt-6">
             <div className="flex w-full flex-col items-start gap-3 rounded-md border border-solid border-neutral-border bg-neutral-50 px-4 py-4">
               <div className="flex w-full items-center gap-2">
-                <FeatherList className="text-body font-body text-subtext-color" />
+                <List className="text-body font-body text-subtext-color" />
                 <span className="line-clamp-1 text-caption-bold font-caption-bold text-subtext-color">
                   {listContext?.title}
                 </span>
@@ -385,7 +378,7 @@ export function CommentsDrawer({
             </div>
           ) : comments.length === 0 ? (
             <div className="flex w-full flex-col items-center justify-center py-12 gap-2">
-              <FeatherMessageSquare className="text-subtext-color h-8 w-8" />
+              <MessageSquare className="text-subtext-color h-8 w-8" />
               <span className="text-body font-body text-subtext-color">
                 No comments yet
               </span>
@@ -445,7 +438,7 @@ export function CommentsDrawer({
             <Button
               variant="brand-primary"
               size="medium"
-              icon={<FeatherSend />}
+              icon={<Send />}
               onClick={handlePostComment}
               loading={isPosting}
               disabled={!user || !newComment.trim()}

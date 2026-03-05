@@ -8,8 +8,8 @@ import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
 import { TextField } from "@/ui/components/TextField";
 import { Loader } from "@/ui/components/Loader";
 import { DrawerLayout } from "@/ui/layouts/DrawerLayout";
-import { FeatherPlus, FeatherTrash, FeatherX } from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
+import { Plus, Trash, X } from "lucide-react";
 
 export interface Collection {
   id: string;
@@ -141,7 +141,7 @@ export default function AddToBookmarkDrawer({
             {title}
           </span>
           <IconButton
-            icon={<FeatherX />}
+            icon={<X />}
             onClick={() => onOpenChange(false)}
           />
         </div>
@@ -231,7 +231,7 @@ export default function AddToBookmarkDrawer({
                 className="h-auto grow shrink-0 basis-0"
                 label=""
                 helpText=""
-                icon={<FeatherPlus />}
+                icon={<Plus />}
                 iconRight={null}
               >
                 <TextField.Input
@@ -248,7 +248,7 @@ export default function AddToBookmarkDrawer({
               <Button
                 variant="neutral-primary"
                 size="medium"
-                icon={<FeatherPlus />}
+                icon={<Plus />}
                 iconRight={null}
                 onClick={handleCreateCollection}
                 loading={isCreating}
@@ -268,7 +268,7 @@ export default function AddToBookmarkDrawer({
                   className="h-8 w-full flex-none"
                   variant="destructive-secondary"
                   size="medium"
-                  icon={<FeatherTrash />}
+                  icon={<Trash />}
                   iconRight={null}
                   onClick={handleDelete}
                   loading={isDeleting}

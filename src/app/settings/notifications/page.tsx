@@ -1,13 +1,7 @@
 import React from "react";
 
-import { FeatherMail } from "@subframe/core";
-import { FeatherMessageSquare } from "@subframe/core";
-import { FeatherHeart } from "@subframe/core";
-import { FeatherBookmark } from "@subframe/core";
-import { FeatherUsers } from "@subframe/core";
-import { FeatherTrendingUp } from "@subframe/core";
-
 import { Button } from "@/ui/components/Button";
+import { Bookmark, Heart, Mail, MessageSquare, TrendingUp, Users } from "lucide-react";
 
 export default function NotificationsSettingsPage() {
   return (
@@ -28,7 +22,7 @@ export default function NotificationsSettingsPage() {
         
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherMessageSquare className="h-5 w-5 text-neutral-600" />
+            <MessageSquare className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Comments
@@ -50,7 +44,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherHeart className="h-5 w-5 text-neutral-600" />
+            <Heart className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Reactions
@@ -72,7 +66,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherBookmark className="h-5 w-5 text-neutral-600" />
+            <Bookmark className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Saves
@@ -94,7 +88,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherUsers className="h-5 w-5 text-neutral-600" />
+            <Users className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Publication Invites
@@ -146,7 +140,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherMessageSquare className="h-5 w-5 text-neutral-600" />
+            <MessageSquare className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Comments
@@ -168,7 +162,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherHeart className="h-5 w-5 text-neutral-600" />
+            <Heart className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Reactions
@@ -201,7 +195,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherMail className="h-5 w-5 text-neutral-600" />
+            <Mail className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Enable Weekly Digest
@@ -246,7 +240,7 @@ export default function NotificationsSettingsPage() {
 
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
-            <FeatherTrendingUp className="h-5 w-5 text-neutral-600" />
+            <TrendingUp className="h-5 w-5 text-neutral-600" />
             <div className="flex flex-col items-start gap-1">
               <span className="text-body-bold font-body-bold text-default-font">
                 Trending Lists

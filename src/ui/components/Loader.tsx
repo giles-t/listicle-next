@@ -1,40 +1,32 @@
 "use client";
-/*
- * Documentation:
- * Loader — https://app.subframe.com/7b590a12c74e/library?component=Loader_f2e570c8-e463-45c2-aae9-a960146bc5d5
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface LoaderRootProps
-  extends React.ComponentProps<typeof SubframeCore.Loader> {
+interface LoaderRootProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "small" | "medium" | "large";
   className?: string;
 }
 
-const LoaderRoot = React.forwardRef<
-  React.ElementRef<typeof SubframeCore.Loader>,
-  LoaderRootProps
->(function LoaderRoot(
-  { size = "medium", className, ...otherProps }: LoaderRootProps,
-  ref
-) {
-  return (
-    <SubframeCore.Loader
-      className={SubframeUtils.twClassNames(
-        "group/f2e570c8 text-body font-body text-brand-600",
-        {
-          "text-heading-2 font-heading-2": size === "large",
-          "text-caption font-caption": size === "small",
-        },
-        className
-      )}
-      ref={ref}
-      {...otherProps}
-    />
-  );
-});
+const LoaderRoot = React.forwardRef<HTMLDivElement, LoaderRootProps>(
+  function LoaderRoot({ size = "medium", className, ...otherProps }: LoaderRootProps, ref) {
+    return (
+      <div
+        className={cn(
+          "inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-600 border-t-transparent",
+          {
+            "h-6 w-6 border-[3px]": size === "large",
+            "h-3 w-3": size === "small",
+          },
+          className
+        )}
+        ref={ref}
+        role="status"
+        aria-label="Loading"
+        {...otherProps}
+      />
+    );
+  }
+);
 
 export const Loader = LoaderRoot;

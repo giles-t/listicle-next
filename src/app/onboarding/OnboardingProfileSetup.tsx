@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/ui/components/Avatar";
 import { Button } from "@/ui/components/Button";
 import { TextField } from "@/ui/components/TextField";
-import { FeatherUpload } from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { completeOnboarding } from "./actions";
 import { checkUsernameAvailability } from "./check-username";
+import { Upload } from "lucide-react";
 
 interface OnboardingProfileSetupProps {
   redirectPath?: string;
@@ -157,7 +157,7 @@ export default function OnboardingProfileSetup({ redirectPath = '/dashboard' }: 
               />
               <Button
                 variant="neutral-secondary"
-                icon={<FeatherUpload />}
+                icon={<Upload />}
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                   event.preventDefault();
                   document.getElementById('avatar-upload')?.click();

@@ -1,37 +1,25 @@
 "use client";
-/*
- * Documentation:
- * Pie Chart — https://app.subframe.com/7b590a12c74e/library?component=Pie+Chart_0654ccc7-054c-4f3a-8e9a-b7c81dd3963c
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface PieChartRootProps
-  extends React.ComponentProps<typeof SubframeCore.PieChart> {
+interface PieChartRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  stacked?: boolean;
   className?: string;
 }
 
-const PieChartRoot = React.forwardRef<
-  React.ElementRef<typeof SubframeCore.PieChart>,
-  PieChartRootProps
->(function PieChartRoot({ className, ...otherProps }: PieChartRootProps, ref) {
-  return (
-    <SubframeCore.PieChart
-      className={SubframeUtils.twClassNames("h-52 w-52", className)}
-      ref={ref}
-      colors={[
-        "#6366f1",
-        "#c7d2fe",
-        "#4f46e5",
-        "#a5b4fc",
-        "#4338ca",
-        "#818cf8",
-      ]}
-      {...otherProps}
-    />
-  );
-});
+const PieChartRoot = React.forwardRef<HTMLDivElement, PieChartRootProps>(
+  function PieChartRoot({ className, ...otherProps }, ref) {
+    return (
+      <div
+        className={cn("flex h-80 w-full items-center justify-center rounded-md border border-dashed border-neutral-300 bg-neutral-50 text-subtext-color", className)}
+        ref={ref}
+        {...otherProps}
+      >
+        <span className="text-body font-body">PieChart placeholder</span>
+      </div>
+    );
+  }
+);
 
 export const PieChart = PieChartRoot;

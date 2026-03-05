@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { DialogLayout } from "@/ui/layouts/DialogLayout";
-import { FeatherAlertTriangle } from "@subframe/core";
+import { AlertTriangle } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -29,7 +29,7 @@ export default function DeleteCollectionModal({
             <IconWithBackground
               variant="error"
               size="large"
-              icon={<FeatherAlertTriangle />}
+              icon={<AlertTriangle />}
             />
             <span className="text-heading-3 font-heading-3 text-default-font">
               Delete Collection?

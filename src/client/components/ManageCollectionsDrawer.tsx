@@ -6,9 +6,9 @@ import { IconButton } from "@/ui/components/IconButton";
 import { TextField } from "@/ui/components/TextField";
 import { Loader } from "@/ui/components/Loader";
 import { DrawerLayout } from "@/ui/layouts/DrawerLayout";
-import { FeatherPlus, FeatherTrash, FeatherX } from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import DeleteCollectionModal from "./DeleteCollectionModal";
+import { Plus, Trash, X } from "lucide-react";
 
 export interface Collection {
   id: string;
@@ -168,7 +168,7 @@ export default function ManageCollectionsDrawer({
               Manage Collections
             </span>
             <IconButton
-              icon={<FeatherX />}
+              icon={<X />}
               onClick={() => onOpenChange(false)}
             />
           </div>
@@ -185,7 +185,7 @@ export default function ManageCollectionsDrawer({
                   className="h-auto grow shrink-0 basis-0"
                   label=""
                   helpText=""
-                  icon={<FeatherPlus />}
+                  icon={<Plus />}
                   iconRight={null}
                 >
                   <TextField.Input
@@ -202,7 +202,7 @@ export default function ManageCollectionsDrawer({
                 <Button
                   variant="neutral-primary"
                   size="medium"
-                  icon={<FeatherPlus />}
+                  icon={<Plus />}
                   iconRight={null}
                   onClick={handleCreateCollection}
                   loading={isCreating}
@@ -250,7 +250,7 @@ export default function ManageCollectionsDrawer({
                     <IconButton
                       variant="neutral-tertiary"
                       size="small"
-                      icon={<FeatherTrash />}
+                      icon={<Trash />}
                       onClick={() => handleDeleteClick(collection)}
                     />
                   </div>

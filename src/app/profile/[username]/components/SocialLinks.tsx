@@ -2,12 +2,7 @@
 
 import React from "react";
 import { IconButton } from "@/ui/components/IconButton";
-import { FeatherTwitter } from "@subframe/core";
-import { FeatherInstagram } from "@subframe/core";
-import { FeatherLinkedin } from "@subframe/core";
-import { FeatherYoutube } from "@subframe/core";
-import { FeatherGithub } from "@subframe/core";
-import { FeatherGlobe } from "@subframe/core";
+import { Github, Globe, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 
 interface SocialLinksProps {
   twitter?: string | null;
@@ -38,37 +33,37 @@ export function SocialLinks({
     <div className="flex w-full flex-wrap items-center gap-1">
       {twitter && (
         <IconButton
-          icon={<FeatherTwitter />}
+          icon={<Twitter />}
           onClick={() => handleSocialClick(`https://twitter.com/${twitter}`)}
         />
       )}
       {instagram && (
         <IconButton
-          icon={<FeatherInstagram />}
+          icon={<Instagram />}
           onClick={() => handleSocialClick(`https://instagram.com/${instagram}`)}
         />
       )}
       {linkedin && (
         <IconButton
-          icon={<FeatherLinkedin />}
+          icon={<Linkedin />}
           onClick={() => handleSocialClick(`https://linkedin.com/in/${linkedin}`)}
         />
       )}
       {youtube && (
         <IconButton
-          icon={<FeatherYoutube />}
+          icon={<Youtube />}
           onClick={() => handleSocialClick(`https://youtube.com/${youtube}`)}
         />
       )}
       {github && (
         <IconButton
-          icon={<FeatherGithub />}
+          icon={<Github />}
           onClick={() => handleSocialClick(`https://github.com/${github}`)}
         />
       )}
       {website && (
         <IconButton
-          icon={<FeatherGlobe />}
+          icon={<Globe />}
           onClick={() => handleSocialClick(website)}
         />
       )}

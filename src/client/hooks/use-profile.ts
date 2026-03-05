@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { toast } from '@subframe/core';
-
+import { toast } from 'sonner';
 export interface ProfileData {
   profile: {
     id: string;

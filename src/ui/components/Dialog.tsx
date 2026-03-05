@@ -1,15 +1,10 @@
 "use client";
-/*
- * Documentation:
- * Dialog — https://app.subframe.com/7b590a12c74e/library?component=Dialog_ca59db17-43fb-4247-8094-3c55162e902d
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { cn } from "../utils";
 
-interface ContentProps
-  extends React.ComponentProps<typeof SubframeCore.Dialog.Content> {
+interface ContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   className?: string;
 }
@@ -19,9 +14,9 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
   ref
 ) {
   return children ? (
-    <SubframeCore.Dialog.Content asChild={true} {...otherProps}>
+    <DialogPrimitive.Content asChild {...otherProps}>
       <div
-        className={SubframeUtils.twClassNames(
+        className={cn(
           "flex min-w-[320px] flex-col items-start gap-2 rounded-md border border-solid border-neutral-border bg-default-background shadow-lg max-h-[90vh] overflow-auto",
           className
         )}
@@ -29,12 +24,11 @@ const Content = React.forwardRef<HTMLDivElement, ContentProps>(function Content(
       >
         {children}
       </div>
-    </SubframeCore.Dialog.Content>
+    </DialogPrimitive.Content>
   ) : null;
 });
 
-interface DialogRootProps
-  extends React.ComponentProps<typeof SubframeCore.Dialog.Root> {
+interface DialogRootProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -43,21 +37,26 @@ interface DialogRootProps
 
 const DialogRoot = React.forwardRef<HTMLDivElement, DialogRootProps>(
   function DialogRoot(
-    { children, className, ...otherProps }: DialogRootProps,
+    { children, open, onOpenChange, className, ...otherProps }: DialogRootProps,
     ref
   ) {
     return children ? (
-      <SubframeCore.Dialog.Root asChild={true} {...otherProps}>
-        <div
-          className={SubframeUtils.twClassNames(
-            "flex h-full w-full flex-col items-center justify-center gap-2 bg-[#00000099]",
-            className
-          )}
-          ref={ref}
-        >
-          {children}
-        </div>
-      </SubframeCore.Dialog.Root>
+      <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay asChild>
+            <div
+              className={cn(
+                "fixed inset-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-[#00000099] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+                className
+              )}
+              ref={ref}
+              {...otherProps}
+            >
+              {children}
+            </div>
+          </DialogPrimitive.Overlay>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     ) : null;
   }
 );

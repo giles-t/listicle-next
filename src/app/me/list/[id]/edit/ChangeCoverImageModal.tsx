@@ -5,7 +5,7 @@ import { Badge } from "@/ui/components/Badge";
 import { Button } from "@/ui/components/Button";
 import { IconButton } from "@/ui/components/IconButton";
 import { Dialog } from "@/ui/components/Dialog";
-import { FeatherCheck } from "@subframe/core";
+import { Check } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -77,7 +77,7 @@ export default function ChangeCoverImageModal({
                     )}
                     {isSelected && (
                       <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-brand-600 rounded-full shadow-lg border-2 border-white flex items-center justify-center">
-                        <FeatherCheck className="w-4 h-4 text-white" />
+                        <Check className="w-4 h-4 text-white" />
                       </div>
                     )}
                     <img

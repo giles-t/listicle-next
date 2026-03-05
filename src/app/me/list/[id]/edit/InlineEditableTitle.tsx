@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/ui/components/Button";
-import { FeatherCheck, FeatherX, toast } from "@subframe/core";
+import { toast } from "sonner";
+import { Check, X } from "lucide-react";
 
 interface InlineEditableTitleProps {
   initialValue: string;
@@ -140,7 +141,7 @@ export default function InlineEditableTitle({
           <Button
             variant="neutral-tertiary"
             size="small"
-            icon={<FeatherX />}
+            icon={<X />}
             onClick={handleCancel}
             disabled={isSaving}
           >
@@ -148,7 +149,7 @@ export default function InlineEditableTitle({
           </Button>
           <Button
             size="small"
-            icon={<FeatherCheck />}
+            icon={<Check />}
             onClick={handleSave}
             loading={isSaving}
           >

@@ -1,15 +1,9 @@
 "use client";
-/*
- * Documentation:
- * Link Button — https://app.subframe.com/7b590a12c74e/library?component=Link+Button_a4ee726a-774c-4091-8c49-55b659356024
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface LinkButtonRootProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface LinkButtonRootProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
   variant?: "brand" | "neutral" | "inverse";
   size?: "large" | "medium" | "small";
@@ -22,81 +16,28 @@ interface LinkButtonRootProps
 
 const LinkButtonRoot = React.forwardRef<HTMLButtonElement, LinkButtonRootProps>(
   function LinkButtonRoot(
-    {
-      disabled = false,
-      variant = "neutral",
-      size = "medium",
-      icon = null,
-      children,
-      iconRight = null,
-      className,
-      type = "button",
-      ...otherProps
-    }: LinkButtonRootProps,
+    { disabled = false, variant = "neutral", size = "medium", icon = null, children, iconRight = null, className, type = "button", ...otherProps }: LinkButtonRootProps,
     ref
   ) {
+    const colorClass = {
+      brand: "text-brand-700 hover:text-brand-700",
+      neutral: "text-neutral-700 hover:text-brand-700",
+      inverse: "text-white hover:text-white",
+    }[variant];
+
     return (
       <button
-        className={SubframeUtils.twClassNames(
-          "group/a4ee726a flex cursor-pointer items-center gap-1 border-none bg-transparent text-left",
-          { "flex-row flex-nowrap gap-1": size === "large" },
-          className
-        )}
-        ref={ref}
-        type={type}
-        disabled={disabled}
-        {...otherProps}
+        className={cn("group flex cursor-pointer items-center gap-1 border-none bg-transparent text-left disabled:text-neutral-400", className)}
+        ref={ref} type={type} disabled={disabled} {...otherProps}
       >
         {icon ? (
-          <SubframeCore.IconWrapper
-            className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400",
-              {
-                "text-caption font-caption": size === "small",
-                "text-heading-3 font-heading-3": size === "large",
-                "text-white group-hover/a4ee726a:text-white":
-                  variant === "inverse",
-                "text-brand-700 group-hover/a4ee726a:text-brand-700":
-                  variant === "brand",
-              }
-            )}
-          >
-            {icon}
-          </SubframeCore.IconWrapper>
+          <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] group-disabled:text-neutral-400", { "text-caption font-caption": size === "small", "text-heading-3 font-heading-3": size === "large" }, colorClass)}>{icon}</span>
         ) : null}
         {children ? (
-          <span
-            className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-hover/a4ee726a:underline group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:no-underline",
-              {
-                "text-caption font-caption": size === "small",
-                "text-heading-3 font-heading-3": size === "large",
-                "text-white group-hover/a4ee726a:text-white":
-                  variant === "inverse",
-                "text-brand-700 group-hover/a4ee726a:text-brand-700":
-                  variant === "brand",
-              }
-            )}
-          >
-            {children}
-          </span>
+          <span className={cn("group-hover:underline group-disabled:text-neutral-400 group-disabled:no-underline", { "text-caption font-caption": size === "small", "text-body font-body": size === "medium", "text-heading-3 font-heading-3": size === "large" }, colorClass)}>{children}</span>
         ) : null}
         {iconRight ? (
-          <SubframeCore.IconWrapper
-            className={SubframeUtils.twClassNames(
-              "text-body font-body text-neutral-700 group-hover/a4ee726a:text-brand-700 group-disabled/a4ee726a:text-neutral-400 group-hover/a4ee726a:group-disabled/a4ee726a:text-neutral-400",
-              {
-                "text-caption font-caption": size === "small",
-                "text-heading-3 font-heading-3": size === "large",
-                "text-white group-hover/a4ee726a:text-white":
-                  variant === "inverse",
-                "text-brand-700 group-hover/a4ee726a:text-brand-700":
-                  variant === "brand",
-              }
-            )}
-          >
-            {iconRight}
-          </SubframeCore.IconWrapper>
+          <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] group-disabled:text-neutral-400", { "text-caption font-caption": size === "small", "text-heading-3 font-heading-3": size === "large" }, colorClass)}>{iconRight}</span>
         ) : null}
       </button>
     );

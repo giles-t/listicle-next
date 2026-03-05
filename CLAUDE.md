@@ -8,7 +8,7 @@ Listicle is a content platform for creating and sharing list-based articles ("Me
 
 - **Framework:** Next.js 15 (App Router), React 19, TypeScript 5.8
 - **Auth & DB:** Supabase (Auth + PostgreSQL), Drizzle ORM
-- **Styling:** Tailwind CSS 4 + Subframe UI component library
+- **Styling:** Tailwind CSS 4 + custom design system (Radix UI primitives, Instrument Serif + Inter typography)
 - **Editor:** TipTap rich text editor with collaboration, AI, and media extensions
 - **Services:** OpenAI (AI features), Resend (email), Sentry (errors), Upstash Redis (caching/rate limiting)
 - **Hosting:** Vercel (standalone output)
@@ -48,7 +48,7 @@ src/
 ├── shared/        # Code shared between client and server
 │   ├── validation/      # Zod schemas (list.ts, user.ts, publication.ts, etc.)
 │   └── utils/           # slug, pagination, date, media, metadata helpers
-└── ui/            # Subframe design system (50+ components)
+└── ui/            # Custom design system (Radix UI + Tailwind, 50+ components)
     ├── components/      # Button, TextField, Dialog, Accordion, etc.
     └── layouts/         # DefaultPageLayout and other page layouts
 ```
@@ -67,7 +67,7 @@ src/
 ## Architecture & Conventions
 
 - **Server components by default.** Only add `"use client"` when interactivity is needed.
-- **Use Subframe UI components** (`src/ui/components/`) before building custom ones.
+- **Use design system components** (`src/ui/components/`) before building custom ones.
 - **API routes** follow REST conventions in `src/app/api/` using Next.js route handlers (`GET`, `POST`, `PATCH`, `DELETE` exports).
 - **Validate all input** with Zod schemas from `src/shared/validation/`.
 - **Database queries** live in `src/server/db/queries/` - one file per domain (lists, profiles, comments, etc.).
@@ -103,14 +103,16 @@ See `.env.example` for all required variables. Key ones:
 - `NEXT_PUBLIC_*` vars are exposed to the client (Supabase URL, anon key, app URL)
 - Server-only: `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `RESEND_API_KEY`, `OPENAI_API_KEY`, `SENTRY_DSN`
 
-## Subframe MCP (Design Integration)
+## Design System
 
-A Subframe MCP server is available for looking up designs. When building or modifying UI, you can use it to:
+Custom design system built on Radix UI primitives + Tailwind CSS 4 with OKLCH colors.
 
-- **View designs:** Paste a Subframe MCP link (from the browser address bar or "Code > Inspect" in Subframe) to see the design spec and generate matching code.
-- **Design pages:** Use the MCP tools to create design variations during planning or implementation.
-
-The MCP generates code using the project's existing Subframe components and theme. See https://docs.subframe.com/learn/guides/working-with-ai-agents for full details.
+- **Typography:** Instrument Serif (headings) + Inter (body) - editorial, premium feel
+- **Colors:** Indigo brand palette in OKLCH format
+- **Icons:** lucide-react (Feather icon set)
+- **Toasts:** Sonner
+- **Components:** `src/ui/components/` - Button, Badge, TextField, Avatar, Dialog, Drawer, etc.
+- **Utility:** `cn()` from `src/ui/utils.ts` (clsx + tailwind-merge)
 
 ## Testing
 

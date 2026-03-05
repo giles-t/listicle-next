@@ -1,21 +1,12 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/ui/components/Button";
 import { Badge } from "@/ui/components/Badge";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
-import * as SubframeCore from "@subframe/core";
-import {
-  FeatherArrowLeft,
-  FeatherList,
-  FeatherListRestart,
-  FeatherImage,
-  FeatherEye,
-  FeatherFilePlus,
-  FeatherSettings2,
-  FeatherSettings,
-  toast,
-} from "@subframe/core";
+import { toast } from "sonner";
 import ChangeListTypeModal, { type ListType } from "./ChangeListTypeModal";
 import ChangeListVisibilityModal from "./ChangeListVisibilityModal";
 import ReorderListModal from "./ReorderListModal";
@@ -28,6 +19,7 @@ import InlineEditableDescription from "./InlineEditableDescription";
 import InlineItemContent from "./InlineItemContent";
 import { extractImagesFromListItems } from "@/shared/utils/extract-images";
 import Link from "next/link";
+import { ArrowLeft, Eye, FilePlus, Image, List, ListRestart, Settings, Settings2 } from "lucide-react";
 
 type ListItem = { id: string; title: string; content: string; sort_order: number };
 type Category = { id: string; name: string; };
@@ -393,7 +385,7 @@ export default function EditListClient({
           <Link href="/me/lists">
             <Button
               variant="neutral-tertiary"
-              icon={<FeatherArrowLeft />}
+              icon={<ArrowLeft />}
             >
               Back
             </Button>
@@ -407,46 +399,46 @@ export default function EditListClient({
             <Link href={`/@${username}/${slug}`} target="_blank">
               <Button
                 variant="neutral-secondary"
-                icon={<FeatherEye />}
+                icon={<Eye />}
               >
                 View
               </Button>
             </Link>
           )}
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
+          <DropdownMenuPrimitive.Root>
+            <DropdownMenuPrimitive.Trigger asChild={true}>
               <Button
                 variant="neutral-tertiary"
-                icon={<FeatherSettings />}
+                icon={<Settings />}
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) => {}}
               />
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
+            </DropdownMenuPrimitive.Trigger>
+            <DropdownMenuPrimitive.Portal>
+              <DropdownMenuPrimitive.Content side="bottom" align="end" sideOffset={4} asChild={true}>
                 <DropdownMenu>
-                  <DropdownMenu.DropdownItem icon={<FeatherList />} onClick={() => requestAnimationFrame(() => setIsChangeTypeOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<List />} onClick={() => requestAnimationFrame(() => setIsChangeTypeOpen(true))}>
                     Change list type
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherListRestart />} onClick={() => requestAnimationFrame(() => setIsReorderOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<ListRestart />} onClick={() => requestAnimationFrame(() => setIsReorderOpen(true))}>
                     Reorder List
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherImage />} onClick={() => requestAnimationFrame(() => setIsChangeCoverImageOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<Image />} onClick={() => requestAnimationFrame(() => setIsChangeCoverImageOpen(true))}>
                     Change cover image
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherEye />} onClick={() => requestAnimationFrame(() => setIsChangeVisibilityOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<Eye />} onClick={() => requestAnimationFrame(() => setIsChangeVisibilityOpen(true))}>
                     Manage list visibility
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherFilePlus />} onClick={() => requestAnimationFrame(() => setIsAddToPublicationOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<FilePlus />} onClick={() => requestAnimationFrame(() => setIsAddToPublicationOpen(true))}>
                     Add to publication
                   </DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownDivider />
-                  <DropdownMenu.DropdownItem icon={<FeatherSettings2 />} onClick={() => requestAnimationFrame(() => setIsMoreSettingsOpen(true))}>
+                  <DropdownMenu.DropdownItem icon={<Settings2 />} onClick={() => requestAnimationFrame(() => setIsMoreSettingsOpen(true))}>
                     More settings
                   </DropdownMenu.DropdownItem>
                 </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
+              </DropdownMenuPrimitive.Content>
+            </DropdownMenuPrimitive.Portal>
+          </DropdownMenuPrimitive.Root>
           <Button onClick={handlePublish} loading={isSavingPublish}>
             {publishedState ? "Unpublish" : "Publish"}
           </Button>

@@ -6,7 +6,7 @@ import type { NodeViewProps } from '@tiptap/react'
 import { Button } from '@/src/ui/components/Button'
 import { TextField } from '@/src/ui/components/TextField'
 import { Loader } from '@/src/ui/components/Loader'
-import { FeatherLink } from '@subframe/core'
+import { Link } from "lucide-react";
 
 export function EmbedInputNodeView({ node, updateAttributes, deleteNode, editor, selected }: NodeViewProps) {
   const [isLoading, setIsLoading] = useState(false)
@@ -134,7 +134,7 @@ export function EmbedInputNodeView({ node, updateAttributes, deleteNode, editor,
         <span className="text-body font-body text-subtext-color">
           Paste a link to embed content from YouTube, X/Twitter, Instagram, etc.
         </span>
-        <TextField className="h-auto w-full flex-none" label="" helpText="" icon={<FeatherLink />}>
+        <TextField className="h-auto w-full flex-none" label="" helpText="" icon={<Link />}>
           <TextField.Input
             ref={inputRef}
             placeholder="https://www.youtube.com/watch?v=..."

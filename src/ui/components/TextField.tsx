@@ -1,12 +1,7 @@
 "use client";
-/*
- * Documentation:
- * Text Field — https://app.subframe.com/7b590a12c74e/library?component=Text+Field_be48ca43-f8e7-4c0e-8870-d219ea11abfe
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
 interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "placeholder"> {
@@ -22,7 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
 ) {
   return (
     <input
-      className={SubframeUtils.twClassNames(
+      className={cn(
         "h-full w-full border-none bg-transparent px-0 py-0 text-body font-body text-default-font outline-none placeholder:text-neutral-400",
         className
       )}
@@ -64,10 +59,7 @@ const TextFieldRoot = React.forwardRef<HTMLLabelElement, TextFieldRootProps>(
   ) {
     return (
       <label
-        className={SubframeUtils.twClassNames(
-          "group/be48ca43 flex flex-col items-start gap-1",
-          className
-        )}
+        className={cn("group flex flex-col items-start gap-1", className)}
         ref={ref}
         {...otherProps}
       >
@@ -77,20 +69,20 @@ const TextFieldRoot = React.forwardRef<HTMLLabelElement, TextFieldRootProps>(
           </span>
         ) : null}
         <div
-          className={SubframeUtils.twClassNames(
-            "flex h-8 w-full flex-none items-center gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-2 group-focus-within/be48ca43:border group-focus-within/be48ca43:border-solid group-focus-within/be48ca43:border-brand-primary",
+          className={cn(
+            "flex h-8 w-full flex-none items-center gap-1 rounded-md border border-solid border-neutral-border bg-default-background px-2 group-focus-within:border-brand-primary transition-colors",
             {
-              "border border-solid border-neutral-100 bg-neutral-100 group-hover/be48ca43:border group-hover/be48ca43:border-solid group-hover/be48ca43:border-neutral-border group-focus-within/be48ca43:bg-default-background":
+              "border-neutral-100 bg-neutral-100 group-hover:border-neutral-border group-focus-within:bg-default-background":
                 variant === "filled",
-              "border border-solid border-error-600": error,
-              "border border-solid border-neutral-200 bg-neutral-200": disabled,
+              "border-error-600": error,
+              "border-neutral-200 bg-neutral-200": disabled,
             }
           )}
         >
           {icon ? (
-            <SubframeCore.IconWrapper className="text-body font-body text-subtext-color">
+            <span className="text-body font-body text-subtext-color shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em]">
               {icon}
-            </SubframeCore.IconWrapper>
+            </span>
           ) : null}
           {children ? (
             <div className="flex grow shrink-0 basis-0 flex-col items-start self-stretch px-1">
@@ -98,23 +90,13 @@ const TextFieldRoot = React.forwardRef<HTMLLabelElement, TextFieldRootProps>(
             </div>
           ) : null}
           {iconRight ? (
-            <SubframeCore.IconWrapper
-              className={SubframeUtils.twClassNames(
-                "text-body font-body text-subtext-color",
-                { "text-error-500": error }
-              )}
-            >
+            <span className={cn("text-body font-body text-subtext-color shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em]", { "text-error-500": error })}>
               {iconRight}
-            </SubframeCore.IconWrapper>
+            </span>
           ) : null}
         </div>
         {helpText ? (
-          <span
-            className={SubframeUtils.twClassNames(
-              "text-caption font-caption text-subtext-color",
-              { "text-error-700": error }
-            )}
-          >
+          <span className={cn("text-caption font-caption text-subtext-color", { "text-error-700": error })}>
             {helpText}
           </span>
         ) : null}

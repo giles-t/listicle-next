@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { DialogLayout } from "@/ui/layouts/DialogLayout";
-import { FeatherTrash } from "@subframe/core";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { Button } from "@/ui/components/Button";
+import { Trash } from "lucide-react";
 
 type ConfirmDeleteModalProps = {
   open: boolean;
@@ -29,7 +29,7 @@ export default function ConfirmDeleteModal({ open, onOpenChange, onConfirm }: Co
       <div className="flex w-96 flex-col items-start gap-6 px-6 py-6">
         <div className="flex w-full flex-col items-center gap-6">
           <div className="flex w-full flex-col items-center gap-4">
-            <IconWithBackground variant="error" size="large" icon={<FeatherTrash />} />
+            <IconWithBackground variant="error" size="large" icon={<Trash />} />
             <span className="text-heading-3 font-heading-3 text-default-font">Delete list?</span>
           </div>
           <span className="text-body font-body text-subtext-color">
@@ -56,5 +56,4 @@ export default function ConfirmDeleteModal({ open, onOpenChange, onConfirm }: Co
     </DialogLayout>
   );
 }
-
 

@@ -11,11 +11,7 @@ import { TextArea } from '@/src/ui/components/TextArea'
 import { Loader } from '@/src/ui/components/Loader'
 
 // Icons
-import { FeatherImage } from '@subframe/core'
-import { FeatherSparkles } from '@subframe/core'
-import { FeatherTrash2 } from '@subframe/core'
-import { FeatherCheck } from '@subframe/core'
-import { FeatherRefreshCw } from '@subframe/core'
+import { Check, Image, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 
 interface AiImageData {
   prompt: string
@@ -279,7 +275,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         </div>
         <Button
           className="mobile:h-8 mobile:w-full mobile:flex-none"
-          icon={<FeatherSparkles />}
+          icon={<Sparkles />}
           onClick={(event) => {
             console.log('🔍 DEBUG: Generate button clicked - RAW EVENT')
             console.log('🔍 DEBUG: Event:', event)
@@ -351,7 +347,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   const renderErrorState = () => (
     <div className="flex w-full max-w-[768px] flex-col items-start gap-4 rounded-md border border-solid border-red-200 bg-red-50 px-6 py-6">
       <div className="flex items-center gap-2">
-        <FeatherTrash2 className="w-5 h-5 text-red-600" />
+        <Trash2 className="w-5 h-5 text-red-600" />
         <span className="text-heading-3 font-heading-3 text-red-800">
           Generation Failed
         </span>
@@ -366,14 +362,14 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <div className="flex items-center gap-2">
           <Button
             variant="destructive-tertiary"
-            icon={<FeatherTrash2 />}
+            icon={<Trash2 />}
             onClick={handleDiscard}
           >
             Discard
           </Button>
           <Button
             variant="brand-primary"
-            icon={<FeatherRefreshCw />}
+            icon={<RefreshCw />}
             onClick={handleRegenerate}
           >
             Try Again
@@ -437,20 +433,20 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <div className="flex items-center gap-2">
           <Button
             variant="destructive-tertiary"
-            icon={<FeatherTrash2 />}
+            icon={<Trash2 />}
             onClick={handleDiscard}
           >
             Discard
           </Button>
           <Button
             variant="neutral-tertiary"
-            icon={<FeatherCheck />}
+            icon={<Check />}
             onClick={handleInsert}
           >
             Insert
           </Button>
           <Button
-            icon={<FeatherRefreshCw />}
+            icon={<RefreshCw />}
             onClick={handleRegenerate}
           >
             Regenerate
@@ -474,7 +470,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <span className="text-white text-sm italic">"{prompt}"</span>
       </div>
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs rounded-full p-2">
-        <FeatherImage className="w-4 h-4 text-gray-600" />
+        <Image className="w-4 h-4 text-gray-600" />
       </div>
     </div>
   )
@@ -507,7 +503,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         onClick={() => setIsExpanded(true)}
       >
         <div className="flex items-center gap-3">
-          <FeatherSparkles className="w-4 h-4 text-blue-600 shrink-0" />
+          <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
           <span className="flex-1 text-sm text-gray-900 italic truncate">"{prompt}"</span>
           <span className="text-xs text-gray-400 shrink-0">Click to edit</span>
         </div>

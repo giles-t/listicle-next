@@ -1,61 +1,28 @@
 "use client";
-/*
- * Documentation:
- * Progress — https://app.subframe.com/7b590a12c74e/library?component=Progress_60964db0-a1bf-428b-b9d5-f34cdf58ea77
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { cn } from "../utils";
 
-interface IndicatorProps
-  extends React.ComponentProps<typeof SubframeCore.Progress.Indicator> {
-  className?: string;
-}
+interface IndicatorProps extends React.HTMLAttributes<HTMLDivElement> { className?: string; }
+const Indicator = React.forwardRef<HTMLDivElement, IndicatorProps>(function Indicator({ className, ...otherProps }, ref) {
+  return <ProgressPrimitive.Indicator className={cn("h-full rounded-full bg-brand-600 transition-all", className)} ref={ref} {...otherProps} />;
+});
 
-const Indicator = React.forwardRef<HTMLDivElement, IndicatorProps>(
-  function Indicator({ className, ...otherProps }: IndicatorProps, ref) {
-    return (
-      <SubframeCore.Progress.Indicator asChild={true} {...otherProps}>
-        <div
-          className={SubframeUtils.twClassNames(
-            "flex h-2 w-full flex-col items-start gap-2 rounded-full bg-brand-600",
-            className
-          )}
-          ref={ref}
-        />
-      </SubframeCore.Progress.Indicator>
-    );
-  }
-);
-
-interface ProgressRootProps
-  extends React.ComponentProps<typeof SubframeCore.Progress.Root> {
-  value?: number;
-  className?: string;
+interface ProgressRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  value?: number; className?: string;
 }
 
 const ProgressRoot = React.forwardRef<HTMLDivElement, ProgressRootProps>(
-  function ProgressRoot(
-    { value = 30, className, ...otherProps }: ProgressRootProps,
-    ref
-  ) {
+  function ProgressRoot({ value = 0, className, ...otherProps }, ref) {
     return (
-      <SubframeCore.Progress.Root asChild={true} value={value} {...otherProps}>
-        <div
-          className={SubframeUtils.twClassNames(
-            "flex w-full flex-col items-start gap-2 overflow-hidden rounded-full bg-neutral-100",
-            className
-          )}
-          ref={ref}
-        >
-          <Indicator />
-        </div>
-      </SubframeCore.Progress.Root>
+      <ProgressPrimitive.Root value={value}
+        className={cn("flex h-2 w-full overflow-hidden rounded-full bg-neutral-100", className)} ref={ref} {...otherProps}
+      >
+        <Indicator style={{ width: `${value}%` }} />
+      </ProgressPrimitive.Root>
     );
   }
 );
 
-export const Progress = Object.assign(ProgressRoot, {
-  Indicator,
-});
+export const Progress = Object.assign(ProgressRoot, { Indicator });

@@ -1,12 +1,7 @@
 "use client";
-/*
- * Documentation:
- * Tabs — https://app.subframe.com/7b590a12c74e/library?component=Tabs_e1ad5091-8ad8-4319-b1f7-3e47f0256c20
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
 interface ItemProps extends React.HTMLAttributes<HTMLDivElement> {
   active?: boolean;
@@ -17,23 +12,15 @@ interface ItemProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
-  {
-    active = false,
-    disabled = false,
-    icon = null,
-    children,
-    className,
-    ...otherProps
-  }: ItemProps,
+  { active = false, disabled = false, icon = null, children, className, ...otherProps }: ItemProps,
   ref
 ) {
   return (
     <div
-      className={SubframeUtils.twClassNames(
-        "group/d5612535 flex h-10 cursor-pointer items-center justify-center gap-2 border-b border-solid border-neutral-border px-2.5 py-0.5",
+      className={cn(
+        "group flex h-10 cursor-pointer items-center justify-center gap-2 border-b border-solid border-neutral-border px-2.5 py-0.5 transition-colors",
         {
-          "border-b-2 border-solid border-brand-600 px-2.5 pt-0.5 pb-px hover:border-b-2 hover:border-solid hover:border-brand-600":
-            active,
+          "border-b-2 border-brand-600 px-2.5 pt-0.5 pb-px": active,
         },
         className
       )}
@@ -41,30 +28,12 @@ const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
       {...otherProps}
     >
       {icon ? (
-        <SubframeCore.IconWrapper
-          className={SubframeUtils.twClassNames(
-            "text-body font-body text-subtext-color group-hover/d5612535:text-default-font",
-            {
-              "text-neutral-400 group-hover/d5612535:text-neutral-400":
-                disabled,
-              "text-brand-700 group-hover/d5612535:text-brand-700": active,
-            }
-          )}
-        >
+        <span className={cn("text-body font-body text-subtext-color group-hover:text-default-font shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em]", { "text-neutral-400 group-hover:text-neutral-400": disabled, "text-brand-700 group-hover:text-brand-700": active })}>
           {icon}
-        </SubframeCore.IconWrapper>
+        </span>
       ) : null}
       {children ? (
-        <span
-          className={SubframeUtils.twClassNames(
-            "text-body-bold font-body-bold text-subtext-color group-hover/d5612535:text-default-font",
-            {
-              "text-neutral-400 group-hover/d5612535:text-neutral-400":
-                disabled,
-              "text-brand-700 group-hover/d5612535:text-brand-700": active,
-            }
-          )}
-        >
+        <span className={cn("text-body-bold font-body-bold text-subtext-color group-hover:text-default-font", { "text-neutral-400 group-hover:text-neutral-400": disabled, "text-brand-700 group-hover:text-brand-700": active })}>
           {children}
         </span>
       ) : null}
@@ -78,28 +47,14 @@ interface TabsRootProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(
-  function TabsRoot(
-    { children, className, ...otherProps }: TabsRootProps,
-    ref
-  ) {
+  function TabsRoot({ children, className, ...otherProps }: TabsRootProps, ref) {
     return (
-      <div
-        className={SubframeUtils.twClassNames(
-          "flex w-full items-end",
-          className
-        )}
-        ref={ref}
-        {...otherProps}
-      >
-        {children ? (
-          <div className="flex items-start self-stretch">{children}</div>
-        ) : null}
+      <div className={cn("flex w-full items-end", className)} ref={ref} {...otherProps}>
+        {children ? <div className="flex items-start self-stretch">{children}</div> : null}
         <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2 self-stretch border-b border-solid border-neutral-border" />
       </div>
     );
   }
 );
 
-export const Tabs = Object.assign(TabsRoot, {
-  Item,
-});
+export const Tabs = Object.assign(TabsRoot, { Item });

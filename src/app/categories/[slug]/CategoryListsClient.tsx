@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/ui/components/Button";
@@ -7,22 +9,11 @@ import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { ListicleCardComponent as ListicleCard } from "@/ui/components/ListicleCardComponent";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
-import {
-  FeatherChevronDown,
-  FeatherChevronRight,
-  FeatherClock,
-  FeatherEye,
-  FeatherFileText,
-  FeatherHeart,
-  FeatherTrendingUp,
-  FeatherUserPlus,
-  FeatherUsers,
-} from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { formatNumber } from "@/shared/utils/format";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { formatDistanceToNow } from "date-fns";
+import { ChevronDown, ChevronRight, Clock, Eye, FileText, Heart, TrendingUp, UserPlus, Users } from "lucide-react";
 
 export interface CategoryList {
   id: string;
@@ -193,14 +184,14 @@ export function CategoryListsClient({
           >
             Home
           </Link>
-          <FeatherChevronRight className="text-body font-body text-subtext-color" />
+          <ChevronRight className="text-body font-body text-subtext-color" />
           <Link
             href="/categories"
             className="text-body font-body text-neutral-700 hover:text-brand-700 hover:underline"
           >
             Categories
           </Link>
-          <FeatherChevronRight className="text-body font-body text-subtext-color" />
+          <ChevronRight className="text-body font-body text-subtext-color" />
           <span className="text-caption-bold font-caption-bold text-default-font">
             {category.name}
           </span>
@@ -219,7 +210,7 @@ export function CategoryListsClient({
             )}
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <FeatherUsers className="text-body font-body text-subtext-color" />
+                <Users className="text-body font-body text-subtext-color" />
                 <span className="text-body-bold font-body-bold text-default-font">
                   {formatNumber(category.followerCount)}
                 </span>
@@ -228,7 +219,7 @@ export function CategoryListsClient({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <FeatherFileText className="text-body font-body text-subtext-color" />
+                <FileText className="text-body font-body text-subtext-color" />
                 <span className="text-body-bold font-body-bold text-default-font">
                   {formatNumber(category.listCount)}
                 </span>
@@ -240,7 +231,7 @@ export function CategoryListsClient({
           </div>
           <Button
             variant={category.isFollowing ? "neutral-secondary" : "brand-secondary"}
-            icon={<FeatherUserPlus />}
+            icon={<UserPlus />}
             loading={isFollowingLoading}
             onClick={handleFollow}
           >
@@ -258,18 +249,18 @@ export function CategoryListsClient({
           <span className="text-heading-2 font-heading-2 text-default-font">
             Featured Lists
           </span>
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
+          <DropdownMenuPrimitive.Root>
+            <DropdownMenuPrimitive.Trigger asChild={true}>
               <Button
                 variant="neutral-secondary"
                 size="medium"
-                iconRight={<FeatherChevronDown />}
+                iconRight={<ChevronDown />}
               >
                 Sort by: {sortLabel}
               </Button>
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content
+            </DropdownMenuPrimitive.Trigger>
+            <DropdownMenuPrimitive.Portal>
+              <DropdownMenuPrimitive.Content
                 side="bottom"
                 align="end"
                 sideOffset={4}
@@ -277,33 +268,33 @@ export function CategoryListsClient({
               >
                 <DropdownMenu>
                   <DropdownMenu.DropdownItem
-                    icon={<FeatherTrendingUp />}
+                    icon={<TrendingUp />}
                     onClick={() => handleSortChange("trending")}
                   >
                     Trending
                   </DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem
-                    icon={<FeatherEye />}
+                    icon={<Eye />}
                     onClick={() => handleSortChange("views")}
                   >
                     Most Views
                   </DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem
-                    icon={<FeatherHeart />}
+                    icon={<Heart />}
                     onClick={() => handleSortChange("likes")}
                   >
                     Most Likes
                   </DropdownMenu.DropdownItem>
                   <DropdownMenu.DropdownItem
-                    icon={<FeatherClock />}
+                    icon={<Clock />}
                     onClick={() => handleSortChange("newest")}
                   >
                     Newest
                   </DropdownMenu.DropdownItem>
                 </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
+              </DropdownMenuPrimitive.Content>
+            </DropdownMenuPrimitive.Portal>
+          </DropdownMenuPrimitive.Root>
         </div>
 
         {/* Lists Grid */}
@@ -361,7 +352,7 @@ export function CategoryListsClient({
             <IconWithBackground
               size="large"
               variant="neutral"
-              icon={<FeatherFileText />}
+              icon={<FileText />}
             />
             <h2 className="text-heading-3 font-heading-3 text-default-font">
               No lists found

@@ -1,125 +1,47 @@
 "use client";
-/*
- * Documentation:
- * Radio Group — https://app.subframe.com/7b590a12c74e/library?component=Radio+Group_c4b6300e-20b4-4f3e-8b9f-379a046674ca
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { cn } from "../utils";
 
-interface OptionProps
-  extends React.ComponentProps<typeof SubframeCore.RadioGroup.Item> {
-  label?: React.ReactNode;
-  disabled?: boolean;
-  checked?: boolean;
-  className?: string;
+interface OptionProps extends React.HTMLAttributes<HTMLDivElement> {
+  value: string; label?: React.ReactNode; disabled?: boolean; className?: string;
 }
 
-const Option = React.forwardRef<HTMLButtonElement, OptionProps>(function Option(
-  {
-    label,
-    disabled = false,
-    checked = false,
-    className,
-    ...otherProps
-  }: OptionProps,
-  ref
-) {
-  return (
-    <SubframeCore.RadioGroup.Item
-      checked={checked}
-      disabled={disabled}
-      asChild={true}
-      {...otherProps}
-    >
-      <button
-        className={SubframeUtils.twClassNames(
-          "group/0f804ad9 flex cursor-pointer items-center gap-2 border-none bg-transparent text-left disabled:cursor-default",
-          className
-        )}
-        ref={ref}
-      >
-        <div className="flex h-4 items-center gap-2">
-          <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-full border-2 border-solid border-neutral-300 bg-default-background group-active/0f804ad9:border-2 group-active/0f804ad9:border-solid group-active/0f804ad9:border-brand-700 group-aria-[checked=true]/0f804ad9:border-2 group-aria-[checked=true]/0f804ad9:border-solid group-aria-[checked=true]/0f804ad9:border-brand-600 group-disabled/0f804ad9:border-2 group-disabled/0f804ad9:border-solid group-disabled/0f804ad9:border-neutral-200 group-disabled/0f804ad9:bg-neutral-100 group-active/0f804ad9:group-disabled/0f804ad9:border-2 group-active/0f804ad9:group-disabled/0f804ad9:border-solid group-active/0f804ad9:group-disabled/0f804ad9:border-neutral-200">
-            <div className="hidden h-2 w-2 flex-none flex-col items-start gap-2 rounded-full bg-default-background group-aria-[checked=true]/0f804ad9:flex group-aria-[checked=true]/0f804ad9:bg-brand-600 group-disabled/0f804ad9:bg-neutral-200" />
-          </div>
-        </div>
-        {label ? (
-          <span className="text-body font-body text-default-font group-disabled/0f804ad9:text-subtext-color">
-            {label}
-          </span>
-        ) : null}
-      </button>
-    </SubframeCore.RadioGroup.Item>
-  );
-});
-
-interface RadioGroupRootProps
-  extends React.ComponentProps<typeof SubframeCore.RadioGroup.Root> {
-  label?: React.ReactNode;
-  helpText?: React.ReactNode;
-  error?: boolean;
-  horizontal?: boolean;
-  children?: React.ReactNode;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  className?: string;
-}
-
-const RadioGroupRoot = React.forwardRef<HTMLDivElement, RadioGroupRootProps>(
-  function RadioGroupRoot(
-    {
-      label,
-      helpText,
-      error = false,
-      horizontal = false,
-      children,
-      className,
-      ...otherProps
-    }: RadioGroupRootProps,
-    ref
-  ) {
+const Option = React.forwardRef<HTMLDivElement, OptionProps>(
+  function Option({ value, label, disabled = false, className, ...otherProps }, ref) {
     return (
-      <SubframeCore.RadioGroup.Root asChild={true} {...otherProps}>
-        <div
-          className={SubframeUtils.twClassNames(
-            "group/c4b6300e flex flex-col items-start gap-2",
-            className
-          )}
-          ref={ref}
+      <div className={cn("flex items-center gap-2", className)} ref={ref} {...otherProps}>
+        <RadioGroupPrimitive.Item value={value} disabled={disabled}
+          className="flex h-4 w-4 items-center justify-center rounded-full border border-solid border-neutral-300 bg-default-background data-[state=checked]:border-brand-600 disabled:opacity-50"
         >
-          {label ? (
-            <span className="text-body-bold font-body-bold text-default-font">
-              {label}
-            </span>
-          ) : null}
-          {children ? (
-            <div
-              className={SubframeUtils.twClassNames(
-                "flex flex-col items-start gap-2",
-                { "flex-row flex-nowrap gap-6": horizontal }
-              )}
-            >
-              {children}
-            </div>
-          ) : null}
-          {helpText ? (
-            <span
-              className={SubframeUtils.twClassNames(
-                "text-caption font-caption text-subtext-color",
-                { "text-error-700": error }
-              )}
-            >
-              {helpText}
-            </span>
-          ) : null}
-        </div>
-      </SubframeCore.RadioGroup.Root>
+          <RadioGroupPrimitive.Indicator className="h-2 w-2 rounded-full bg-brand-600" />
+        </RadioGroupPrimitive.Item>
+        {label ? <span className={cn("text-body font-body text-default-font", { "text-neutral-400": disabled })}>{label}</span> : null}
+      </div>
     );
   }
 );
 
-export const RadioGroup = Object.assign(RadioGroupRoot, {
-  Option,
-});
+interface RadioGroupRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: React.ReactNode; helpText?: React.ReactNode; error?: boolean; horizontal?: boolean;
+  children?: React.ReactNode; value?: string; onValueChange?: (value: string) => void; className?: string;
+}
+
+const RadioGroupRoot = React.forwardRef<HTMLDivElement, RadioGroupRootProps>(
+  function RadioGroupRoot({ label, helpText, error = false, horizontal = false, children, value, onValueChange, className, ...otherProps }, ref) {
+    return (
+      <div className={cn("flex flex-col items-start gap-2", className)} ref={ref} {...otherProps}>
+        {label ? <span className="text-caption-bold font-caption-bold text-default-font">{label}</span> : null}
+        <RadioGroupPrimitive.Root value={value} onValueChange={onValueChange}
+          className={cn("flex flex-col items-start gap-2", { "flex-row flex-wrap gap-4": horizontal })}
+        >
+          {children}
+        </RadioGroupPrimitive.Root>
+        {helpText ? <span className={cn("text-caption font-caption text-subtext-color", { "text-error-700": error })}>{helpText}</span> : null}
+      </div>
+    );
+  }
+);
+
+export const RadioGroup = Object.assign(RadioGroupRoot, { Option });

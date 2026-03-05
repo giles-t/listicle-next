@@ -4,9 +4,9 @@ import React from "react";
 import { Button } from "@/ui/components/Button";
 import { FullscreenDialog } from "@/ui/components/FullscreenDialog";
 import { IconButton } from "@/ui/components/IconButton";
-import { FeatherX } from "@subframe/core";
 import * as Dialog from "@radix-ui/react-dialog";
 import RichTextEditor from "@/client/components/NotionEditor";
+import { X } from "lucide-react";
 
 type ListItem = {
   id: string;

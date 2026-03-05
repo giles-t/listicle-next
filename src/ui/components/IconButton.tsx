@@ -1,13 +1,8 @@
 "use client";
-/*
- * Documentation:
- * Icon Button — https://app.subframe.com/7b590a12c74e/library?component=Icon+Button_af9405b1-8c54-4e01-9786-5aad308224f6
- */
 
 import React from "react";
-import { FeatherPlus } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { Plus } from "lucide-react";
+import { cn } from "../utils";
 
 interface IconButtonRootProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -36,7 +31,7 @@ const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
       disabled = false,
       variant = "neutral-tertiary",
       size = "medium",
-      icon = <FeatherPlus />,
+      icon = <Plus />,
       loading = false,
       className,
       type = "button",
@@ -44,30 +39,35 @@ const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
     }: IconButtonRootProps,
     ref
   ) {
+    const iconColor = {
+      "brand-primary": "text-white",
+      "brand-secondary": "text-brand-700",
+      "brand-tertiary": "text-brand-700",
+      "neutral-primary": "text-neutral-700",
+      "neutral-secondary": "text-neutral-700",
+      "neutral-tertiary": "text-neutral-700",
+      "destructive-primary": "text-white",
+      "destructive-secondary": "text-error-700",
+      "destructive-tertiary": "text-error-700",
+      inverse: "text-white",
+    }[variant];
+
     return (
       <button
-        className={SubframeUtils.twClassNames(
-          "group/af9405b1 flex h-8 w-8 cursor-pointer items-center justify-center gap-2 rounded-md border-none bg-transparent text-left hover:bg-neutral-100 active:bg-neutral-50 disabled:cursor-default disabled:bg-neutral-100 hover:disabled:cursor-default hover:disabled:bg-neutral-100 active:disabled:cursor-default active:disabled:bg-neutral-100",
+        className={cn(
+          "group flex h-8 w-8 cursor-pointer items-center justify-center gap-2 rounded-md border-none bg-transparent text-left transition-colors hover:bg-neutral-100 active:bg-neutral-50 disabled:cursor-default disabled:bg-neutral-100",
           {
             "h-6 w-6": size === "small",
             "h-10 w-10": size === "large",
             "hover:bg-[#ffffff29] active:bg-[#ffffff3d]": variant === "inverse",
-            "hover:bg-error-50 active:bg-error-100":
-              variant === "destructive-tertiary",
-            "bg-error-50 hover:bg-error-100 active:bg-error-50":
-              variant === "destructive-secondary",
-            "bg-error-600 hover:bg-error-500 active:bg-error-600":
-              variant === "destructive-primary",
-            "border border-solid border-neutral-border bg-white hover:bg-neutral-100 active:bg-white":
-              variant === "neutral-secondary",
-            "bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-100":
-              variant === "neutral-primary",
-            "hover:bg-brand-50 active:bg-brand-100":
-              variant === "brand-tertiary",
-            "bg-brand-50 hover:bg-brand-100 active:bg-brand-50":
-              variant === "brand-secondary",
-            "bg-brand-600 hover:bg-brand-500 active:bg-brand-600":
-              variant === "brand-primary",
+            "hover:bg-error-50 active:bg-error-100": variant === "destructive-tertiary",
+            "bg-error-50 hover:bg-error-100 active:bg-error-50": variant === "destructive-secondary",
+            "bg-error-600 hover:bg-error-500 active:bg-error-600": variant === "destructive-primary",
+            "border border-solid border-neutral-border bg-white hover:bg-neutral-100 active:bg-white": variant === "neutral-secondary",
+            "bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-100": variant === "neutral-primary",
+            "hover:bg-brand-50 active:bg-brand-100": variant === "brand-tertiary",
+            "bg-brand-50 hover:bg-brand-100 active:bg-brand-50": variant === "brand-secondary",
+            "bg-brand-600 hover:bg-brand-500 active:bg-brand-600": variant === "brand-primary",
           },
           className
         )}
@@ -76,52 +76,13 @@ const IconButtonRoot = React.forwardRef<HTMLButtonElement, IconButtonRootProps>(
         disabled={disabled}
         {...otherProps}
       >
-        {icon ? (
-          <SubframeCore.IconWrapper
-            className={SubframeUtils.twClassNames(
-              "text-heading-3 font-heading-3 text-neutral-700 group-disabled/af9405b1:text-neutral-400",
-              {
-                hidden: loading,
-                "text-body font-body": size === "small",
-                "text-heading-3 font-heading-3": size === "large",
-                "text-white group-hover/af9405b1:text-white":
-                  variant === "inverse",
-                "text-error-700 group-hover/af9405b1:text-error-700 group-active/af9405b1:text-error-700":
-                  variant === "destructive-tertiary" ||
-                  variant === "destructive-secondary",
-                "text-white group-hover/af9405b1:text-white group-active/af9405b1:text-white":
-                  variant === "destructive-primary" ||
-                  variant === "brand-primary",
-                "text-neutral-700": variant === "neutral-secondary",
-                "text-neutral-700 group-hover/af9405b1:text-neutral-700 group-active/af9405b1:text-neutral-700":
-                  variant === "neutral-primary",
-                "text-brand-700 group-hover/af9405b1:text-brand-700 group-active/af9405b1:text-brand-700":
-                  variant === "brand-tertiary" || variant === "brand-secondary",
-              }
-            )}
-          >
+        {loading ? (
+          <span className={cn("h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent", { "h-3 w-3": size === "small" }, iconColor)} />
+        ) : icon ? (
+          <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] group-disabled:text-neutral-400", { "text-body font-body": size === "small", "text-heading-3 font-heading-3": size === "large" }, iconColor)}>
             {icon}
-          </SubframeCore.IconWrapper>
+          </span>
         ) : null}
-        <SubframeCore.Loader
-          className={SubframeUtils.twClassNames(
-            "hidden text-caption font-caption text-neutral-700 group-disabled/af9405b1:text-neutral-400",
-            {
-              "inline-block": loading,
-              "text-caption font-caption": size === "small",
-              "text-white":
-                variant === "inverse" ||
-                variant === "destructive-primary" ||
-                variant === "brand-primary",
-              "text-error-700":
-                variant === "destructive-tertiary" ||
-                variant === "destructive-secondary",
-              "text-neutral-700": variant === "neutral-primary",
-              "text-brand-700":
-                variant === "brand-tertiary" || variant === "brand-secondary",
-            }
-          )}
-        />
       </button>
     );
   }

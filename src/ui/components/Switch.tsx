@@ -1,67 +1,32 @@
 "use client";
-/*
- * Documentation:
- * Switch — https://app.subframe.com/7b590a12c74e/library?component=Switch_7a464794-9ea9-4040-b1de-5bfb2ce599d9
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as SwitchPrimitive from "@radix-ui/react-switch";
+import { cn } from "../utils";
 
-interface ThumbProps
-  extends React.ComponentProps<typeof SubframeCore.Switch.Thumb> {
-  className?: string;
-}
-
-const Thumb = React.forwardRef<HTMLDivElement, ThumbProps>(function Thumb(
-  { className, ...otherProps }: ThumbProps,
-  ref
-) {
-  return (
-    <SubframeCore.Switch.Thumb asChild={true} {...otherProps}>
-      <div
-        className={SubframeUtils.twClassNames(
-          "flex h-3.5 w-3.5 flex-col items-start gap-2 rounded-full bg-white shadow-sm",
-          className
-        )}
-        ref={ref}
-      />
-    </SubframeCore.Switch.Thumb>
-  );
-});
-
-interface SwitchRootProps
-  extends React.ComponentProps<typeof SubframeCore.Switch.Root> {
+interface SwitchRootProps extends React.HTMLAttributes<HTMLButtonElement> {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   className?: string;
 }
 
-const SwitchRoot = React.forwardRef<HTMLDivElement, SwitchRootProps>(
-  function SwitchRoot(
-    { checked = false, className, ...otherProps }: SwitchRootProps,
-    ref
-  ) {
+const SwitchRoot = React.forwardRef<HTMLButtonElement, SwitchRootProps>(
+  function SwitchRoot({ checked = false, onCheckedChange, className, ...otherProps }: SwitchRootProps, ref) {
     return (
-      <SubframeCore.Switch.Root
+      <SwitchPrimitive.Root
         checked={checked}
-        asChild={true}
+        onCheckedChange={onCheckedChange}
+        className={cn(
+          "flex h-5 w-8 cursor-pointer items-center rounded-full border border-solid border-neutral-200 bg-neutral-200 px-0.5 py-0.5 transition-colors data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600",
+          className
+        )}
+        ref={ref}
         {...otherProps}
       >
-        <div
-          className={SubframeUtils.twClassNames(
-            "group/7a464794 flex h-5 w-8 cursor-pointer flex-col items-start justify-center gap-2 rounded-full border border-solid border-neutral-200 bg-neutral-200 px-0.5 py-0.5 aria-[checked=true]:border aria-[checked=true]:border-solid aria-[checked=true]:border-brand-600 aria-[checked=true]:bg-brand-600",
-            className
-          )}
-          ref={ref}
-        >
-          <Thumb />
-        </div>
-      </SubframeCore.Switch.Root>
+        <SwitchPrimitive.Thumb className="block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform data-[state=checked]:translate-x-3" />
+      </SwitchPrimitive.Root>
     );
   }
 );
 
-export const Switch = Object.assign(SwitchRoot, {
-  Thumb,
-});
+export const Switch = SwitchRoot;

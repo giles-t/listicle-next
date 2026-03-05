@@ -1,56 +1,24 @@
 "use client";
-/*
- * Documentation:
- * OAuth Social Button — https://app.subframe.com/7b590a12c74e/library?component=OAuth+Social+Button_f1948f75-65f9-4f21-b3e4-a49511440c26
- */
 
 import React from "react";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface OAuthSocialButtonRootProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: React.ReactNode;
-  logo?: string;
-  disabled?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  className?: string;
+interface OAuthSocialButtonRootProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: React.ReactNode; logo?: string; disabled?: boolean; className?: string;
 }
 
-const OAuthSocialButtonRoot = React.forwardRef<
-  HTMLButtonElement,
-  OAuthSocialButtonRootProps
->(function OAuthSocialButtonRoot(
-  {
-    children,
-    logo,
-    disabled = false,
-    className,
-    type = "button",
-    ...otherProps
-  }: OAuthSocialButtonRootProps,
-  ref
-) {
-  return (
-    <button
-      className={SubframeUtils.twClassNames(
-        "group/f1948f75 flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-4 text-left hover:bg-neutral-50 active:bg-white disabled:cursor-default disabled:bg-white hover:disabled:cursor-default hover:disabled:bg-white active:disabled:cursor-default active:disabled:bg-white",
-        className
-      )}
-      ref={ref}
-      type={type}
-      disabled={disabled}
-      {...otherProps}
-    >
-      {logo ? (
-        <img className="h-5 w-5 flex-none object-cover" src={logo} />
-      ) : null}
-      {children ? (
-        <span className="text-body-bold font-body-bold text-neutral-700 group-disabled/f1948f75:text-neutral-400">
-          {children}
-        </span>
-      ) : null}
-    </button>
-  );
-});
+const OAuthSocialButtonRoot = React.forwardRef<HTMLButtonElement, OAuthSocialButtonRootProps>(
+  function OAuthSocialButtonRoot({ children, logo, disabled = false, className, type = "button", ...otherProps }, ref) {
+    return (
+      <button
+        className={cn("group flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-4 text-left transition-colors hover:bg-neutral-50 active:bg-white disabled:cursor-default disabled:bg-white", className)}
+        ref={ref} type={type} disabled={disabled} {...otherProps}
+      >
+        {logo ? <img className="h-5 w-5 flex-none object-cover" src={logo} /> : null}
+        {children ? <span className="text-body-bold font-body-bold text-neutral-700 group-disabled:text-neutral-400">{children}</span> : null}
+      </button>
+    );
+  }
+);
 
 export const OAuthSocialButton = OAuthSocialButtonRoot;

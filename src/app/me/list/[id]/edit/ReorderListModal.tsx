@@ -5,7 +5,6 @@ import { Badge } from "@/ui/components/Badge";
 import { Button } from "@/ui/components/Button";
 import { IconButton } from "@/ui/components/IconButton";
 import { Drawer } from "@/ui/components/Drawer";
-import { FeatherGripVertical, FeatherChevronUp, FeatherChevronDown } from "@subframe/core";
 import {
   DndContext,
   closestCenter,
@@ -25,6 +24,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 
 type ListItem = {
   id: string;
@@ -77,20 +77,20 @@ function SortableItem({ item, index, onMoveUp, onMoveDown, isFirst, isLast, disa
         <IconButton
           size="small"
           variant="neutral-tertiary"
-          icon={<FeatherChevronUp />}
+          icon={<ChevronUp />}
           onClick={onMoveUp}
           disabled={isFirst || disabled}
         />
         <IconButton
           size="small"
           variant="neutral-tertiary"
-          icon={<FeatherChevronDown />}
+          icon={<ChevronDown />}
           onClick={onMoveDown}
           disabled={isLast || disabled}
         />
         <IconButton
           size="small"
-          icon={<FeatherGripVertical />}
+          icon={<GripVertical />}
           className="cursor-grab active:cursor-grabbing"
           disabled={disabled}
           {...attributes}

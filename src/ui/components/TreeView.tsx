@@ -1,148 +1,53 @@
 "use client";
-/*
- * Documentation:
- * Accordion — https://app.subframe.com/7b590a12c74e/library?component=Accordion_d2e81e20-863a-4027-826a-991d8910efd9
- * Tree View — https://app.subframe.com/7b590a12c74e/library?component=Tree+View_4ed46422-ecc3-41e8-8787-e55ee10cdc75
- */
 
 import React from "react";
-import { FeatherFile } from "@subframe/core";
-import { FeatherFolder } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
-import { Accordion } from "./Accordion";
-
-interface FolderProps extends React.ComponentProps<typeof Accordion> {
-  children?: React.ReactNode;
-  label?: React.ReactNode;
-  icon?: React.ReactNode;
-  className?: string;
-}
-
-const Folder = React.forwardRef<
-  React.ElementRef<typeof Accordion>,
-  FolderProps
->(function Folder(
-  {
-    children,
-    label,
-    icon = <FeatherFolder />,
-    className,
-    ...otherProps
-  }: FolderProps,
-  ref
-) {
-  return (
-    <Accordion
-      className={SubframeUtils.twClassNames(
-        "group/c841484c cursor-pointer",
-        className
-      )}
-      trigger={
-        <div className="flex w-full items-center gap-2 rounded-md px-3 py-2 group-hover/c841484c:bg-neutral-50">
-          {icon ? (
-            <SubframeCore.IconWrapper className="text-body font-body text-default-font">
-              {icon}
-            </SubframeCore.IconWrapper>
-          ) : null}
-          {label ? (
-            <span className="line-clamp-1 grow shrink-0 basis-0 text-body font-body text-default-font">
-              {label}
-            </span>
-          ) : null}
-          <Accordion.Chevron />
-        </div>
-      }
-      defaultOpen={true}
-      ref={ref}
-      {...otherProps}
-    >
-      {children ? (
-        <div className="flex w-full flex-col items-start gap-1 pl-6 pt-1">
-          {children}
-        </div>
-      ) : null}
-    </Accordion>
-  );
-});
+import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
+import { ChevronRight } from "lucide-react";
+import { cn } from "../utils";
 
 interface ItemProps extends React.HTMLAttributes<HTMLDivElement> {
-  selected?: boolean;
-  label?: React.ReactNode;
-  icon?: React.ReactNode;
-  className?: string;
+  label?: React.ReactNode; icon?: React.ReactNode; selected?: boolean; className?: string;
 }
-
-const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
-  {
-    selected = false,
-    label,
-    icon = <FeatherFile />,
-    className,
-    ...otherProps
-  }: ItemProps,
-  ref
-) {
-  return (
-    <div
-      className={SubframeUtils.twClassNames(
-        "group/42786044 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 hover:bg-neutral-50",
-        { "bg-brand-100 hover:bg-brand-100": selected },
-        className
-      )}
-      ref={ref}
-      {...otherProps}
-    >
-      {icon ? (
-        <SubframeCore.IconWrapper
-          className={SubframeUtils.twClassNames(
-            "text-body font-body text-default-font",
-            { "text-brand-700": selected }
-          )}
-        >
-          {icon}
-        </SubframeCore.IconWrapper>
-      ) : null}
-      {label ? (
-        <span
-          className={SubframeUtils.twClassNames(
-            "line-clamp-1 grow shrink-0 basis-0 text-body font-body text-default-font",
-            { "text-brand-700": selected }
-          )}
-        >
-          {label}
-        </span>
-      ) : null}
-    </div>
-  );
-});
-
-interface TreeViewRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-const TreeViewRoot = React.forwardRef<HTMLDivElement, TreeViewRootProps>(
-  function TreeViewRoot(
-    { children, className, ...otherProps }: TreeViewRootProps,
-    ref
-  ) {
-    return children ? (
-      <div
-        className={SubframeUtils.twClassNames(
-          "flex w-full flex-col items-start",
-          className
-        )}
-        ref={ref}
-        {...otherProps}
-      >
-        {children}
+const Item = React.forwardRef<HTMLDivElement, ItemProps>(
+  function Item({ label, icon, selected = false, className, ...otherProps }, ref) {
+    return (
+      <div className={cn("flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-3 hover:bg-neutral-100", { "bg-brand-50": selected }, className)} ref={ref} {...otherProps}>
+        {icon ? <span className="shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] text-subtext-color">{icon}</span> : null}
+        {label ? <span className={cn("text-body font-body text-default-font", { "text-brand-700 font-medium": selected })}>{label}</span> : null}
       </div>
-    ) : null;
+    );
   }
 );
 
-export const TreeView = Object.assign(TreeViewRoot, {
-  Folder,
-  Item,
-});
+interface FolderProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: React.ReactNode; icon?: React.ReactNode; children?: React.ReactNode; className?: string;
+}
+const Folder = React.forwardRef<HTMLDivElement, FolderProps>(
+  function Folder({ label, icon, children, className, ...otherProps }, ref) {
+    return (
+      <CollapsiblePrimitive.Root asChild>
+        <div className={cn("flex w-full flex-col", className)} ref={ref} {...otherProps}>
+          <CollapsiblePrimitive.Trigger asChild>
+            <div className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-3 hover:bg-neutral-100">
+              <ChevronRight className="h-3 w-3 text-subtext-color transition-transform data-[state=open]:rotate-90" />
+              {icon ? <span className="shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] text-subtext-color">{icon}</span> : null}
+              {label ? <span className="text-body font-body text-default-font">{label}</span> : null}
+            </div>
+          </CollapsiblePrimitive.Trigger>
+          <CollapsiblePrimitive.Content>
+            <div className="pl-4">{children}</div>
+          </CollapsiblePrimitive.Content>
+        </div>
+      </CollapsiblePrimitive.Root>
+    );
+  }
+);
+
+interface TreeViewRootProps extends React.HTMLAttributes<HTMLDivElement> { children?: React.ReactNode; className?: string; }
+const TreeViewRoot = React.forwardRef<HTMLDivElement, TreeViewRootProps>(
+  function TreeViewRoot({ children, className, ...otherProps }, ref) {
+    return <div className={cn("flex w-full flex-col", className)} ref={ref} {...otherProps}>{children}</div>;
+  }
+);
+
+export const TreeView = Object.assign(TreeViewRoot, { Folder, Item });

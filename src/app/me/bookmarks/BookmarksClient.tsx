@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { Avatar } from "@/ui/components/Avatar";
@@ -15,23 +17,11 @@ import { Loader } from "@/ui/components/Loader";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import AddToBookmarkDrawer from "@/client/components/AddToBookmarkDrawer";
 import ManageCollectionsDrawer from "@/client/components/ManageCollectionsDrawer";
-import {
-  FeatherChevronDown,
-  FeatherFolder,
-  FeatherFolderPlus,
-  FeatherGrid,
-  FeatherList,
-  FeatherMapPin,
-  FeatherMoreHorizontal,
-  FeatherSearch,
-  FeatherTrash,
-  FeatherBookmark,
-} from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { formatRelativeTime, formatShortDate } from "@/shared/utils/date";
 import { formatNumber } from "@/shared/utils/format";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
+import { Bookmark, ChevronDown, Folder, FolderPlus, Grid, List, MapPin, MoreHorizontal, Search, Trash } from "lucide-react";
 
 export type BookmarkData = {
   id: string;
@@ -310,7 +300,7 @@ export default function BookmarksClient({
   const createMenuActions = (bookmark: BookmarkData) => (
     <DropdownMenu>
       <DropdownMenu.DropdownItem
-        icon={<FeatherFolder />}
+        icon={<Folder />}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -322,7 +312,7 @@ export default function BookmarksClient({
       <DropdownMenu.DropdownDivider />
       <DropdownMenu.DropdownItem
         className="[&>*]:text-error-600"
-        icon={<FeatherTrash />}
+        icon={<Trash />}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -336,18 +326,18 @@ export default function BookmarksClient({
 
   // Create menu for list view
   const createListMenu = (bookmark: BookmarkData) => (
-    <SubframeCore.DropdownMenu.Root>
-      <SubframeCore.DropdownMenu.Trigger asChild={true}>
+    <DropdownMenuPrimitive.Root>
+      <DropdownMenuPrimitive.Trigger asChild={true}>
         <IconButton
           variant="neutral-tertiary"
           size="small"
-          icon={<FeatherMoreHorizontal />}
+          icon={<MoreHorizontal />}
           loading={isDeleting === bookmark.id}
           onClick={(e) => e.preventDefault()}
         />
-      </SubframeCore.DropdownMenu.Trigger>
-      <SubframeCore.DropdownMenu.Portal>
-        <SubframeCore.DropdownMenu.Content
+      </DropdownMenuPrimitive.Trigger>
+      <DropdownMenuPrimitive.Portal>
+        <DropdownMenuPrimitive.Content
           side="bottom"
           align="end"
           sideOffset={4}
@@ -355,7 +345,7 @@ export default function BookmarksClient({
         >
           <DropdownMenu>
             <DropdownMenu.DropdownItem
-              icon={<FeatherFolder />}
+              icon={<Folder />}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -367,7 +357,7 @@ export default function BookmarksClient({
             <DropdownMenu.DropdownDivider />
             <DropdownMenu.DropdownItem
               className="[&>*]:text-error-600"
-              icon={<FeatherTrash />}
+              icon={<Trash />}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -377,9 +367,9 @@ export default function BookmarksClient({
               Delete bookmark
             </DropdownMenu.DropdownItem>
           </DropdownMenu>
-        </SubframeCore.DropdownMenu.Content>
-      </SubframeCore.DropdownMenu.Portal>
-    </SubframeCore.DropdownMenu.Root>
+        </DropdownMenuPrimitive.Content>
+      </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPrimitive.Root>
   );
 
   // Card view item using BookmarkCardComponent
@@ -394,7 +384,7 @@ export default function BookmarksClient({
           image={image || undefined}
           collectionBadge={
             bookmark.collection ? (
-              <Badge variant="neutral" icon={<FeatherFolder />}>
+              <Badge variant="neutral" icon={<Folder />}>
                 {bookmark.collection.name}
               </Badge>
             ) : undefined
@@ -435,7 +425,7 @@ export default function BookmarksClient({
           description={description || undefined}
           collectionBadge={
             bookmark.collection ? (
-              <Badge variant="neutral" icon={<FeatherFolder />}>
+              <Badge variant="neutral" icon={<Folder />}>
                 {bookmark.collection.name}
               </Badge>
             ) : undefined
@@ -456,7 +446,7 @@ export default function BookmarksClient({
   const EmptyState = () => (
     <div className="flex w-full flex-col items-center justify-center py-12 text-center">
       <div className="mb-4">
-        <IconWithBackground variant="neutral" size="large" icon={<FeatherBookmark />} />
+        <IconWithBackground variant="neutral" size="large" icon={<Bookmark />} />
       </div>
       <h3 className="text-heading-3 font-heading-3 text-default-font mb-2">
         {searchQuery || selectedCategory || selectedCollection !== 'all' ? 'No bookmarks found' : 'No bookmarks yet'}
@@ -495,7 +485,7 @@ export default function BookmarksClient({
             </span>
           </div>
           <Button
-            icon={<FeatherFolderPlus />}
+            icon={<FolderPlus />}
             onClick={() => setManageCollectionsDrawerOpen(true)}
           >
             Manage Collections
@@ -513,7 +503,7 @@ export default function BookmarksClient({
                 variant="outline"
                 label=""
                 helpText=""
-                icon={<FeatherSearch />}
+                icon={<Search />}
               >
                 <TextField.Input
                   placeholder="Search bookmarks..."
@@ -523,17 +513,17 @@ export default function BookmarksClient({
               </TextField>
 
               {/* Collection filter */}
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild={true}>
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild={true}>
                   <Button
                     variant="neutral-secondary"
-                    iconRight={<FeatherChevronDown />}
+                    iconRight={<ChevronDown />}
                   >
                     {selectedCollectionName}
                   </Button>
-                </SubframeCore.DropdownMenu.Trigger>
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content
                     side="bottom"
                     align="start"
                     sideOffset={4}
@@ -556,29 +546,29 @@ export default function BookmarksClient({
                       {collections.map((col) => (
                         <DropdownMenu.DropdownItem
                           key={col.id}
-                          icon={<FeatherFolder />}
+                          icon={<Folder />}
                           onClick={() => setSelectedCollection(col.id)}
                         >
                           {col.name}
                         </DropdownMenu.DropdownItem>
                       ))}
                     </DropdownMenu>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
 
               {/* Category filter */}
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild={true}>
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild={true}>
                   <Button
                     variant="neutral-secondary"
-                    iconRight={<FeatherChevronDown />}
+                    iconRight={<ChevronDown />}
                   >
                     {selectedCategoryName}
                   </Button>
-                </SubframeCore.DropdownMenu.Trigger>
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content
                     side="bottom"
                     align="start"
                     sideOffset={4}
@@ -595,29 +585,29 @@ export default function BookmarksClient({
                       {categories.map((cat) => (
                         <DropdownMenu.DropdownItem
                           key={cat.id}
-                          icon={<FeatherFolder />}
+                          icon={<Folder />}
                           onClick={() => setSelectedCategory(cat.slug)}
                         >
                           {cat.name}
                         </DropdownMenu.DropdownItem>
                       ))}
                     </DropdownMenu>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
 
               {/* Sort filter */}
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild={true}>
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild={true}>
                   <Button
                     variant="neutral-secondary"
-                    iconRight={<FeatherChevronDown />}
+                    iconRight={<ChevronDown />}
                   >
                     {sortLabel}
                   </Button>
-                </SubframeCore.DropdownMenu.Trigger>
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content
                     side="bottom"
                     align="start"
                     sideOffset={4}
@@ -644,9 +634,9 @@ export default function BookmarksClient({
                         Alphabetical
                       </DropdownMenu.DropdownItem>
                     </DropdownMenu>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
             </div>
 
             {/* View toggle - hidden on mobile */}
@@ -660,8 +650,8 @@ export default function BookmarksClient({
                   }
                 }}
               >
-                <ToggleGroup.Item icon={<FeatherGrid />} value="card" />
-                <ToggleGroup.Item icon={<FeatherList />} value="list" />
+                <ToggleGroup.Item icon={<Grid />} value="card" />
+                <ToggleGroup.Item icon={<List />} value="list" />
               </ToggleGroup>
             </div>
           </div>

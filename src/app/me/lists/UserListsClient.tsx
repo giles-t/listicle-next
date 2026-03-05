@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,12 +13,11 @@ import { Avatar } from "@/ui/components/Avatar";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
 import { Loader } from "@/ui/components/Loader";
-import * as SubframeCore from "@subframe/core";
-import { FeatherEye, FeatherFileText, FeatherMoreHorizontal, FeatherEdit2, FeatherTrash } from "@subframe/core";
 import { formatRelativeTime, formatShortDate } from "@/shared/utils/date";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { Edit2, Eye, FileText, MoreHorizontal, Trash } from "lucide-react";
 
 export type UserList = {
   id: string;
@@ -131,7 +132,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
             className="h-20 w-20 flex-none rounded-sm bg-neutral-100 flex items-center justify-center cursor-pointer"
             aria-label="Edit list"
           >
-            <FeatherFileText className="w-6 h-6 text-neutral-400" />
+            <FileText className="w-6 h-6 text-neutral-400" />
           </Link>
         )}
         <div className="flex flex-col items-start justify-center gap-2 self-stretch grow">
@@ -153,21 +154,21 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
         </div>
         <div className="flex grow shrink-0 basis-0 items-center justify-end gap-2 self-stretch mobile:items-center mobile:justify-start">
           <Badge variant={isDraft ? "neutral" : "success"}>{isDraft ? "Draft" : "Published"}</Badge>
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
-              <IconButton icon={<FeatherMoreHorizontal />} loading={isDeleting === list.id} />
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
+          <DropdownMenuPrimitive.Root>
+            <DropdownMenuPrimitive.Trigger asChild={true}>
+              <IconButton icon={<MoreHorizontal />} loading={isDeleting === list.id} />
+            </DropdownMenuPrimitive.Trigger>
+            <DropdownMenuPrimitive.Portal>
+              <DropdownMenuPrimitive.Content side="bottom" align="end" sideOffset={4} asChild={true}>
                 <DropdownMenu>
                  {isDraft ? (
                   <>
-                    <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
+                    <DropdownMenu.DropdownItem icon={<Edit2 />} onClick={() => handleEditList(list.id)}>
                       Edit Draft
                     </DropdownMenu.DropdownItem>
                     <DropdownMenu.DropdownItem
                       className="text-error-700"
-                      icon={<FeatherTrash className="text-error-700" />}
+                      icon={<Trash className="text-error-700" />}
                       onClick={() => requestDelete(list)}
                     >
                       <span className="text-error-700">Delete Draft</span>
@@ -175,15 +176,15 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
                   </>
                 ) : (
                   <>
-                    <DropdownMenu.DropdownItem icon={<FeatherEye />} onClick={() => router.push(`/@${profile.username || "user"}/${list.slug}`)}>
+                    <DropdownMenu.DropdownItem icon={<Eye />} onClick={() => router.push(`/@${profile.username || "user"}/${list.slug}`)}>
                       View List
                     </DropdownMenu.DropdownItem>
-                    <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
+                    <DropdownMenu.DropdownItem icon={<Edit2 />} onClick={() => handleEditList(list.id)}>
                       Edit List
                     </DropdownMenu.DropdownItem>
                     <DropdownMenu.DropdownItem
                       className="text-error-700"
-                      icon={<FeatherTrash className="text-error-700" />}
+                      icon={<Trash className="text-error-700" />}
                       onClick={() => requestDelete(list)}
                     >
                       <span className="text-error-700">Delete List</span>
@@ -191,9 +192,9 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
                   </>
                 )}
                 </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
+              </DropdownMenuPrimitive.Content>
+            </DropdownMenuPrimitive.Portal>
+          </DropdownMenuPrimitive.Root>
         </div>
       </div>
     );
@@ -243,5 +244,4 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
       </div>
   );
 }
-
 

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { FeatherUsers, FeatherUserPlus } from "@subframe/core";
 import { formatNumber } from "@/shared/utils/format";
 import { FollowersDrawer, FollowListType } from "@/client/components/FollowersDrawer";
+import { UserPlus, Users } from "lucide-react";
 
 interface FollowStatsProps {
   username: string;
@@ -33,7 +33,7 @@ export function FollowStats({
           onClick={() => openDrawer("followers")}
           className="flex items-center gap-1 hover:opacity-70 transition-opacity"
         >
-          <FeatherUsers className="text-body font-body text-subtext-color" />
+          <Users className="text-body font-body text-subtext-color" />
           <span className="text-body-bold font-body-bold text-default-font">
             {formatNumber(followersCount)}
           </span>
@@ -45,7 +45,7 @@ export function FollowStats({
           onClick={() => openDrawer("following")}
           className="flex items-center gap-1 hover:opacity-70 transition-opacity"
         >
-          <FeatherUserPlus className="text-body font-body text-subtext-color" />
+          <UserPlus className="text-body font-body text-subtext-color" />
           <span className="text-body-bold font-body-bold text-default-font">
             {formatNumber(followingCount)}
           </span>

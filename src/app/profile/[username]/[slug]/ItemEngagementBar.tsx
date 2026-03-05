@@ -1,24 +1,19 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState } from "react";
 import { Button } from "@/ui/components/Button";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
-import { FeatherEye } from "@subframe/core";
-import { FeatherFlag } from "@subframe/core";
-import { FeatherLink } from "@subframe/core";
-import { FeatherMessageCircle } from "@subframe/core";
-import { FeatherMoreHorizontal } from "@subframe/core";
-import { FeatherShare2 } from "@subframe/core";
-import { FeatherSmile } from "@subframe/core";
-import { toast } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { toast } from "sonner";
 import { ReactionBar } from "./ReactionBar";
 import { usePageReactions } from "./PageReactionsContext";
 import { useAuth } from "@/client/hooks/use-auth";
 import { ReactionsDrawer } from "@/client/components/ReactionsDrawer";
 import { CommentsDrawer } from "@/client/components/CommentsDrawer";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { Eye, Flag, Link, MessageCircle, MoreHorizontal, Share2, Smile } from "lucide-react";
 
 interface ItemEngagementBarProps {
   listId: string;
@@ -95,21 +90,21 @@ export function ItemEngagementBar({
         <div className="flex items-center gap-2">
           <Button
             variant="neutral-tertiary"
-            icon={<FeatherEye />}
+            icon={<Eye />}
             onClick={() => {}}
           >
             {String(viewsCount ?? 0)}
           </Button>
           <Button
             variant="neutral-tertiary"
-            icon={<FeatherSmile />}
+            icon={<Smile />}
             onClick={() => setReactionsDrawerOpen(true)}
           >
             {String(displayReactionsCount ?? 0)}
           </Button>
           <Button
             variant="neutral-tertiary"
-            icon={<FeatherMessageCircle />}
+            icon={<MessageCircle />}
             onClick={handleComment}
           >
             {String(commentsCount ?? 0)}
@@ -124,34 +119,34 @@ export function ItemEngagementBar({
             size="medium"
           />
           <IconButton
-            icon={<FeatherShare2 />}
+            icon={<Share2 />}
             onClick={handleShare}
           />
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
+          <DropdownMenuPrimitive.Root>
+            <DropdownMenuPrimitive.Trigger asChild={true}>
               <IconButton
-                icon={<FeatherMoreHorizontal />}
+                icon={<MoreHorizontal />}
                 onClick={() => {}}
               />
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content
+            </DropdownMenuPrimitive.Trigger>
+            <DropdownMenuPrimitive.Portal>
+              <DropdownMenuPrimitive.Content
                 side="bottom"
                 align="end"
                 sideOffset={4}
                 asChild={true}
               >
                 <DropdownMenu>
-                  <DropdownMenu.DropdownItem icon={<FeatherLink />} onClick={handleCopyLink}>
+                  <DropdownMenu.DropdownItem icon={<Link />} onClick={handleCopyLink}>
                     Copy link
                   </DropdownMenu.DropdownItem>
-                  <DropdownMenu.DropdownItem icon={<FeatherFlag />} onClick={handleReport}>
+                  <DropdownMenu.DropdownItem icon={<Flag />} onClick={handleReport}>
                     Report
                   </DropdownMenu.DropdownItem>
                 </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
+              </DropdownMenuPrimitive.Content>
+            </DropdownMenuPrimitive.Portal>
+          </DropdownMenuPrimitive.Root>
         </div>
       </div>
       <ReactionBar listId={listId} targetId={itemId} userId={user?.id} />

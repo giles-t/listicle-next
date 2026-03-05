@@ -1,42 +1,25 @@
 "use client";
-/*
- * Documentation:
- * Area Chart — https://app.subframe.com/7b590a12c74e/library?component=Area+Chart_8aa1e7b3-5db6-4a62-aa49-137ced21a231
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface AreaChartRootProps
-  extends React.ComponentProps<typeof SubframeCore.AreaChart> {
+interface AreaChartRootProps extends React.HTMLAttributes<HTMLDivElement> {
   stacked?: boolean;
   className?: string;
 }
 
-const AreaChartRoot = React.forwardRef<
-  React.ElementRef<typeof SubframeCore.AreaChart>,
-  AreaChartRootProps
->(function AreaChartRoot(
-  { stacked = false, className, ...otherProps }: AreaChartRootProps,
-  ref
-) {
-  return (
-    <SubframeCore.AreaChart
-      className={SubframeUtils.twClassNames("h-80 w-full", className)}
-      ref={ref}
-      stacked={stacked}
-      colors={[
-        "#6366f1",
-        "#c7d2fe",
-        "#4f46e5",
-        "#a5b4fc",
-        "#4338ca",
-        "#818cf8",
-      ]}
-      {...otherProps}
-    />
-  );
-});
+const AreaChartRoot = React.forwardRef<HTMLDivElement, AreaChartRootProps>(
+  function AreaChartRoot({ className, ...otherProps }, ref) {
+    return (
+      <div
+        className={cn("flex h-80 w-full items-center justify-center rounded-md border border-dashed border-neutral-300 bg-neutral-50 text-subtext-color", className)}
+        ref={ref}
+        {...otherProps}
+      >
+        <span className="text-body font-body">AreaChart placeholder</span>
+      </div>
+    );
+  }
+);
 
 export const AreaChart = AreaChartRoot;

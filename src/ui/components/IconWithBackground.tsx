@@ -1,78 +1,26 @@
 "use client";
-/*
- * Documentation:
- * Icon with background — https://app.subframe.com/7b590a12c74e/library?component=Icon+with+background_c5d68c0e-4c0c-4cff-8d8c-6ff334859b3a
- */
 
 import React from "react";
-import { FeatherCheck } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface IconWithBackgroundRootProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface IconWithBackgroundRootProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "brand" | "neutral" | "error" | "success" | "warning";
   size?: "x-large" | "large" | "medium" | "small" | "x-small";
-  icon?: React.ReactNode;
-  square?: boolean;
-  className?: string;
+  icon?: React.ReactNode; square?: boolean; className?: string;
 }
 
-const IconWithBackgroundRoot = React.forwardRef<
-  HTMLDivElement,
-  IconWithBackgroundRootProps
->(function IconWithBackgroundRoot(
-  {
-    variant = "brand",
-    size = "x-small",
-    icon = <FeatherCheck />,
-    square = false,
-    className,
-    ...otherProps
-  }: IconWithBackgroundRootProps,
-  ref
-) {
-  return (
-    <div
-      className={SubframeUtils.twClassNames(
-        "group/c5d68c0e flex h-5 w-5 items-center justify-center gap-2 rounded-full bg-brand-100",
-        {
-          "rounded-md": square,
-          "h-6 w-6": size === "small",
-          "h-8 w-8": size === "medium",
-          "h-12 w-12": size === "large",
-          "h-16 w-16": size === "x-large",
-          "bg-warning-100": variant === "warning",
-          "bg-success-100": variant === "success",
-          "bg-error-100": variant === "error",
-          "bg-neutral-100": variant === "neutral",
-        },
-        className
-      )}
-      ref={ref}
-      {...otherProps}
-    >
-      {icon ? (
-        <SubframeCore.IconWrapper
-          className={SubframeUtils.twClassNames(
-            "font-['Inter'] text-[10px] font-[400] leading-[12px] text-brand-800",
-            {
-              "text-caption font-caption": size === "small",
-              "text-body font-body": size === "medium",
-              "text-heading-2 font-heading-2": size === "large",
-              "text-heading-1 font-heading-1": size === "x-large",
-              "text-warning-800": variant === "warning",
-              "text-success-800": variant === "success",
-              "text-error-800": variant === "error",
-              "text-neutral-700": variant === "neutral",
-            }
-          )}
-        >
-          {icon}
-        </SubframeCore.IconWrapper>
-      ) : null}
-    </div>
-  );
-});
+const IconWithBackgroundRoot = React.forwardRef<HTMLDivElement, IconWithBackgroundRootProps>(
+  function IconWithBackgroundRoot({ variant = "brand", size = "medium", icon, square = false, className, ...otherProps }, ref) {
+    const bgColor = { brand: "bg-brand-100", neutral: "bg-neutral-100", error: "bg-error-100", success: "bg-success-100", warning: "bg-warning-100" }[variant];
+    const iconColor = { brand: "text-brand-800", neutral: "text-neutral-800", error: "text-error-800", success: "text-success-800", warning: "text-warning-800" }[variant];
+    const sizeClass = { "x-large": "h-16 w-16", large: "h-12 w-12", medium: "h-8 w-8", small: "h-6 w-6", "x-small": "h-5 w-5" }[size];
+
+    return (
+      <div className={cn("flex items-center justify-center overflow-hidden", sizeClass, bgColor, square ? "rounded-md" : "rounded-full", className)} ref={ref} {...otherProps}>
+        {icon ? <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em]", iconColor)}>{icon}</span> : null}
+      </div>
+    );
+  }
+);
 
 export const IconWithBackground = IconWithBackgroundRoot;

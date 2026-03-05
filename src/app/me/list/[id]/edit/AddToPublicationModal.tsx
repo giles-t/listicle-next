@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/Button";
 import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
 import { Dialog } from "@/ui/components/Dialog";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
-import { FeatherBookmark } from "@subframe/core";
+import { Bookmark } from "lucide-react";
 
 type Publication = {
   id: string;
@@ -108,7 +108,7 @@ export default function AddToPublicationModal({
                 <IconWithBackground
                   variant="neutral"
                   size="large"
-                  icon={<FeatherBookmark />}
+                  icon={<Bookmark />}
                 />
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-heading-3 font-heading-3 text-default-font">

@@ -8,8 +8,8 @@ import { List } from "@/ui/components/List";
 import { TextField } from "@/ui/components/TextField";
 import { DrawerLayout } from "@/ui/layouts/DrawerLayout";
 import { Loader } from "@/ui/components/Loader";
-import { FeatherSearch, FeatherX } from "@subframe/core";
 import Link from "next/link";
+import { Search, X } from "lucide-react";
 
 export type FollowListType = "followers" | "following";
 
@@ -143,7 +143,7 @@ export function FollowersDrawer({
         <div className="flex w-full flex-col items-start border-b border-solid border-neutral-border bg-default-background">
           <div className="flex w-full items-center gap-2 px-4 py-4">
             <IconButton
-              icon={<FeatherX />}
+              icon={<X />}
               onClick={() => onOpenChange(false)}
             />
             <div className="flex grow shrink-0 basis-0 items-center gap-2">
@@ -161,7 +161,7 @@ export function FollowersDrawer({
               variant="filled"
               label=""
               helpText=""
-              icon={<FeatherSearch />}
+              icon={<Search />}
             >
               <TextField.Input
                 placeholder={`Search ${type}...`}

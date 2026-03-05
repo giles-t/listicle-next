@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,21 +20,8 @@ import { useAuth } from "@/client/hooks/use-auth";
 import { formatNumber } from "@/shared/utils/format";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { formatDistanceToNow } from "date-fns";
-import {
-  FeatherArrowDown,
-  FeatherBarChart2,
-  FeatherChevronDown,
-  FeatherClock,
-  FeatherList,
-  FeatherPlusCircle,
-  FeatherRefreshCcw,
-  FeatherSearch,
-  FeatherTrendingUp,
-  FeatherUserPlus,
-  FeatherUsers,
-} from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
+import { ArrowDown, BarChart2, ChevronDown, Clock, List, PlusCircle, RefreshCcw, Search, TrendingUp, UserPlus, Users } from "lucide-react";
 
 interface Category {
   id: string;
@@ -148,7 +137,7 @@ function UserCard({
         )}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <FeatherUsers className="text-body font-body text-subtext-color" />
+            <Users className="text-body font-body text-subtext-color" />
             <span className="text-body-bold font-body-bold text-default-font">
               {formatNumber(user.followerCount)}
             </span>
@@ -157,7 +146,7 @@ function UserCard({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <FeatherList className="text-body font-body text-subtext-color" />
+            <List className="text-body font-body text-subtext-color" />
             <span className="text-body-bold font-body-bold text-default-font">
               {formatNumber(user.listCount)}
             </span>
@@ -168,7 +157,7 @@ function UserCard({
       {!isOwnProfile && (
         <Button
           variant={localIsFollowing ? "brand-primary" : "brand-secondary"}
-          icon={localIsFollowing ? undefined : <FeatherUserPlus />}
+          icon={localIsFollowing ? undefined : <UserPlus />}
           loading={isLoading}
           onClick={handleFollowClick}
         >
@@ -427,7 +416,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
               variant="filled"
               label=""
               helpText=""
-              icon={<FeatherSearch />}
+              icon={<Search />}
             >
               <TextField.Input
                 placeholder={searchPlaceholder}
@@ -459,7 +448,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
               <IconWithBackground
                 variant="brand"
                 size="large"
-                icon={activeTab === "lists" ? <FeatherList /> : <FeatherUsers />}
+                icon={activeTab === "lists" ? <List /> : <Users />}
               />
               <div className="flex flex-col items-center gap-1">
                 <span className="text-heading-3 font-heading-3 text-default-font">
@@ -476,7 +465,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
             </div>
             <div className="flex flex-col items-center gap-2">
               <Link href="/">
-                <Button icon={<FeatherTrendingUp />}>
+                <Button icon={<TrendingUp />}>
                   Browse Popular Lists
                 </Button>
               </Link>
@@ -484,7 +473,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                 <Link href="/create">
                   <Button
                     variant="neutral-tertiary"
-                    icon={<FeatherPlusCircle />}
+                    icon={<PlusCircle />}
                   >
                     Create Your First List
                   </Button>
@@ -500,17 +489,17 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                   <>
                     <div className="flex items-center gap-2 mobile:h-auto mobile:w-full mobile:flex-none mobile:flex-row mobile:flex-wrap mobile:gap-2">
                       {/* Category Filter */}
-                      <SubframeCore.DropdownMenu.Root>
-                        <SubframeCore.DropdownMenu.Trigger asChild>
+                      <DropdownMenuPrimitive.Root>
+                        <DropdownMenuPrimitive.Trigger asChild>
                           <Button
                             variant="neutral-secondary"
-                            iconRight={<FeatherChevronDown />}
+                            iconRight={<ChevronDown />}
                           >
                             {selectedCategory?.name || "Category"}
                           </Button>
-                        </SubframeCore.DropdownMenu.Trigger>
-                        <SubframeCore.DropdownMenu.Portal>
-                          <SubframeCore.DropdownMenu.Content
+                        </DropdownMenuPrimitive.Trigger>
+                        <DropdownMenuPrimitive.Portal>
+                          <DropdownMenuPrimitive.Content
                             side="bottom"
                             align="start"
                             sideOffset={4}
@@ -533,22 +522,22 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                 </DropdownMenu.DropdownItem>
                               ))}
                             </DropdownMenu>
-                          </SubframeCore.DropdownMenu.Content>
-                        </SubframeCore.DropdownMenu.Portal>
-                      </SubframeCore.DropdownMenu.Root>
+                          </DropdownMenuPrimitive.Content>
+                        </DropdownMenuPrimitive.Portal>
+                      </DropdownMenuPrimitive.Root>
 
                       {/* Date Filter */}
-                      <SubframeCore.DropdownMenu.Root>
-                        <SubframeCore.DropdownMenu.Trigger asChild>
+                      <DropdownMenuPrimitive.Root>
+                        <DropdownMenuPrimitive.Trigger asChild>
                           <Button
                             variant="neutral-secondary"
-                            iconRight={<FeatherChevronDown />}
+                            iconRight={<ChevronDown />}
                           >
                             {dateLabel}
                           </Button>
-                        </SubframeCore.DropdownMenu.Trigger>
-                        <SubframeCore.DropdownMenu.Portal>
-                          <SubframeCore.DropdownMenu.Content
+                        </DropdownMenuPrimitive.Trigger>
+                        <DropdownMenuPrimitive.Portal>
+                          <DropdownMenuPrimitive.Content
                             side="bottom"
                             align="start"
                             sideOffset={4}
@@ -586,22 +575,22 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                 Past year
                               </DropdownMenu.DropdownItem>
                             </DropdownMenu>
-                          </SubframeCore.DropdownMenu.Content>
-                        </SubframeCore.DropdownMenu.Portal>
-                      </SubframeCore.DropdownMenu.Root>
+                          </DropdownMenuPrimitive.Content>
+                        </DropdownMenuPrimitive.Portal>
+                      </DropdownMenuPrimitive.Root>
 
                       {/* List Length Filter */}
-                      <SubframeCore.DropdownMenu.Root>
-                        <SubframeCore.DropdownMenu.Trigger asChild>
+                      <DropdownMenuPrimitive.Root>
+                        <DropdownMenuPrimitive.Trigger asChild>
                           <Button
                             variant="neutral-secondary"
-                            iconRight={<FeatherChevronDown />}
+                            iconRight={<ChevronDown />}
                           >
                             {listLengthLabel}
                           </Button>
-                        </SubframeCore.DropdownMenu.Trigger>
-                        <SubframeCore.DropdownMenu.Portal>
-                          <SubframeCore.DropdownMenu.Content
+                        </DropdownMenuPrimitive.Trigger>
+                        <DropdownMenuPrimitive.Portal>
+                          <DropdownMenuPrimitive.Content
                             side="bottom"
                             align="start"
                             sideOffset={4}
@@ -633,15 +622,15 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                 Long (&gt; 20 items)
                               </DropdownMenu.DropdownItem>
                             </DropdownMenu>
-                          </SubframeCore.DropdownMenu.Content>
-                        </SubframeCore.DropdownMenu.Portal>
-                      </SubframeCore.DropdownMenu.Root>
+                          </DropdownMenuPrimitive.Content>
+                        </DropdownMenuPrimitive.Portal>
+                      </DropdownMenuPrimitive.Root>
 
                       <div className="flex h-4 w-px flex-none items-start bg-neutral-border mobile:hidden" />
 
                       <Button
                         variant="neutral-tertiary"
-                        icon={<FeatherRefreshCcw />}
+                        icon={<RefreshCcw />}
                         onClick={handleReset}
                       >
                         Reset
@@ -652,18 +641,18 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                       <span className="text-body font-body text-subtext-color mobile:hidden">
                         Sort by:
                       </span>
-                      <SubframeCore.DropdownMenu.Root>
-                        <SubframeCore.DropdownMenu.Trigger asChild>
+                      <DropdownMenuPrimitive.Root>
+                        <DropdownMenuPrimitive.Trigger asChild>
                           <Button
                             variant="neutral-tertiary"
-                            icon={<FeatherBarChart2 />}
-                            iconRight={<FeatherChevronDown />}
+                            icon={<BarChart2 />}
+                            iconRight={<ChevronDown />}
                           >
                             {sortLabel}
                           </Button>
-                        </SubframeCore.DropdownMenu.Trigger>
-                        <SubframeCore.DropdownMenu.Portal>
-                          <SubframeCore.DropdownMenu.Content
+                        </DropdownMenuPrimitive.Trigger>
+                        <DropdownMenuPrimitive.Portal>
+                          <DropdownMenuPrimitive.Content
                             side="bottom"
                             align="end"
                             sideOffset={4}
@@ -671,27 +660,27 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                           >
                             <DropdownMenu>
                               <DropdownMenu.DropdownItem
-                                icon={<FeatherBarChart2 />}
+                                icon={<BarChart2 />}
                                 onClick={() => setSortBy("relevance")}
                               >
                                 Relevance
                               </DropdownMenu.DropdownItem>
                               <DropdownMenu.DropdownItem
-                                icon={<FeatherClock />}
+                                icon={<Clock />}
                                 onClick={() => setSortBy("newest")}
                               >
                                 Newest first
                               </DropdownMenu.DropdownItem>
                               <DropdownMenu.DropdownItem
-                                icon={<FeatherTrendingUp />}
+                                icon={<TrendingUp />}
                                 onClick={() => setSortBy("popular")}
                               >
                                 Most popular
                               </DropdownMenu.DropdownItem>
                             </DropdownMenu>
-                          </SubframeCore.DropdownMenu.Content>
-                        </SubframeCore.DropdownMenu.Portal>
-                      </SubframeCore.DropdownMenu.Root>
+                          </DropdownMenuPrimitive.Content>
+                        </DropdownMenuPrimitive.Portal>
+                      </DropdownMenuPrimitive.Root>
                     </div>
                   </>
                 ) : (
@@ -700,18 +689,18 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                     <span className="text-body font-body text-subtext-color mobile:hidden">
                       Sort by:
                     </span>
-                    <SubframeCore.DropdownMenu.Root>
-                      <SubframeCore.DropdownMenu.Trigger asChild>
+                    <DropdownMenuPrimitive.Root>
+                      <DropdownMenuPrimitive.Trigger asChild>
                         <Button
                           variant="neutral-tertiary"
-                          icon={<FeatherBarChart2 />}
-                          iconRight={<FeatherChevronDown />}
+                          icon={<BarChart2 />}
+                          iconRight={<ChevronDown />}
                         >
                           {sortLabel}
                         </Button>
-                      </SubframeCore.DropdownMenu.Trigger>
-                      <SubframeCore.DropdownMenu.Portal>
-                        <SubframeCore.DropdownMenu.Content
+                      </DropdownMenuPrimitive.Trigger>
+                      <DropdownMenuPrimitive.Portal>
+                        <DropdownMenuPrimitive.Content
                           side="bottom"
                           align="end"
                           sideOffset={4}
@@ -719,21 +708,21 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                         >
                           <DropdownMenu>
                             <DropdownMenu.DropdownItem
-                              icon={<FeatherBarChart2 />}
+                              icon={<BarChart2 />}
                               onClick={() => setSortBy("relevance")}
                             >
                               Relevance
                             </DropdownMenu.DropdownItem>
                             <DropdownMenu.DropdownItem
-                              icon={<FeatherTrendingUp />}
+                              icon={<TrendingUp />}
                               onClick={() => setSortBy("popular")}
                             >
                               Most followers
                             </DropdownMenu.DropdownItem>
                           </DropdownMenu>
-                        </SubframeCore.DropdownMenu.Content>
-                      </SubframeCore.DropdownMenu.Portal>
-                    </SubframeCore.DropdownMenu.Root>
+                        </DropdownMenuPrimitive.Content>
+                      </DropdownMenuPrimitive.Portal>
+                    </DropdownMenuPrimitive.Root>
                   </div>
                 )}
               </div>
@@ -851,7 +840,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                       <IconWithBackground
                         variant="neutral"
                         size="large"
-                        icon={<FeatherSearch />}
+                        icon={<Search />}
                       />
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-heading-3 font-heading-3 text-default-font">
@@ -866,7 +855,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                     </div>
                     <Button
                       variant="neutral-secondary"
-                      icon={<FeatherRefreshCcw />}
+                      icon={<RefreshCcw />}
                       onClick={handleReset}
                     >
                       Reset filters
@@ -901,7 +890,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                       <IconWithBackground
                         variant="neutral"
                         size="large"
-                        icon={<FeatherSearch />}
+                        icon={<Search />}
                       />
                       <div className="flex flex-col items-center gap-1">
                         <span className="text-heading-3 font-heading-3 text-default-font">
@@ -916,7 +905,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                     </div>
                     <Button
                       variant="neutral-secondary"
-                      icon={<FeatherRefreshCcw />}
+                      icon={<RefreshCcw />}
                       onClick={handleReset}
                     >
                       Clear search
@@ -932,7 +921,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                 <Button
                   variant="neutral-secondary"
                   size="large"
-                  iconRight={<FeatherArrowDown />}
+                  iconRight={<ArrowDown />}
                   loading={isLoading}
                   onClick={handleLoadMore}
                 >

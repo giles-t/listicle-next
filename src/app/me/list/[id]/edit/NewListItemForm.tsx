@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/ui/components/Button";
 import { Loader } from "@/ui/components/Loader";
  
-import { FeatherCheck, FeatherX, FeatherPlus, toast } from "@subframe/core";
+import { toast } from "sonner";
+import { Check, Plus, X } from "lucide-react";
 
 type Props = {
   listId: string;
@@ -70,7 +71,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
           <Button
             className="h-12 w-auto flex-none rounded-full"
             variant="neutral-secondary"
-            icon={<FeatherPlus />}
+            icon={<Plus />}
             onClick={() => setIsOpen(true)}
           >
             New Item
@@ -134,7 +135,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
                 <Button
                   className="h-12 w-auto flex-none rounded-full"
                   variant="brand-tertiary"
-                  icon={<FeatherCheck />}
+                  icon={<Check />}
                   type="submit"
                   loading={isSubmitting}
                 >
@@ -143,7 +144,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
                 <Button
                   className="h-12 w-auto flex-none rounded-full"
                   variant="neutral-tertiary"
-                  icon={<FeatherX />}
+                  icon={<X />}
                   type="button"
                   onClick={() => {
                     setNewItemTitle("");

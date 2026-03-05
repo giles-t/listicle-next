@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { captureException } from '../../shared/sentry';
 
 type ApiOptions = {

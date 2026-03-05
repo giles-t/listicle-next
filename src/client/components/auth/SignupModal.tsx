@@ -7,10 +7,9 @@ import { OAuthSocialButton } from "@/ui/components/OAuthSocialButton";
 import { TextField } from "@/ui/components/TextField";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
-import { FeatherInbox } from "@subframe/core";
 import { Badge } from "@/ui/components/Badge";
-import { FeatherClock } from "@subframe/core";
 import { useAuth } from "@/client/hooks/use-auth";
+import { Clock, Inbox } from "lucide-react";
 
 interface SignupModalProps {
   open: boolean;
@@ -69,7 +68,7 @@ function SignupModal({ open, onOpenChange, onSignInClick }: SignupModalProps) {
               <IconWithBackground
                 variant="success"
                 size="x-large"
-                icon={<FeatherInbox />}
+                icon={<Inbox />}
               />
               <span className="text-heading-2 font-heading-2 text-default-font">
                 Check your email
@@ -80,7 +79,7 @@ function SignupModal({ open, onOpenChange, onSignInClick }: SignupModalProps) {
                 We've sent a magic link to your email address. Click the link to
                 sign in to your account.
               </span>
-              <Badge variant="success" icon={<FeatherClock />}>
+              <Badge variant="success" icon={<Clock />}>
                 Arrives in 1-2 minutes
               </Badge>
             </div>

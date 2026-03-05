@@ -1,58 +1,26 @@
 "use client";
-/*
- * Documentation:
- * Checkbox — https://app.subframe.com/7b590a12c74e/library?component=Checkbox_3816e3b5-c48c-499b-b45e-0777c6972523
- */
 
 import React from "react";
-import { FeatherCheck } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
+import { cn } from "../utils";
 
-interface CheckboxRootProps
-  extends React.ComponentProps<typeof SubframeCore.Checkbox.Root> {
-  label?: React.ReactNode;
-  disabled?: boolean;
-  checked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  className?: string;
+interface CheckboxRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: React.ReactNode; disabled?: boolean; checked?: boolean; onCheckedChange?: (checked: boolean) => void; className?: string;
 }
 
-const CheckboxRoot = React.forwardRef<HTMLButtonElement, CheckboxRootProps>(
-  function CheckboxRoot(
-    {
-      label,
-      disabled = false,
-      checked = false,
-      className,
-      ...otherProps
-    }: CheckboxRootProps,
-    ref
-  ) {
+const CheckboxRoot = React.forwardRef<HTMLDivElement, CheckboxRootProps>(
+  function CheckboxRoot({ label, disabled = false, checked, onCheckedChange, className, ...otherProps }, ref) {
     return (
-      <SubframeCore.Checkbox.Root
-        checked={checked}
-        disabled={disabled}
-        asChild={true}
-        {...otherProps}
-      >
-        <button
-          className={SubframeUtils.twClassNames(
-            "group/3816e3b5 flex cursor-pointer items-center gap-2 text-left",
-            className
-          )}
-          ref={ref}
+      <div className={cn("flex items-center gap-2", className)} ref={ref} {...otherProps}>
+        <CheckboxPrimitive.Root
+          checked={checked} onCheckedChange={onCheckedChange} disabled={disabled}
+          className="flex h-4 w-4 items-center justify-center rounded-sm border border-solid border-neutral-300 bg-default-background data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600 disabled:opacity-50"
         >
-          <div className="flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-[2px] border-2 border-solid border-neutral-300 bg-default-background group-active/3816e3b5:border-2 group-active/3816e3b5:border-solid group-active/3816e3b5:border-brand-600 group-focus-within/3816e3b5:border-2 group-focus-within/3816e3b5:border-solid group-focus-within/3816e3b5:border-brand-600 group-aria-[checked=true]/3816e3b5:border group-aria-[checked=true]/3816e3b5:border-solid group-aria-[checked=true]/3816e3b5:border-brand-600 group-aria-[checked=true]/3816e3b5:bg-brand-600 group-active/3816e3b5:group-aria-[checked=true]/3816e3b5:border-2 group-active/3816e3b5:group-aria-[checked=true]/3816e3b5:border-solid group-active/3816e3b5:group-aria-[checked=true]/3816e3b5:border-brand-500 group-active/3816e3b5:group-aria-[checked=true]/3816e3b5:bg-brand-500 group-focus-within/3816e3b5:group-aria-[checked=true]/3816e3b5:border-2 group-focus-within/3816e3b5:group-aria-[checked=true]/3816e3b5:border-solid group-focus-within/3816e3b5:group-aria-[checked=true]/3816e3b5:border-brand-500 group-focus-within/3816e3b5:group-aria-[checked=true]/3816e3b5:bg-brand-500 group-disabled/3816e3b5:border-2 group-disabled/3816e3b5:border-solid group-disabled/3816e3b5:border-neutral-200 group-disabled/3816e3b5:bg-neutral-100 group-active/3816e3b5:group-disabled/3816e3b5:border-2 group-active/3816e3b5:group-disabled/3816e3b5:border-solid group-active/3816e3b5:group-disabled/3816e3b5:border-neutral-200">
-            <FeatherCheck className="hidden text-body font-body text-white group-aria-[checked=true]/3816e3b5:inline-flex group-aria-[checked=true]/3816e3b5:font-['Inter'] group-aria-[checked=true]/3816e3b5:text-[14px] group-aria-[checked=true]/3816e3b5:font-[600] group-aria-[checked=true]/3816e3b5:leading-[14px] group-aria-[checked=true]/3816e3b5:tracking-normal group-disabled/3816e3b5:text-neutral-400" />
-          </div>
-          {label ? (
-            <span className="text-body font-body text-default-font group-disabled/3816e3b5:text-subtext-color">
-              {label}
-            </span>
-          ) : null}
-        </button>
-      </SubframeCore.Checkbox.Root>
+          <CheckboxPrimitive.Indicator><Check className="h-3 w-3 text-white" /></CheckboxPrimitive.Indicator>
+        </CheckboxPrimitive.Root>
+        {label ? <span className={cn("text-body font-body text-default-font", { "text-neutral-400": disabled })}>{label}</span> : null}
+      </div>
     );
   }
 );

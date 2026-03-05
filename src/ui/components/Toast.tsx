@@ -1,84 +1,26 @@
 "use client";
-/*
- * Documentation:
- * Toast — https://app.subframe.com/7b590a12c74e/library?component=Toast_2c7966c2-a95d-468a-83fe-bf196b95be7a
- */
 
 import React from "react";
-import { FeatherInfo } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface ToastRootProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+interface ToastRootProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "brand" | "neutral" | "error" | "success";
-  icon?: React.ReactNode;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  actions?: React.ReactNode;
-  className?: string;
+  icon?: React.ReactNode; title?: React.ReactNode; description?: React.ReactNode; actions?: React.ReactNode; className?: string;
 }
 
 const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(
-  function ToastRoot(
-    {
-      variant = "neutral",
-      icon = <FeatherInfo />,
-      title,
-      description,
-      actions,
-      className,
-      ...otherProps
-    }: ToastRootProps,
-    ref
-  ) {
+  function ToastRoot({ variant = "neutral", icon, title, description, actions, className, ...otherProps }, ref) {
+    const colors = { brand: "border-brand-200", neutral: "border-neutral-200", error: "border-error-200", success: "border-success-200" }[variant];
+    const iconColor = { brand: "text-brand-600", neutral: "text-neutral-600", error: "text-error-600", success: "text-success-600" }[variant];
+
     return (
-      <div
-        className={SubframeUtils.twClassNames(
-          "group/2c7966c2 flex w-80 items-center gap-4 rounded-md bg-default-background px-4 py-3 shadow-lg",
-          className
-        )}
-        ref={ref}
-        {...otherProps}
-      >
-        {icon ? (
-          <SubframeCore.IconWrapper
-            className={SubframeUtils.twClassNames(
-              "text-heading-3 font-heading-3 text-neutral-700",
-              {
-                "text-success-700": variant === "success",
-                "text-error-700": variant === "error",
-                "text-brand-600": variant === "brand",
-              }
-            )}
-          >
-            {icon}
-          </SubframeCore.IconWrapper>
-        ) : null}
-        <div className="flex grow shrink-0 basis-0 flex-col items-start">
-          {title ? (
-            <span
-              className={SubframeUtils.twClassNames(
-                "w-full text-body-bold font-body-bold text-default-font",
-                {
-                  "text-success-700": variant === "success",
-                  "text-error-700": variant === "error",
-                  "text-brand-800": variant === "brand",
-                }
-              )}
-            >
-              {title}
-            </span>
-          ) : null}
-          {description ? (
-            <span className="w-full text-caption font-caption text-subtext-color">
-              {description}
-            </span>
-          ) : null}
+      <div className={cn("flex w-80 items-start gap-3 rounded-md border border-solid bg-default-background px-4 py-3 shadow-lg", colors, className)} ref={ref} {...otherProps}>
+        {icon ? <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] mt-0.5", iconColor)}>{icon}</span> : null}
+        <div className="flex grow flex-col items-start gap-1">
+          {title ? <span className="text-body-bold font-body-bold text-default-font">{title}</span> : null}
+          {description ? <span className="text-body font-body text-subtext-color">{description}</span> : null}
+          {actions ? <div className="flex items-center gap-2 pt-1">{actions}</div> : null}
         </div>
-        {actions ? (
-          <div className="flex items-center justify-end gap-1">{actions}</div>
-        ) : null}
       </div>
     );
   }

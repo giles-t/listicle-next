@@ -1,146 +1,55 @@
 "use client";
-/*
- * Documentation:
- * Table — https://app.subframe.com/7b590a12c74e/library?component=Table_142dfde7-d0cc-48a1-a04c-a08ab2252633
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  children?: React.ReactNode;
-  clickable?: boolean;
-  className?: string;
+interface HeaderCellProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  icon?: React.ReactNode; children?: React.ReactNode; className?: string;
 }
-
-const Row = React.forwardRef<HTMLTableRowElement, RowProps>(function Row(
-  { children, clickable = false, className, ...otherProps }: RowProps,
-  ref
-) {
-  return (
-    <tr
-      className={SubframeUtils.twClassNames(
-        "group/5d119f8d border-t border-solid border-neutral-border",
-        { "hover:bg-neutral-50": clickable },
-        className
-      )}
-      ref={ref}
-      {...otherProps}
-    >
-      {children}
-    </tr>
-  );
-});
-
-interface CellProps extends React.TdHTMLAttributes<HTMLTableDataCellElement> {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-const Cell = React.forwardRef<HTMLDivElement, CellProps>(function Cell(
-  { children, className, ...otherProps }: CellProps,
-  ref
-) {
-  return (
-    <td {...otherProps}>
-      <div
-        className={SubframeUtils.twClassNames(
-          "flex h-12 w-full items-center gap-1 px-3",
-          className
-        )}
-        ref={ref}
-      >
-        {children}
-      </div>
-    </td>
-  );
-});
-
-interface HeaderRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-const HeaderRow = React.forwardRef<HTMLTableRowElement, HeaderRowProps>(
-  function HeaderRow(
-    { children, className, ...otherProps }: HeaderRowProps,
-    ref
-  ) {
+const HeaderCell = React.forwardRef<HTMLTableCellElement, HeaderCellProps>(
+  function HeaderCell({ icon, children, className, ...otherProps }, ref) {
     return (
-      <tr className={className} ref={ref} {...otherProps}>
-        {children}
-      </tr>
-    );
-  }
-);
-
-interface HeaderCellProps
-  extends React.ThHTMLAttributes<HTMLTableHeaderCellElement> {
-  children?: React.ReactNode;
-  icon?: React.ReactNode;
-  className?: string;
-}
-
-const HeaderCell = React.forwardRef<HTMLDivElement, HeaderCellProps>(
-  function HeaderCell(
-    { children, icon = null, className, ...otherProps }: HeaderCellProps,
-    ref
-  ) {
-    return (
-      <th {...otherProps}>
-        <div
-          className={SubframeUtils.twClassNames(
-            "flex h-8 w-full items-center gap-1 px-3 text-left",
-            className
-          )}
-          ref={ref}
-        >
-          {children ? (
-            <span className="whitespace-nowrap text-caption-bold font-caption-bold text-subtext-color">
-              {children}
-            </span>
-          ) : null}
-          {icon ? (
-            <SubframeCore.IconWrapper className="text-caption font-caption text-subtext-color">
-              {icon}
-            </SubframeCore.IconWrapper>
-          ) : null}
+      <th className={cn("text-left text-caption-bold font-caption-bold text-subtext-color px-3 py-2", className)} ref={ref} {...otherProps}>
+        <div className="flex items-center gap-1">
+          {icon ? <span className="shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em]">{icon}</span> : null}
+          {children}
         </div>
       </th>
     );
   }
 );
 
-interface TableRootProps extends React.TableHTMLAttributes<HTMLTableElement> {
-  header?: React.ReactNode;
-  children?: React.ReactNode;
-  className?: string;
-}
+interface CellProps extends React.TdHTMLAttributes<HTMLTableCellElement> { children?: React.ReactNode; className?: string; }
+const Cell = React.forwardRef<HTMLTableCellElement, CellProps>(
+  function Cell({ children, className, ...otherProps }, ref) {
+    return <td className={cn("text-body font-body text-default-font px-3 py-2", className)} ref={ref} {...otherProps}>{children}</td>;
+  }
+);
 
+interface HeaderRowProps extends React.HTMLAttributes<HTMLTableRowElement> { children?: React.ReactNode; className?: string; }
+const HeaderRow = React.forwardRef<HTMLTableRowElement, HeaderRowProps>(
+  function HeaderRow({ children, className, ...otherProps }, ref) {
+    return <tr className={cn("border-b border-solid border-neutral-border", className)} ref={ref} {...otherProps}>{children}</tr>;
+  }
+);
+
+interface RowProps extends React.HTMLAttributes<HTMLTableRowElement> { clickable?: boolean; children?: React.ReactNode; className?: string; }
+const Row = React.forwardRef<HTMLTableRowElement, RowProps>(
+  function Row({ clickable = false, children, className, ...otherProps }, ref) {
+    return <tr className={cn("border-b border-solid border-neutral-border", { "cursor-pointer hover:bg-neutral-50": clickable }, className)} ref={ref} {...otherProps}>{children}</tr>;
+  }
+);
+
+interface TableRootProps extends React.HTMLAttributes<HTMLTableElement> { header?: React.ReactNode; children?: React.ReactNode; className?: string; }
 const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(
-  function TableRoot(
-    { header, children, className, ...otherProps }: TableRootProps,
-    ref
-  ) {
+  function TableRoot({ header, children, className, ...otherProps }, ref) {
     return (
-      <table
-        className={SubframeUtils.twClassNames("w-full", className)}
-        ref={ref}
-        {...otherProps}
-      >
-        <thead>{header}</thead>
-        <tbody className="border-b border-solid border-neutral-border">
-          {children}
-        </tbody>
+      <table className={cn("w-full border-collapse", className)} ref={ref} {...otherProps}>
+        {header ? <thead>{header}</thead> : null}
+        {children ? <tbody>{children}</tbody> : null}
       </table>
     );
   }
 );
 
-export const Table = Object.assign(TableRoot, {
-  Row,
-  Cell,
-  HeaderRow,
-  HeaderCell,
-});
+export const Table = Object.assign(TableRoot, { Row, Cell, HeaderRow, HeaderCell });

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { AddBookmarkComponent } from "@/ui/components/AddBookmarkComponent";
 import AddToBookmarkDrawer from "@/client/components/AddToBookmarkDrawer";
 import { useAuth } from "@/client/hooks/use-auth";

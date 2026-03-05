@@ -1,16 +1,9 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { FeatherBell } from "@subframe/core";
-import { FeatherBookmark } from "@subframe/core";
-import { FeatherList } from "@subframe/core";
-import { FeatherLogOut } from "@subframe/core";
-import { FeatherPlusCircle } from "@subframe/core";
-import { FeatherSearch } from "@subframe/core";
-import { FeatherSettings } from "@subframe/core";
-import { FeatherUser } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
 import { Avatar } from "../../ui/components/Avatar";
 import { Button } from "../../ui/components/Button";
 import { DropdownMenu } from "../../ui/components/DropdownMenu";
@@ -20,6 +13,7 @@ import LoginModal from "./auth/LoginModal";
 import SignupModal from "./auth/SignupModal";
 import { useAuth } from "../hooks/use-auth";
 import Link from "next/link";
+import { Bell, Bookmark, List, LogOut, PlusCircle, Search, Settings, User } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -167,7 +161,7 @@ export function TopNav() {
                 <Link href="/create">
                   <Button 
                     variant="neutral-tertiary" 
-                    icon={<FeatherPlusCircle />}
+                    icon={<PlusCircle />}
                   >
                     New
                   </Button>
@@ -175,7 +169,7 @@ export function TopNav() {
               ) : (
                 <Button 
                   variant="neutral-tertiary" 
-                  icon={<FeatherPlusCircle />}
+                  icon={<PlusCircle />}
                   onClick={handleNewClick}
                 >
                   New
@@ -184,7 +178,7 @@ export function TopNav() {
               {mounted && user && (
                 <div className="relative">
                   <IconButton 
-                    icon={<FeatherBell />}
+                    icon={<Bell />}
                     onClick={handleNotificationClick}
                   />
                   {unreadCount > 0 && (
@@ -195,13 +189,13 @@ export function TopNav() {
                 </div>
               )}
               <IconButton 
-                icon={<FeatherSearch />}
+                icon={<Search />}
                 onClick={handleSearchClick}
               />
             </div>
             {mounted && user ? (
-              <SubframeCore.DropdownMenu.Root>
-                <SubframeCore.DropdownMenu.Trigger asChild={true}>
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild={true}>
                   <Avatar 
                     image={profile?.avatar || undefined}
                     className=""
@@ -212,9 +206,9 @@ export function TopNav() {
                       profile?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"
                     )}
                   </Avatar>
-                </SubframeCore.DropdownMenu.Trigger>
-                <SubframeCore.DropdownMenu.Portal>
-                  <SubframeCore.DropdownMenu.Content
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content
                     side="bottom"
                     align="end"
                     sideOffset={4}
@@ -223,28 +217,28 @@ export function TopNav() {
                     <DropdownMenu>
                           <Link className="w-full" href={getProfileLink()}>
                             <DropdownMenu.DropdownItem 
-                              icon={<FeatherUser />}
+                              icon={<User />}
                             >
                               Profile
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <Link className="w-full" href="/me/lists">
                             <DropdownMenu.DropdownItem 
-                              icon={<FeatherList />}
+                              icon={<List />}
                             >
                               My Lists
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <Link className="w-full" href="/me/bookmarks">
                             <DropdownMenu.DropdownItem 
-                              icon={<FeatherBookmark />}
+                              icon={<Bookmark />}
                             >
                               Bookmarks
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <Link className="w-full" href="/notifications">
                             <DropdownMenu.DropdownItem 
-                              icon={<FeatherBell />}
+                              icon={<Bell />}
                             >
                               Notifications
                               {unreadCount > 0 && (
@@ -256,21 +250,21 @@ export function TopNav() {
                           </Link>
                           <Link className="w-full" href="/settings">
                             <DropdownMenu.DropdownItem 
-                              icon={<FeatherSettings />}
+                              icon={<Settings />}
                             >
                               Settings
                             </DropdownMenu.DropdownItem>
                           </Link>
                           <DropdownMenu.DropdownItem 
-                            icon={<FeatherLogOut />}
+                            icon={<LogOut />}
                             onClick={handleLogoutClick}
                           >
                             Log out
                           </DropdownMenu.DropdownItem>
                     </DropdownMenu>
-                  </SubframeCore.DropdownMenu.Content>
-                </SubframeCore.DropdownMenu.Portal>
-              </SubframeCore.DropdownMenu.Root>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
             ) : (
               <Button 
                 variant="brand-primary"

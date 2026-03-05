@@ -1,107 +1,31 @@
 "use client";
-/*
- * Documentation:
- * Alert — https://app.subframe.com/7b590a12c74e/library?component=Alert_3a65613d-d546-467c-80f4-aaba6a7edcd5
- */
 
 import React from "react";
-import { FeatherInfo } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface AlertRootProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
+interface AlertRootProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "brand" | "neutral" | "error" | "success" | "warning";
-  icon?: React.ReactNode;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  actions?: React.ReactNode;
-  className?: string;
+  icon?: React.ReactNode; title?: React.ReactNode; description?: React.ReactNode; actions?: React.ReactNode; className?: string;
 }
 
 const AlertRoot = React.forwardRef<HTMLDivElement, AlertRootProps>(
-  function AlertRoot(
-    {
-      variant = "neutral",
-      icon = <FeatherInfo />,
-      title,
-      description,
-      actions,
-      className,
-      ...otherProps
-    }: AlertRootProps,
-    ref
-  ) {
+  function AlertRoot({ variant = "neutral", icon, title, description, actions, className, ...otherProps }, ref) {
+    const colors = {
+      brand: "bg-brand-50 border-brand-200",
+      neutral: "bg-neutral-50 border-neutral-200",
+      error: "bg-error-50 border-error-200",
+      success: "bg-success-50 border-success-200",
+      warning: "bg-warning-50 border-warning-200",
+    }[variant];
+    const iconColor = { brand: "text-brand-600", neutral: "text-neutral-600", error: "text-error-600", success: "text-success-600", warning: "text-warning-600" }[variant];
+
     return (
-      <div
-        className={SubframeUtils.twClassNames(
-          "group/3a65613d flex w-full flex-col items-start gap-2 rounded-md border border-solid border-neutral-200 bg-neutral-50 pl-4 pr-3 py-3",
-          {
-            "border border-solid border-warning-100 bg-warning-50":
-              variant === "warning",
-            "border border-solid border-success-100 bg-success-50":
-              variant === "success",
-            "border border-solid border-error-100 bg-error-50":
-              variant === "error",
-            "border border-solid border-brand-100 bg-brand-50":
-              variant === "brand",
-          },
-          className
-        )}
-        ref={ref}
-        {...otherProps}
-      >
-        <div className="flex w-full items-center gap-4">
-          {icon ? (
-            <SubframeCore.IconWrapper
-              className={SubframeUtils.twClassNames(
-                "text-heading-3 font-heading-3 text-neutral-800",
-                {
-                  "text-warning-800": variant === "warning",
-                  "text-success-800": variant === "success",
-                  "text-error-800": variant === "error",
-                  "text-brand-800": variant === "brand",
-                }
-              )}
-            >
-              {icon}
-            </SubframeCore.IconWrapper>
-          ) : null}
-          <div className="flex grow shrink-0 basis-0 flex-col items-start">
-            {title ? (
-              <span
-                className={SubframeUtils.twClassNames(
-                  "w-full whitespace-pre-wrap text-body-bold font-body-bold text-default-font",
-                  {
-                    "text-warning-900": variant === "warning",
-                    "text-success-900": variant === "success",
-                    "text-error-900": variant === "error",
-                    "text-brand-900": variant === "brand",
-                  }
-                )}
-              >
-                {title}
-              </span>
-            ) : null}
-            {description ? (
-              <span
-                className={SubframeUtils.twClassNames(
-                  "w-full whitespace-pre-wrap text-caption font-caption text-subtext-color",
-                  {
-                    "text-warning-800": variant === "warning",
-                    "text-success-800": variant === "success",
-                    "text-error-800": variant === "error",
-                    "text-brand-800": variant === "brand",
-                  }
-                )}
-              >
-                {description}
-              </span>
-            ) : null}
-          </div>
-          {actions ? (
-            <div className="flex items-center justify-end gap-1">{actions}</div>
-          ) : null}
+      <div className={cn("flex w-full items-start gap-3 rounded-md border border-solid px-4 py-3", colors, className)} ref={ref} {...otherProps}>
+        {icon ? <span className={cn("shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] mt-0.5", iconColor)}>{icon}</span> : null}
+        <div className="flex grow flex-col items-start gap-1">
+          {title ? <span className="text-body-bold font-body-bold text-default-font">{title}</span> : null}
+          {description ? <span className="text-body font-body text-subtext-color">{description}</span> : null}
+          {actions ? <div className="flex items-center gap-2 pt-1">{actions}</div> : null}
         </div>
       </div>
     );

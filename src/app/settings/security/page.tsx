@@ -1,11 +1,8 @@
 import React from "react";
 import { Button } from "@/ui/components/Button";
 
-import { FeatherShield } from "@subframe/core";
-import { FeatherSmartphone } from "@subframe/core";
-import { FeatherLogOut } from "@subframe/core";
-import { FeatherTrash2 } from "@subframe/core";
 import { Badge } from "@/ui/components/Badge";
+import { LogOut, Shield, Smartphone, Trash2 } from "lucide-react";
 
 export default function SecuritySettingsPage() {
   return (
@@ -100,7 +97,7 @@ export default function SecuritySettingsPage() {
         <Button
           variant="neutral-secondary"
           size="small"
-          icon={<FeatherSmartphone />}
+          icon={<Smartphone />}
         >
           Setup
         </Button>
@@ -129,7 +126,7 @@ export default function SecuritySettingsPage() {
             <Button
               variant="destructive-secondary"
               size="small"
-              icon={<FeatherLogOut />}
+              icon={<LogOut />}
             >
               Sign out
             </Button>
@@ -147,7 +144,7 @@ export default function SecuritySettingsPage() {
             <Button
               variant="destructive-secondary"
               size="small"
-              icon={<FeatherLogOut />}
+              icon={<LogOut />}
             >
               Sign out
             </Button>
@@ -173,7 +170,7 @@ export default function SecuritySettingsPage() {
             </div>
             <Button
               variant="destructive-secondary"
-              icon={<FeatherLogOut />}
+              icon={<LogOut />}
             >
               Sign out all
             </Button>
@@ -190,7 +187,7 @@ export default function SecuritySettingsPage() {
             </div>
             <Button
               variant="destructive-primary"
-              icon={<FeatherTrash2 />}
+              icon={<Trash2 />}
             >
               Delete Account
             </Button>

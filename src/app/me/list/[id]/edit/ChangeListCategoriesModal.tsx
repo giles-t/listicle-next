@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/Button";
 import { FilterChip } from "@/ui/components/FilterChip";
 import { TextField } from "@/ui/components/TextField";
 import { Dialog } from "@/ui/components/Dialog";
-import { FeatherHash, FeatherSearch, FeatherLoader } from "@subframe/core";
+import { Hash, Loader, Search } from "lucide-react";
 
 type Category = {
   id: string;
@@ -117,7 +117,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
             variant="filled"
             label=""
             helpText=""
-            icon={<FeatherSearch />}
+            icon={<Search />}
           >
             <TextField.Input
               placeholder="Search categories"
@@ -139,7 +139,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
                   <FilterChip
                     key={category.id}
                     selected={true}
-                    icon={<FeatherHash />}
+                    icon={<Hash />}
                     image=""
                     onClick={() => handleCategoryToggle(category)}
                   >
@@ -161,7 +161,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
             <div className="flex w-full flex-wrap items-start gap-2">
               {isLoadingCategories ? (
                 <div className="flex items-center gap-2 py-4">
-                  <FeatherLoader className="animate-spin" />
+                  <Loader className="animate-spin" />
                   <span className="text-body font-body text-subtext-color">Loading categories...</span>
                 </div>
               ) : filteredCategories.length > 0 ? (
@@ -169,7 +169,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
                   <FilterChip
                     key={category.id}
                     selected={false}
-                    icon={<FeatherHash />}
+                    icon={<Hash />}
                     image=""
                     onClick={() => handleCategoryToggle(category)}
                   >

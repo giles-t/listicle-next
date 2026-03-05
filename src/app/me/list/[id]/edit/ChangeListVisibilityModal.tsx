@@ -5,8 +5,7 @@ import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
 import { Dialog } from "@/ui/components/Dialog";
-import { FeatherGlobe } from "@subframe/core";
-import { FeatherLock } from "@subframe/core";
+import { Globe, Lock } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -51,7 +50,7 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
                   <IconWithBackground
                     size="medium"
-                    icon={<FeatherGlobe />}
+                    icon={<Globe />}
                     square={true}
                   />
                   <div className="flex flex-col items-start">
@@ -69,7 +68,7 @@ function ChangeListVisibilityModal({ open, onOpenChange, initialIsVisible, onCon
                   <IconWithBackground
                     variant="neutral"
                     size="medium"
-                    icon={<FeatherLock />}
+                    icon={<Lock />}
                     square={true}
                   />
                   <div className="flex flex-col items-start">

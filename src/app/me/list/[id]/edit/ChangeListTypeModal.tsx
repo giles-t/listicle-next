@@ -5,7 +5,7 @@ import { Dialog } from "@/ui/components/Dialog";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
 import { Button } from "@/ui/components/Button";
-import { FeatherList, FeatherListOrdered, FeatherListStart } from "@subframe/core";
+import { List, ListOrdered, ListStart } from "lucide-react";
 
 export type ListType = "unordered" | "ordered" | "reversed";
 
@@ -36,7 +36,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
             <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4">
               <RadioCardGroup.RadioCard hideRadio={true} value="unordered" checked={value === "unordered"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
-                  <IconWithBackground variant="neutral" size="medium" icon={<FeatherList />} square={true} />
+                  <IconWithBackground variant="neutral" size="medium" icon={<List />} square={true} />
                   <div className="flex flex-col items-start">
                     <span className="text-body-bold font-body-bold text-default-font">Bullet list</span>
                     <span className="text-caption font-caption text-subtext-color">List has bullet points</span>
@@ -45,7 +45,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
               </RadioCardGroup.RadioCard>
               <RadioCardGroup.RadioCard hideRadio={true} value="ordered" checked={value === "ordered"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
-                  <IconWithBackground variant="neutral" size="medium" icon={<FeatherListOrdered />} square={true} />
+                  <IconWithBackground variant="neutral" size="medium" icon={<ListOrdered />} square={true} />
                   <div className="flex grow shrink-0 basis-0 flex-col items-start">
                     <span className="text-body-bold font-body-bold text-default-font">Ordered list</span>
                     <span className="text-caption font-caption text-subtext-color">List is ordered 1, 2, 3, 4, 5</span>
@@ -54,7 +54,7 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
               </RadioCardGroup.RadioCard>
               <RadioCardGroup.RadioCard hideRadio={true} value="reversed" checked={value === "reversed"}>
                 <div className="flex grow shrink-0 basis-0 items-center gap-4">
-                  <IconWithBackground variant="neutral" size="medium" icon={<FeatherListStart />} square={true} />
+                  <IconWithBackground variant="neutral" size="medium" icon={<ListStart />} square={true} />
                   <div className="flex grow shrink-0 basis-0 flex-col items-start">
                     <span className="text-body-bold font-body-bold text-default-font">Reverse ordered list</span>
                     <span className="text-caption font-caption text-subtext-color">List is ordered 5, 4, 3, 2, 1</span>
@@ -77,5 +77,4 @@ export default function ChangeListTypeModal({ open, onOpenChange, initialValue, 
     </Dialog>
   );
 }
-
 

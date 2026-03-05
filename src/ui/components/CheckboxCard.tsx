@@ -1,68 +1,35 @@
 "use client";
-/*
- * Documentation:
- * Checkbox Card — https://app.subframe.com/7b590a12c74e/library?component=Checkbox+Card_de0b4dfb-3946-4702-be52-5678dd71925a
- */
 
 import React from "react";
-import { FeatherCheck } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
+import { cn } from "../utils";
 
-interface CheckboxCardRootProps
-  extends React.ComponentProps<typeof SubframeCore.Checkbox.Root> {
-  disabled?: boolean;
-  checked?: boolean;
-  hideCheckbox?: boolean;
-  children?: React.ReactNode;
-  onCheckedChange?: (checked: boolean) => void;
-  className?: string;
+interface CheckboxCardRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  disabled?: boolean; checked?: boolean; hideCheckbox?: boolean; children?: React.ReactNode; onCheckedChange?: (checked: boolean) => void; className?: string;
 }
 
-const CheckboxCardRoot = React.forwardRef<
-  HTMLButtonElement,
-  CheckboxCardRootProps
->(function CheckboxCardRoot(
-  {
-    disabled = false,
-    checked = false,
-    hideCheckbox = false,
-    children,
-    className,
-    ...otherProps
-  }: CheckboxCardRootProps,
-  ref
-) {
-  return (
-    <SubframeCore.Checkbox.Root
-      checked={checked}
-      disabled={disabled}
-      asChild={true}
-      {...otherProps}
-    >
-      <button
-        className={SubframeUtils.twClassNames(
-          "group/de0b4dfb flex cursor-pointer items-center gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-4 py-3 text-left hover:border hover:border-solid hover:border-neutral-border hover:bg-neutral-50 aria-[checked=true]:border aria-[checked=true]:border-solid aria-[checked=true]:border-brand-200 aria-[checked=true]:bg-brand-50 hover:aria-[checked=true]:border hover:aria-[checked=true]:border-solid hover:aria-[checked=true]:border-brand-200 hover:aria-[checked=true]:bg-brand-50 disabled:cursor-default disabled:border disabled:border-solid disabled:border-neutral-100 disabled:bg-neutral-100 hover:disabled:cursor-default hover:disabled:border hover:disabled:border-solid hover:disabled:border-neutral-100 hover:disabled:bg-neutral-100",
-          className
-        )}
-        ref={ref}
-      >
+const CheckboxCardRoot = React.forwardRef<HTMLDivElement, CheckboxCardRootProps>(
+  function CheckboxCardRoot({ disabled = false, checked, hideCheckbox = false, children, onCheckedChange, className, ...otherProps }, ref) {
+    return (
+      <CheckboxPrimitive.Root checked={checked} onCheckedChange={onCheckedChange} disabled={disabled} asChild>
         <div
-          className={SubframeUtils.twClassNames(
-            "flex h-4 w-4 flex-none flex-col items-center justify-center gap-2 rounded-[2px] border-2 border-solid border-neutral-300 group-aria-[checked=true]/de0b4dfb:border group-aria-[checked=true]/de0b4dfb:border-solid group-aria-[checked=true]/de0b4dfb:border-brand-600 group-aria-[checked=true]/de0b4dfb:bg-brand-600 group-disabled/de0b4dfb:border-2 group-disabled/de0b4dfb:border-solid group-disabled/de0b4dfb:border-neutral-200 group-disabled/de0b4dfb:bg-neutral-100",
-            { hidden: hideCheckbox }
+          className={cn(
+            "flex w-full cursor-pointer items-center gap-2 rounded-md border border-solid border-neutral-border bg-default-background px-4 py-3 transition-colors hover:bg-neutral-50 data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-50",
+            { "opacity-50 cursor-default": disabled }, className
           )}
+          ref={ref} {...otherProps}
         >
-          <FeatherCheck className="hidden font-['Inter'] text-[14px] font-[400] leading-[14px] text-white group-aria-[checked=true]/de0b4dfb:inline-flex group-aria-[checked=true]/de0b4dfb:font-['Inter'] group-aria-[checked=true]/de0b4dfb:text-[16px] group-aria-[checked=true]/de0b4dfb:font-[400] group-aria-[checked=true]/de0b4dfb:leading-[16px] group-aria-[checked=true]/de0b4dfb:tracking-normal group-disabled/de0b4dfb:text-neutral-400" />
+          {!hideCheckbox ? (
+            <div className="flex h-4 w-4 items-center justify-center rounded-sm border border-solid border-neutral-300 data-[state=checked]:border-brand-600 data-[state=checked]:bg-brand-600">
+              <CheckboxPrimitive.Indicator><Check className="h-3 w-3 text-white" /></CheckboxPrimitive.Indicator>
+            </div>
+          ) : null}
+          {children ? <div className="flex grow shrink-0 basis-0 flex-col items-start">{children}</div> : null}
         </div>
-        {children ? (
-          <div className="flex grow shrink-0 basis-0 items-center gap-4">
-            {children}
-          </div>
-        ) : null}
-      </button>
-    </SubframeCore.Checkbox.Root>
-  );
-});
+      </CheckboxPrimitive.Root>
+    );
+  }
+);
 
 export const CheckboxCard = CheckboxCardRoot;

@@ -1,40 +1,25 @@
 "use client";
-/*
- * Documentation:
- * Line Chart — https://app.subframe.com/7b590a12c74e/library?component=Line+Chart_22944dd2-3cdd-42fd-913a-1b11a3c1d16d
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface LineChartRootProps
-  extends React.ComponentProps<typeof SubframeCore.LineChart> {
+interface LineChartRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  stacked?: boolean;
   className?: string;
 }
 
-const LineChartRoot = React.forwardRef<
-  React.ElementRef<typeof SubframeCore.LineChart>,
-  LineChartRootProps
->(function LineChartRoot(
-  { className, ...otherProps }: LineChartRootProps,
-  ref
-) {
-  return (
-    <SubframeCore.LineChart
-      className={SubframeUtils.twClassNames("h-80 w-full", className)}
-      ref={ref}
-      colors={[
-        "#6366f1",
-        "#c7d2fe",
-        "#4f46e5",
-        "#a5b4fc",
-        "#4338ca",
-        "#818cf8",
-      ]}
-      {...otherProps}
-    />
-  );
-});
+const LineChartRoot = React.forwardRef<HTMLDivElement, LineChartRootProps>(
+  function LineChartRoot({ className, ...otherProps }, ref) {
+    return (
+      <div
+        className={cn("flex h-80 w-full items-center justify-center rounded-md border border-dashed border-neutral-300 bg-neutral-50 text-subtext-color", className)}
+        ref={ref}
+        {...otherProps}
+      >
+        <span className="text-body font-body">LineChart placeholder</span>
+      </div>
+    );
+  }
+);
 
 export const LineChart = LineChartRoot;

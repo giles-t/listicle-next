@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/ui/components/Button";
@@ -7,35 +9,8 @@ import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { TextField } from "@/ui/components/TextField";
 import { ToggleGroup } from "@/ui/components/ToggleGroup";
-import { toast } from "@subframe/core";
-import {
-  FeatherActivity,
-  FeatherArrowUpDown,
-  FeatherBriefcase,
-  FeatherChevronDown,
-  FeatherCpu,
-  FeatherFileText,
-  FeatherFilm,
-  FeatherGraduationCap,
-  FeatherHeart,
-  FeatherLayoutGrid,
-  FeatherList,
-  FeatherPlaneTakeoff,
-  FeatherSearch,
-  FeatherShirt,
-  FeatherTrophy,
-  FeatherUsers,
-  FeatherUtensilsCrossed,
-  FeatherBook,
-  FeatherMusic,
-  FeatherCamera,
-  FeatherHome,
-  FeatherGlobe,
-  FeatherCar,
-  FeatherGamepad2,
-  FeatherPalette,
-} from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { toast } from "sonner";
+import { Activity, ArrowUpDown, Book, Briefcase, Camera, Car, ChevronDown, Cpu, FileText, Film, Gamepad2, Globe, GraduationCap, Heart, Home, LayoutGrid, List, Music, Palette, PlaneTakeoff, Search, Shirt, Trophy, Users, UtensilsCrossed } from "lucide-react";
 
 // Types
 export interface Category {
@@ -56,28 +31,28 @@ type ViewMode = "grid" | "list";
 
 // Icon mapping from database icon string to React component
 const ICON_MAP: Record<string, React.ReactNode> = {
-  cpu: <FeatherCpu />,
-  plane: <FeatherPlaneTakeoff />,
-  utensils: <FeatherUtensilsCrossed />,
-  heart: <FeatherHeart />,
-  briefcase: <FeatherBriefcase />,
-  activity: <FeatherActivity />,
-  film: <FeatherFilm />,
-  "graduation-cap": <FeatherGraduationCap />,
-  trophy: <FeatherTrophy />,
-  shirt: <FeatherShirt />,
-  book: <FeatherBook />,
-  music: <FeatherMusic />,
-  camera: <FeatherCamera />,
-  home: <FeatherHome />,
-  globe: <FeatherGlobe />,
-  car: <FeatherCar />,
-  gamepad: <FeatherGamepad2 />,
-  palette: <FeatherPalette />,
+  cpu: <Cpu />,
+  plane: <PlaneTakeoff />,
+  utensils: <UtensilsCrossed />,
+  heart: <Heart />,
+  briefcase: <Briefcase />,
+  activity: <Activity />,
+  film: <Film />,
+  "graduation-cap": <GraduationCap />,
+  trophy: <Trophy />,
+  shirt: <Shirt />,
+  book: <Book />,
+  music: <Music />,
+  camera: <Camera />,
+  home: <Home />,
+  globe: <Globe />,
+  car: <Car />,
+  gamepad: <Gamepad2 />,
+  palette: <Palette />,
 };
 
 function getIconComponent(iconName: string): React.ReactNode {
-  return ICON_MAP[iconName] || <FeatherGlobe />;
+  return ICON_MAP[iconName] || <Globe />;
 }
 
 function formatCount(count: number): string {
@@ -129,7 +104,7 @@ function CategoryRow({ category, onFollow, isLoading }: CategoryRowProps) {
             className="flex items-center gap-2"
             aria-label={`${formatCount(category.followerCount)} followers`}
           >
-            <FeatherUsers className="text-body font-body text-subtext-color" />
+            <Users className="text-body font-body text-subtext-color" />
             <span className="text-body-bold font-body-bold text-default-font">
               {formatCount(category.followerCount)}
             </span>
@@ -138,7 +113,7 @@ function CategoryRow({ category, onFollow, isLoading }: CategoryRowProps) {
             className="flex items-center gap-2"
             aria-label={`${category.listCount} lists`}
           >
-            <FeatherFileText className="text-body font-body text-subtext-color" />
+            <FileText className="text-body font-body text-subtext-color" />
             <span className="text-body-bold font-body-bold text-default-font">
               {category.listCount}
             </span>
@@ -217,7 +192,7 @@ function CategoryCard({ category, onFollow, isLoading }: CategoryCardProps) {
           className="flex items-center gap-2"
           aria-label={`${formatCount(category.followerCount)} followers`}
         >
-          <FeatherUsers className="text-body font-body text-subtext-color" />
+          <Users className="text-body font-body text-subtext-color" />
           <span className="text-body-bold font-body-bold text-default-font">
             {formatCount(category.followerCount)}
           </span>
@@ -226,7 +201,7 @@ function CategoryCard({ category, onFollow, isLoading }: CategoryCardProps) {
           className="flex items-center gap-2"
           aria-label={`${category.listCount} lists`}
         >
-          <FeatherFileText className="text-body font-body text-subtext-color" />
+          <FileText className="text-body font-body text-subtext-color" />
           <span className="text-body-bold font-body-bold text-default-font">
             {category.listCount}
           </span>
@@ -384,7 +359,7 @@ export function CategoryBrowseClient({ categories: initialCategories }: Category
           variant="outline"
           label=""
           helpText=""
-          icon={<FeatherSearch />}
+          icon={<Search />}
         >
           <TextField.Input
             placeholder="Search categories..."
@@ -405,19 +380,19 @@ export function CategoryBrowseClient({ categories: initialCategories }: Category
         <span className="grow shrink-0 basis-0 text-body-bold font-body-bold text-default-font">
           {filteredAndSortedCategories.length} {filteredAndSortedCategories.length === 1 ? "category" : "categories"}
         </span>
-        <SubframeCore.DropdownMenu.Root>
-          <SubframeCore.DropdownMenu.Trigger asChild={true}>
+        <DropdownMenuPrimitive.Root>
+          <DropdownMenuPrimitive.Trigger asChild={true}>
             <Button
               variant="neutral-secondary"
-              icon={<FeatherArrowUpDown />}
-              iconRight={<FeatherChevronDown />}
+              icon={<ArrowUpDown />}
+              iconRight={<ChevronDown />}
               aria-label={`Sort by: ${sortLabel}`}
             >
               Sort by: {sortLabel}
             </Button>
-          </SubframeCore.DropdownMenu.Trigger>
-          <SubframeCore.DropdownMenu.Portal>
-            <SubframeCore.DropdownMenu.Content
+          </DropdownMenuPrimitive.Trigger>
+          <DropdownMenuPrimitive.Portal>
+            <DropdownMenuPrimitive.Content
               side="bottom"
               align="start"
               sideOffset={4}
@@ -449,9 +424,9 @@ export function CategoryBrowseClient({ categories: initialCategories }: Category
                   By lists
                 </DropdownMenu.DropdownItem>
               </DropdownMenu>
-            </SubframeCore.DropdownMenu.Content>
-          </SubframeCore.DropdownMenu.Portal>
-        </SubframeCore.DropdownMenu.Root>
+            </DropdownMenuPrimitive.Content>
+          </DropdownMenuPrimitive.Portal>
+        </DropdownMenuPrimitive.Root>
         <ToggleGroup
           value={viewMode}
           onValueChange={(value: string) => {
@@ -462,13 +437,13 @@ export function CategoryBrowseClient({ categories: initialCategories }: Category
         >
           <ToggleGroup.Item
             className="h-7 w-auto flex-none"
-            icon={<FeatherLayoutGrid />}
+            icon={<LayoutGrid />}
             value="grid"
             aria-label="Grid view"
           />
           <ToggleGroup.Item
             className="h-7 w-auto flex-none"
-            icon={<FeatherList />}
+            icon={<List />}
             value="list"
             aria-label="List view"
           />
@@ -513,7 +488,7 @@ export function CategoryBrowseClient({ categories: initialCategories }: Category
           role="status"
           aria-live="polite"
         >
-          <FeatherSearch className="h-12 w-12 text-subtext-color" />
+          <Search className="h-12 w-12 text-subtext-color" />
           <h2 className="text-heading-3 font-heading-3 text-default-font">
             No categories found
           </h2>

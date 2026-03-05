@@ -1,12 +1,9 @@
-import * as SubframeCore from "@subframe/core";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export const twClassNames = SubframeCore.createTwClassNames([
-  "text-caption",
-  "text-caption-bold",
-  "text-body",
-  "text-body-bold",
-  "text-heading-3",
-  "text-heading-2",
-  "text-heading-1",
-  "text-monospace-body",
-]);
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// Backwards compatibility alias
+export const twClassNames = cn;

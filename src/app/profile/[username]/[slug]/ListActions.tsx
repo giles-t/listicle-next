@@ -1,11 +1,13 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React from "react";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
-import { FeatherFlag, FeatherLink, FeatherMoreHorizontal, FeatherShare2, toast } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
+import { toast } from "sonner";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { Flag, Link, MoreHorizontal, Share2 } from "lucide-react";
 
 interface ListActionsProps {
   listId: string;
@@ -48,24 +50,24 @@ export function ListActions({ listId, initialBookmarked, initialCollectionId }: 
         initialCollectionId={initialCollectionId}
         size="medium"
       />
-      <IconButton icon={<FeatherShare2 />} onClick={handleShare} />
-      <SubframeCore.DropdownMenu.Root>
-        <SubframeCore.DropdownMenu.Trigger asChild={true}>
-          <IconButton icon={<FeatherMoreHorizontal />} onClick={() => {}} />
-        </SubframeCore.DropdownMenu.Trigger>
-        <SubframeCore.DropdownMenu.Portal>
-          <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
+      <IconButton icon={<Share2 />} onClick={handleShare} />
+      <DropdownMenuPrimitive.Root>
+        <DropdownMenuPrimitive.Trigger asChild={true}>
+          <IconButton icon={<MoreHorizontal />} onClick={() => {}} />
+        </DropdownMenuPrimitive.Trigger>
+        <DropdownMenuPrimitive.Portal>
+          <DropdownMenuPrimitive.Content side="bottom" align="end" sideOffset={4} asChild={true}>
             <DropdownMenu>
-              <DropdownMenu.DropdownItem icon={<FeatherLink />} onClick={handleCopyLink}>
+              <DropdownMenu.DropdownItem icon={<Link />} onClick={handleCopyLink}>
                 Copy link
               </DropdownMenu.DropdownItem>
-              <DropdownMenu.DropdownItem icon={<FeatherFlag />} onClick={handleReport}>
+              <DropdownMenu.DropdownItem icon={<Flag />} onClick={handleReport}>
                 Report
               </DropdownMenu.DropdownItem>
             </DropdownMenu>
-          </SubframeCore.DropdownMenu.Content>
-        </SubframeCore.DropdownMenu.Portal>
-      </SubframeCore.DropdownMenu.Root>
+          </DropdownMenuPrimitive.Content>
+        </DropdownMenuPrimitive.Portal>
+      </DropdownMenuPrimitive.Root>
     </div>
   );
 }

@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Button } from "@/ui/components/Button";
 import { SkeletonText } from "@/ui/components/SkeletonText";
-import { FeatherPlus } from "@subframe/core";
 import { EmojiPicker } from "frimousse";
 import NumberFlow from "@number-flow/react";
 import { usePageReactions } from "./PageReactionsContext";
+import { Plus } from "lucide-react";
 
 interface ReactionBarProps {
   listId: string;
@@ -248,7 +248,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
             className="py-3.5  !border !border-solid !border-transparent hover:!bg-neutral-100 dark:!bg-neutral-800 dark:hover:!bg-neutral-700"
             variant="neutral-tertiary"
             size="small"
-            icon={<FeatherPlus />}
+            icon={<Plus />}
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             disabled={!userId}
           />

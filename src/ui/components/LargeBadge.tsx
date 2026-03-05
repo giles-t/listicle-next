@@ -1,49 +1,18 @@
 "use client";
-/*
- * Documentation:
- * Large Badge — https://app.subframe.com/7b590a12c74e/library?component=Large+Badge_f003eb3b-6b6f-483f-8f2e-f6fcd63ad117
- */
 
 import React from "react";
-import { FeatherPlus } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
 interface LargeBadgeRootProps extends React.HTMLAttributes<HTMLDivElement> {
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-  className?: string;
+  icon?: React.ReactNode; children?: React.ReactNode; className?: string;
 }
 
 const LargeBadgeRoot = React.forwardRef<HTMLDivElement, LargeBadgeRootProps>(
-  function LargeBadgeRoot(
-    {
-      icon = <FeatherPlus />,
-      children,
-      className,
-      ...otherProps
-    }: LargeBadgeRootProps,
-    ref
-  ) {
+  function LargeBadgeRoot({ icon, children, className, ...otherProps }, ref) {
     return (
-      <div
-        className={SubframeUtils.twClassNames(
-          "group/f003eb3b flex cursor-pointer items-center gap-2 overflow-hidden rounded-full border border-solid border-neutral-border px-3 py-2 hover:bg-neutral-50 active:bg-neutral-100",
-          className
-        )}
-        ref={ref}
-        {...otherProps}
-      >
-        {icon ? (
-          <SubframeCore.IconWrapper className="text-heading-3 font-heading-3 text-brand-700">
-            {icon}
-          </SubframeCore.IconWrapper>
-        ) : null}
-        {children ? (
-          <span className="text-caption-bold font-caption-bold text-default-font">
-            {children}
-          </span>
-        ) : null}
+      <div className={cn("flex items-center gap-2 rounded-full border border-solid border-neutral-border px-3 py-1", className)} ref={ref} {...otherProps}>
+        {icon ? <span className="shrink-0 [&>svg]:h-[1em] [&>svg]:w-[1em] text-default-font">{icon}</span> : null}
+        {children ? <span className="text-body font-body text-default-font">{children}</span> : null}
       </div>
     );
   }

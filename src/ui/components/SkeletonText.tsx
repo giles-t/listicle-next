@@ -1,42 +1,26 @@
 "use client";
-/*
- * Documentation:
- * Skeleton Text — https://app.subframe.com/7b590a12c74e/library?component=Skeleton+Text_a9aae3f0-955e-4607-a272-374f1dc18f4b
- */
 
 import React from "react";
-import * as SubframeCore from "@subframe/core";
-import * as SubframeUtils from "../utils";
+import { cn } from "../utils";
 
-interface SkeletonTextRootProps
-  extends React.ComponentProps<typeof SubframeCore.Skeleton> {
-  size?: "default" | "label" | "subheader" | "section-header" | "header";
-  className?: string;
+interface SkeletonTextRootProps extends React.HTMLAttributes<HTMLDivElement> {
+  size?: "default" | "label" | "subheader" | "section-header" | "header"; className?: string;
 }
 
-const SkeletonTextRoot = React.forwardRef<
-  React.ElementRef<typeof SubframeCore.Skeleton>,
-  SkeletonTextRootProps
->(function SkeletonTextRoot(
-  { size = "default", className, ...otherProps }: SkeletonTextRootProps,
-  ref
-) {
-  return (
-    <SubframeCore.Skeleton
-      className={SubframeUtils.twClassNames(
-        "group/a9aae3f0 flex h-5 w-full flex-col items-start gap-2 rounded-md bg-neutral-200",
-        {
-          "h-10 w-full": size === "header",
-          "h-9 w-full": size === "section-header",
-          "h-7 w-full": size === "subheader",
-          "h-4 w-full": size === "label",
-        },
-        className
-      )}
-      ref={ref}
-      {...otherProps}
-    />
-  );
-});
+const SkeletonTextRoot = React.forwardRef<HTMLDivElement, SkeletonTextRootProps>(
+  function SkeletonTextRoot({ size = "default", className, ...otherProps }, ref) {
+    return (
+      <div
+        className={cn("h-4 w-full animate-pulse rounded-md bg-neutral-200", {
+          "h-3": size === "label",
+          "h-5": size === "subheader",
+          "h-6": size === "section-header",
+          "h-8": size === "header",
+        }, className)}
+        ref={ref} {...otherProps}
+      />
+    );
+  }
+);
 
 export const SkeletonText = SkeletonTextRoot;

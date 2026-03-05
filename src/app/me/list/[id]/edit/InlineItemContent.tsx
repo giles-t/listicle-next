@@ -4,7 +4,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import RichTextEditor from "@/client/components/NotionEditor";
 import { StaticContentRenderer } from "@/client/components/StaticContentRenderer";
 import { Button } from "@/ui/components/Button";
-import { FeatherCheck, FeatherX, toast } from "@subframe/core";
+import { toast } from "sonner";
+import { Check, X } from "lucide-react";
 
 type ListItem = {
   id: string;
@@ -113,7 +114,7 @@ export default function InlineItemContent({
           <Button
             variant="neutral-tertiary"
             size="small"
-            icon={<FeatherX />}
+            icon={<X />}
             onClick={handleCancel}
             disabled={isSaving}
           >
@@ -121,7 +122,7 @@ export default function InlineItemContent({
           </Button>
           <Button
             size="small"
-            icon={<FeatherCheck />}
+            icon={<Check />}
             onClick={handleSave}
             loading={isSaving}
           >

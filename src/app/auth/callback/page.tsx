@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/src/client/supabase';
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 
 export default function AuthCallback() {
   const router = useRouter();

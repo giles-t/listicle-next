@@ -1,13 +1,7 @@
 "use client";
-/*
- * Documentation:
- * Dialog — https://app.subframe.com/7b590a12c74e/library?component=Dialog_ca59db17-43fb-4247-8094-3c55162e902d
- * Dialog Layout — https://app.subframe.com/7b590a12c74e/library?component=Dialog+Layout_ff4920a8-df26-4012-934d-0a9edbf5e373
- */
 
 import React from "react";
 import { Dialog } from "../components/Dialog";
-import * as SubframeUtils from "../utils";
 
 interface DialogLayoutRootProps extends React.ComponentProps<typeof Dialog> {
   children?: React.ReactNode;
@@ -17,10 +11,7 @@ interface DialogLayoutRootProps extends React.ComponentProps<typeof Dialog> {
 const DialogLayoutRoot = React.forwardRef<
   React.ElementRef<typeof Dialog>,
   DialogLayoutRootProps
->(function DialogLayoutRoot(
-  { children, className, ...otherProps }: DialogLayoutRootProps,
-  ref
-) {
+>(function DialogLayoutRoot({ children, className, ...otherProps }, ref) {
   return (
     <Dialog className={className} ref={ref} {...otherProps}>
       <Dialog.Content>

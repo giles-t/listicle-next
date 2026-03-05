@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../supabase';
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 import { captureException } from '../../shared/sentry';
 import { Session, User as SupabaseUser, AuthError } from '@supabase/supabase-js';
 import { authManager } from '../auth/auth-manager';

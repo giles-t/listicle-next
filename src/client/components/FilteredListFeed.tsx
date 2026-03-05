@@ -6,13 +6,13 @@ import { Button } from "@/ui/components/Button";
 import { ListicleCardComponent as ListicleCard } from "@/ui/components/ListicleCardComponent";
 import { SearchListComponent } from "@/ui/components/SearchListComponent";
 import { Badge } from "@/ui/components/Badge";
-import { FeatherFilter } from "@subframe/core";
 import { formatNumber } from "@/shared/utils/format";
 import { formatDistanceToNow } from "date-fns";
 import { FilterSidebar, type CategoryOption, type SortOption, type TimeFilter, type FeaturedFilter, type ForYouFilter } from "./FilterSidebar";
 import { MobileFilterDrawer } from "./MobileFilterDrawer";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
+import { Filter } from "lucide-react";
 
 interface ListItem {
   id: string;
@@ -302,7 +302,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
       <div className="hidden items-start fixed bottom-6 right-6 mobile:flex z-50">
         <Button
           size="large"
-          icon={<FeatherFilter />}
+          icon={<Filter />}
           onClick={handleOpenDrawer}
         >
           Filters

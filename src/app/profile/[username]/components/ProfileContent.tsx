@@ -1,5 +1,7 @@
 "use client";
 
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Avatar } from "@/ui/components/Avatar";
@@ -10,8 +12,6 @@ import { IconButton } from "@/ui/components/IconButton";
 import { SearchListComponent } from "@/ui/components/SearchListComponent";
 import { ListicleCardComponent } from "@/ui/components/ListicleCardComponent";
 import { AddBookmarkComponent } from "@/ui/components/AddBookmarkComponent";
-import { FeatherArrowUpDown, FeatherChevronDown, FeatherChevronLeft, FeatherChevronRight, FeatherBookmark, FeatherVerified, FeatherUsers, FeatherUserPlus } from "@subframe/core";
-import * as SubframeCore from "@subframe/core";
 import { formatDistanceToNow } from "date-fns";
 import { formatNumber } from "@/shared/utils/format";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
@@ -20,6 +20,7 @@ import { SocialLinks } from "./SocialLinks";
 import { FollowStats } from "./FollowStats";
 import { EmptyListsState } from "./EmptyListsState";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { ArrowUpDown, BadgeCheck, Bookmark, ChevronDown, ChevronLeft, ChevronRight, UserPlus, Users } from "lucide-react";
 
 type SortOption = "recent" | "popular" | "oldest";
 
@@ -163,7 +164,7 @@ export function ProfileContent({
               {profile.name}
             </span>
             {/* TODO: Add verification logic */}
-            <FeatherVerified className="text-heading-3 font-heading-3 text-default-font" />
+            <BadgeCheck className="text-heading-3 font-heading-3 text-default-font" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-caption font-caption text-default-font">
@@ -209,19 +210,19 @@ export function ProfileContent({
             All Lists
           </span>
           <div className="flex grow shrink-0 basis-0 items-center justify-end gap-2">
-            <SubframeCore.DropdownMenu.Root>
-              <SubframeCore.DropdownMenu.Trigger asChild={true}>
+            <DropdownMenuPrimitive.Root>
+              <DropdownMenuPrimitive.Trigger asChild={true}>
                 <Button
                   variant="neutral-secondary"
-                  icon={<FeatherArrowUpDown />}
-                  iconRight={<FeatherChevronDown />}
+                  icon={<ArrowUpDown />}
+                  iconRight={<ChevronDown />}
                   disabled={isLoading}
                 >
                   {SORT_LABELS[sort]}
                 </Button>
-              </SubframeCore.DropdownMenu.Trigger>
-              <SubframeCore.DropdownMenu.Portal>
-                <SubframeCore.DropdownMenu.Content
+              </DropdownMenuPrimitive.Trigger>
+              <DropdownMenuPrimitive.Portal>
+                <DropdownMenuPrimitive.Content
                   side="bottom"
                   align="end"
                   sideOffset={4}
@@ -247,9 +248,9 @@ export function ProfileContent({
                       Oldest
                     </DropdownMenu.DropdownItem>
                   </DropdownMenu>
-                </SubframeCore.DropdownMenu.Content>
-              </SubframeCore.DropdownMenu.Portal>
-            </SubframeCore.DropdownMenu.Root>
+                </DropdownMenuPrimitive.Content>
+              </DropdownMenuPrimitive.Portal>
+            </DropdownMenuPrimitive.Root>
           </div>
         </div>
 
@@ -327,7 +328,7 @@ export function ProfileContent({
                   <IconButton
                     variant="neutral-secondary"
                     size="small"
-                    icon={<FeatherChevronLeft />}
+                    icon={<ChevronLeft />}
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page === 1 || isLoading}
                   />
@@ -356,7 +357,7 @@ export function ProfileContent({
                   <IconButton
                     variant="neutral-secondary"
                     size="small"
-                    icon={<FeatherChevronRight />}
+                    icon={<ChevronRight />}
                     onClick={() => handlePageChange(page + 1)}
                     disabled={page === totalPages || isLoading}
                   />

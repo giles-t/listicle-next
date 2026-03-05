@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { Button } from "@/ui/components/Button";
-import { FeatherArrowLeft } from "@subframe/core";
 import { TextFieldUnstyled } from "@/ui/components/TextFieldUnstyled";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/client/hooks/use-auth";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 function CreateList() {
   const [title, setTitle] = useState("");
@@ -84,7 +84,7 @@ function CreateList() {
       <div className="flex w-full items-center justify-between border-b border-solid border-neutral-border px-6 py-4">
         <Button
           variant="neutral-tertiary"
-          icon={<FeatherArrowLeft />}
+          icon={<ArrowLeft />}
           onClick={handleBack}
         >
           Back

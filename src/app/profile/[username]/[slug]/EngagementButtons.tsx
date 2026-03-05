@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/ui/components/Button";
-import { FeatherEye, FeatherMessageCircle, FeatherSmile } from "@subframe/core";
 import { ReactionsDrawer } from "@/client/components/ReactionsDrawer";
 import { CommentsDrawer } from "@/client/components/CommentsDrawer";
+import { Eye, MessageCircle, Smile } from "lucide-react";
 
 interface EngagementButtonsProps {
   listId: string;
@@ -30,13 +30,13 @@ export function EngagementButtons({
   return (
     <>
       <div className="flex items-center gap-2">
-        <Button variant="neutral-tertiary" icon={<FeatherEye />} onClick={() => {}}>
+        <Button variant="neutral-tertiary" icon={<Eye />} onClick={() => {}}>
           {String(viewsCount ?? 0)}
         </Button>
-        <Button variant="neutral-tertiary" icon={<FeatherSmile />} onClick={() => setReactionsDrawerOpen(true)}>
+        <Button variant="neutral-tertiary" icon={<Smile />} onClick={() => setReactionsDrawerOpen(true)}>
           {String(reactionsCount ?? 0)}
         </Button>
-        <Button variant="neutral-tertiary" icon={<FeatherMessageCircle />} onClick={() => setCommentsDrawerOpen(true)}>
+        <Button variant="neutral-tertiary" icon={<MessageCircle />} onClick={() => setCommentsDrawerOpen(true)}>
           {String(commentsCount ?? 0)}
         </Button>
       </div>

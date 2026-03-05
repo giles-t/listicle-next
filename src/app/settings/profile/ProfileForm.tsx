@@ -4,23 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@subframe/core";
+import { toast } from "sonner";
 
 import { Avatar } from "@/ui/components/Avatar";
 import { Button } from "@/ui/components/Button";
-import { FeatherUpload, FeatherLoader, FeatherCheck } from "@subframe/core";
 import { TextField } from "@/ui/components/TextField";
 import { TextArea } from "@/ui/components/TextArea";
-import { FeatherGlobe } from "@subframe/core";
-import { FeatherTwitter } from "@subframe/core";
-import { FeatherLinkedin } from "@subframe/core";
-import { FeatherInstagram } from "@subframe/core";
-import { FeatherYoutube } from "@subframe/core";
-import { FeatherGithub } from "@subframe/core";
 import { profileFormSchema, ProfileFormData } from "@/shared/validation/user";
 import { updateProfile, uploadAvatar } from "./actions";
 import { checkUsernameAvailability } from "@/src/app/onboarding/check-username";
 import { useAuth } from "@/client/hooks/use-auth";
+import { Check, Github, Globe, Instagram, Linkedin, Loader, Twitter, Upload, Youtube } from "lucide-react";
 
 // Utility functions to extract usernames from URLs
 const extractTwitterUsername = (url: string): string => {
@@ -259,7 +253,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 <Button
                   type="button"
                   variant="neutral-secondary"
-                  icon={<FeatherUpload />}
+                  icon={<Upload />}
                   disabled={isUploadingAvatar}
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                 >
@@ -284,9 +278,9 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           error={!!errors.username}
           iconRight={
             isCheckingUsername ? (
-              <FeatherLoader className="h-4 w-4 animate-spin text-subtext-color" />
+              <Loader className="h-4 w-4 animate-spin text-subtext-color" />
             ) : usernameAvailable === true ? (
-              <FeatherCheck className="h-4 w-4 text-success-600" />
+              <Check className="h-4 w-4 text-success-600" />
             ) : null
           }
         >
@@ -340,7 +334,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="Website"
           helpText={errors.website?.message || "Your personal or professional website"}
-          icon={<FeatherGlobe />}
+          icon={<Globe />}
           error={!!errors.website}
         >
           <TextField.Input
@@ -352,7 +346,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="Twitter"
           helpText={errors.twitter?.message || "Your Twitter username (without @)"}
-          icon={<FeatherTwitter />}
+          icon={<Twitter />}
           error={!!errors.twitter}
         >
           <TextField.Input
@@ -364,7 +358,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="LinkedIn"
           helpText={errors.linkedin?.message || "Your LinkedIn username or custom URL"}
-          icon={<FeatherLinkedin />}
+          icon={<Linkedin />}
           error={!!errors.linkedin}
         >
           <TextField.Input
@@ -376,7 +370,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="Instagram"
           helpText={errors.instagram?.message || "Your Instagram username (without @)"}
-          icon={<FeatherInstagram />}
+          icon={<Instagram />}
           error={!!errors.instagram}
         >
           <TextField.Input
@@ -388,7 +382,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="YouTube"
           helpText={errors.youtube?.message || "Your YouTube channel name or custom URL"}
-          icon={<FeatherYoutube />}
+          icon={<Youtube />}
           error={!!errors.youtube}
         >
           <TextField.Input
@@ -400,7 +394,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="h-auto w-full flex-none"
           label="GitHub"
           helpText={errors.github?.message || "Your GitHub username"}
-          icon={<FeatherGithub />}
+          icon={<Github />}
           error={!!errors.github}
         >
           <TextField.Input

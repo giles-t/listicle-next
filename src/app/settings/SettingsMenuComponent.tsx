@@ -4,9 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SettingsMenu } from "@/ui/components/SettingsMenu";
-import { FeatherUser } from "@subframe/core";
-import { FeatherLock } from "@subframe/core";
-import { FeatherBell } from "@subframe/core";
+import { Bell, Lock, User } from "lucide-react";
 
 export function SettingsMenuComponent() {
   const pathname = usePathname();
@@ -24,21 +22,21 @@ export function SettingsMenuComponent() {
           <Link className="w-full" href="/settings/profile">
             <SettingsMenu.Item 
               selected={pathname === "/settings/profile"} 
-              icon={<FeatherUser />} 
+              icon={<User />} 
               label="Profile" 
             />
           </Link>
           <Link className="w-full" href="/settings/security">
             <SettingsMenu.Item 
               selected={pathname === "/settings/security"} 
-              icon={<FeatherLock />} 
+              icon={<Lock />} 
               label="Security" 
             />
           </Link>
           <Link className="w-full" href="/settings/notifications">
             <SettingsMenu.Item 
               selected={pathname === "/settings/notifications"} 
-              icon={<FeatherBell />} 
+              icon={<Bell />} 
               label="Notifications" 
             />
           </Link>

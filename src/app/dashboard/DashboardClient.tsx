@@ -6,21 +6,9 @@ import { User } from '@supabase/supabase-js';
 import { Button } from '@/ui/components/Button';
 import { IconWithBackground } from '@/ui/components/IconWithBackground';
 import { Badge } from '@/ui/components/Badge';
-import {
-  FeatherEye,
-  FeatherHeart,
-  FeatherMessageCircle,
-  FeatherUsers,
-  FeatherFileText,
-  FeatherPlus,
-  FeatherList,
-  FeatherSettings,
-  FeatherBell,
-  FeatherEdit2,
-  FeatherArrowRight,
-} from '@subframe/core';
 import { formatRelativeTime } from '@/shared/utils/date';
 import type { UserStats } from '@/server/db/queries/profiles';
+import { ArrowRight, Bell, Edit2, Eye, FileText, Heart, List, MessageCircle, Plus, Settings, Users } from "lucide-react";
 
 interface SerializedListPreview {
   id: string;
@@ -93,7 +81,7 @@ export function DashboardClient({
           <Link href="/notifications">
             <Button
               variant="neutral-secondary"
-              icon={<FeatherBell />}
+              icon={<Bell />}
               size="medium"
             >
               Notifications
@@ -103,7 +91,7 @@ export function DashboardClient({
             </Button>
           </Link>
           <Link href="/create">
-            <Button icon={<FeatherPlus />} size="medium">
+            <Button icon={<Plus />} size="medium">
               New List
             </Button>
           </Link>
@@ -112,32 +100,32 @@ export function DashboardClient({
 
       {/* Stats Row */}
       <div className="flex flex-wrap gap-3">
-        <StatCard icon={<FeatherFileText />} label="Published Lists" value={stats.listsCount} variant="brand" />
-        <StatCard icon={<FeatherEye />} label="Total Views" value={stats.totalViews} variant="neutral" />
-        <StatCard icon={<FeatherHeart />} label="Reactions" value={stats.totalLikes} variant="error" />
-        <StatCard icon={<FeatherMessageCircle />} label="Comments" value={stats.totalComments} variant="warning" />
-        <StatCard icon={<FeatherUsers />} label="Followers" value={stats.followersCount} variant="success" />
+        <StatCard icon={<FileText />} label="Published Lists" value={stats.listsCount} variant="brand" />
+        <StatCard icon={<Eye />} label="Total Views" value={stats.totalViews} variant="neutral" />
+        <StatCard icon={<Heart />} label="Reactions" value={stats.totalLikes} variant="error" />
+        <StatCard icon={<MessageCircle />} label="Comments" value={stats.totalComments} variant="warning" />
+        <StatCard icon={<Users />} label="Followers" value={stats.followersCount} variant="success" />
       </div>
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-2">
         <Link href="/create">
-          <Button variant="brand-secondary" icon={<FeatherPlus />} size="small">
+          <Button variant="brand-secondary" icon={<Plus />} size="small">
             Create List
           </Button>
         </Link>
         <Link href="/me/lists">
-          <Button variant="neutral-secondary" icon={<FeatherList />} size="small">
+          <Button variant="neutral-secondary" icon={<List />} size="small">
             My Lists
           </Button>
         </Link>
         <Link href="/me/bookmarks">
-          <Button variant="neutral-secondary" icon={<FeatherHeart />} size="small">
+          <Button variant="neutral-secondary" icon={<Heart />} size="small">
             Bookmarks
           </Button>
         </Link>
         <Link href="/settings">
-          <Button variant="neutral-secondary" icon={<FeatherSettings />} size="small">
+          <Button variant="neutral-secondary" icon={<Settings />} size="small">
             Settings
           </Button>
         </Link>
@@ -150,7 +138,7 @@ export function DashboardClient({
             Recent Lists
           </h2>
           <Link href="/me/lists">
-            <Button variant="neutral-tertiary" iconRight={<FeatherArrowRight />} size="small">
+            <Button variant="neutral-tertiary" iconRight={<ArrowRight />} size="small">
               View all
             </Button>
           </Link>
@@ -161,7 +149,7 @@ export function DashboardClient({
             <IconWithBackground
               variant="brand"
               size="x-large"
-              icon={<FeatherFileText />}
+              icon={<FileText />}
             />
             <div className="flex flex-col items-center gap-1">
               <span className="text-heading-3 font-heading-3 text-default-font">
@@ -172,7 +160,7 @@ export function DashboardClient({
               </span>
             </div>
             <Link href="/create">
-              <Button icon={<FeatherPlus />}>Create your first list</Button>
+              <Button icon={<Plus />}>Create your first list</Button>
             </Link>
           </div>
         ) : (
@@ -192,7 +180,7 @@ export function DashboardClient({
                     </h3>
                   </Link>
                   <Link href={`/me/list/${list.id}/edit`}>
-                    <Button variant="neutral-tertiary" icon={<FeatherEdit2 />} size="small" />
+                    <Button variant="neutral-tertiary" icon={<Edit2 />} size="small" />
                   </Link>
                 </div>
                 {list.description && (
@@ -203,15 +191,15 @@ export function DashboardClient({
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-solid border-neutral-100">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 text-caption font-caption text-subtext-color">
-                      <FeatherEye className="w-3 h-3" />
+                      <Eye className="w-3 h-3" />
                       {list.viewsCount}
                     </span>
                     <span className="flex items-center gap-1 text-caption font-caption text-subtext-color">
-                      <FeatherHeart className="w-3 h-3" />
+                      <Heart className="w-3 h-3" />
                       {list.likesCount}
                     </span>
                     <span className="flex items-center gap-1 text-caption font-caption text-subtext-color">
-                      <FeatherMessageCircle className="w-3 h-3" />
+                      <MessageCircle className="w-3 h-3" />
                       {list.commentsCount}
                     </span>
                   </div>
