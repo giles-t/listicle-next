@@ -2,15 +2,33 @@
 
 import React, { useState } from "react";
 import { Button } from "@/ui/components/Button";
-import { FeatherArrowLeft } from "@subframe/core";
-import { TextFieldUnstyled } from "@/ui/components/TextFieldUnstyled";
+import { IconWithBackground } from "@/ui/components/IconWithBackground";
+import { RadioCardGroup } from "@/ui/components/RadioCardGroup";
+import { TextArea } from "@/ui/components/TextArea";
+import { TextField } from "@/ui/components/TextField";
+import {
+  FeatherArrowLeft,
+  FeatherEdit3,
+  FeatherHash,
+  FeatherImage,
+  FeatherList,
+  FeatherListOrdered,
+  FeatherListStart,
+  FeatherMessageSquare,
+  FeatherPlus,
+  FeatherTarget,
+  FeatherTrendingUp,
+} from "@subframe/core";
+import { toast } from "@subframe/core";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/client/hooks/use-auth";
-import { toast } from "@subframe/core";
+
+type ListType = "ordered" | "unordered" | "reversed";
 
 function CreateList() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [listType, setListType] = useState<ListType>("ordered");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
@@ -38,49 +56,41 @@ function CreateList() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/lists', {
-        method: 'POST',
+      const response = await fetch("/api/lists", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim() || undefined,
-          listType: 'ordered',
-          isPublished: false
+          listType,
+          isPublished: false,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create list');
+        throw new Error(errorData.error || "Failed to create list");
       }
 
       const newList = await response.json();
       toast.success("List created successfully!");
-      
-      // Navigate to the list editing page
+
       router.push(`/me/list/${newList.id}/edit`);
-      
     } catch (error) {
-      console.error('Error creating list:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create list');
+      console.error("Error creating list:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create list"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
-
-  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
-  };
-
   return (
-    <div className="flex h-full w-full flex-col items-start">
+    <div className="flex h-full w-full flex-col items-start bg-default-background">
       <div className="flex w-full items-center justify-between border-b border-solid border-neutral-border px-6 py-4">
         <Button
           variant="neutral-tertiary"
@@ -89,7 +99,8 @@ function CreateList() {
         >
           Back
         </Button>
-        <Button 
+        <Button
+          icon={<FeatherPlus />}
           onClick={handleCreate}
           loading={isSubmitting}
           disabled={isSubmitting || !title.trim()}
@@ -97,86 +108,223 @@ function CreateList() {
           {isSubmitting ? "Creating..." : "Create"}
         </Button>
       </div>
-      <div className="container max-w-none flex w-full grow shrink-0 basis-0 flex-col items-start bg-default-background">
-        <div className="flex w-full grow shrink-0 basis-0 flex-col items-center gap-16 px-6 py-12">
-          <div className="flex w-full max-w-[768px] flex-col items-start gap-8">
-            <div className="flex w-full max-w-[768px] flex-col items-center gap-8">
-              <span className="text-heading-2 font-heading-2 text-default-font">
-                What do you want to list about?
-              </span>
-            </div>
+      <div className="flex w-full grow shrink-0 basis-0 items-start mobile:flex-col mobile:flex-nowrap mobile:gap-0">
+        <div className="flex max-w-[576px] flex-col items-start gap-8 px-12 py-12 mobile:max-w-none">
+          <div className="flex w-full flex-col items-start gap-2">
+            <span className="text-heading-2 font-heading-2 text-default-font">
+              Create your listicle
+            </span>
+            <span className="text-body font-body text-subtext-color">
+              Share your ideas in a structured, engaging format
+            </span>
+          </div>
+          <div className="flex w-full flex-col items-start gap-6">
+            <TextField
+              className="h-auto w-full flex-none"
+              variant="filled"
+              label="Title"
+              helpText="Give your list a catchy, specific title (5-100 characters)"
+            >
+              <TextField.Input
+                placeholder="e.g. 10 Essential Tips for Remote Work"
+                value={title}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setTitle(event.target.value)
+                }
+                maxLength={100}
+              />
+            </TextField>
+            <TextArea
+              className="h-auto w-full flex-none"
+              variant="filled"
+              label="Subtitle (optional)"
+              helpText="Add context or a compelling hook (max 500 characters)"
+            >
+              <TextArea.Input
+                placeholder="Describe what readers will learn or why this list matters..."
+                value={description}
+                onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setDescription(event.target.value)
+                }
+                maxLength={500}
+              />
+            </TextArea>
             <div className="flex w-full flex-col items-start gap-4">
-              <TextFieldUnstyled className="h-auto w-full flex-none">
-                <TextFieldUnstyled.Input
-                  className="text-heading-2 font-heading-2"
-                  placeholder="Write a title..."
-                  value={title}
-                  onChange={handleTitleChange}
-                  maxLength={100}
-                />
-              </TextFieldUnstyled>
-              <TextFieldUnstyled className="h-auto w-full flex-none">
-                <TextFieldUnstyled.Input
-                  placeholder="Write a subtitle..."
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  maxLength={500}
-                />
-              </TextFieldUnstyled>
+              <span className="text-body-bold font-body-bold text-default-font">
+                List type
+              </span>
+              <RadioCardGroup
+                className="h-auto w-full flex-none"
+                value={listType}
+                onValueChange={(value: string) =>
+                  setListType(value as ListType)
+                }
+              >
+                <div className="flex grow shrink-0 basis-0 flex-col items-start gap-3">
+                  <RadioCardGroup.RadioCard
+                    hideRadio={true}
+                    value="unordered"
+                    checked={listType === "unordered"}
+                  >
+                    <div className="flex grow shrink-0 basis-0 items-center gap-4">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="medium"
+                        icon={<FeatherList />}
+                        square={true}
+                      />
+                      <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                        <span className="text-body-bold font-body-bold text-default-font">
+                          Bullet list
+                        </span>
+                        <span className="text-caption font-caption text-subtext-color">
+                          Items displayed with bullet points
+                        </span>
+                      </div>
+                    </div>
+                  </RadioCardGroup.RadioCard>
+                  <RadioCardGroup.RadioCard hideRadio={true} value="ordered" checked={listType === "ordered"}>
+                    <div className="flex grow shrink-0 basis-0 items-center gap-4">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="medium"
+                        icon={<FeatherListOrdered />}
+                        square={true}
+                      />
+                      <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                        <span className="text-body-bold font-body-bold text-default-font">
+                          Numbered list
+                        </span>
+                        <span className="text-caption font-caption text-subtext-color">
+                          Items ranked from 1 to N
+                        </span>
+                      </div>
+                    </div>
+                  </RadioCardGroup.RadioCard>
+                  <RadioCardGroup.RadioCard hideRadio={true} value="reversed" checked={listType === "reversed"}>
+                    <div className="flex grow shrink-0 basis-0 items-center gap-4">
+                      <IconWithBackground
+                        variant="neutral"
+                        size="medium"
+                        icon={<FeatherListStart />}
+                        square={true}
+                      />
+                      <div className="flex grow shrink-0 basis-0 flex-col items-start">
+                        <span className="text-body-bold font-body-bold text-default-font">
+                          Countdown list
+                        </span>
+                        <span className="text-caption font-caption text-subtext-color">
+                          Items ranked from N down to 1
+                        </span>
+                      </div>
+                    </div>
+                  </RadioCardGroup.RadioCard>
+                </div>
+              </RadioCardGroup>
             </div>
           </div>
-          <div className="flex w-full flex-col items-center gap-8">
-            <div className="flex w-full max-w-[768px] flex-col items-start gap-8">
-              <span className="text-heading-2 font-heading-2 text-default-font">
-                Here&#39;s what other people are bulleting about
-              </span>
+        </div>
+        <div className="flex h-px flex-col items-center gap-2 bg-neutral-border mobile:hidden" />
+        <div className="flex grow shrink-0 basis-0 flex-col items-start gap-8 bg-neutral-50 px-12 py-12">
+          <div className="flex w-full flex-col items-start gap-2">
+            <span className="text-heading-2 font-heading-2 text-default-font">
+              Tips for great listicles
+            </span>
+            <span className="text-body font-body text-subtext-color">
+              Follow these guidelines to create engaging content
+            </span>
+          </div>
+          <div className="flex w-full flex-col items-start gap-6">
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherTarget />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  Keep titles specific
+                </span>
+                <span className="text-body font-body text-subtext-color">
+                  Vague titles like &quot;Best Apps&quot; perform worse than
+                  &quot;Best Apps for Project Management in 2024&quot;
+                </span>
+              </div>
             </div>
-            <div className="flex w-full max-w-[768px] flex-col items-start gap-6">
-              <div className="flex w-full flex-col items-start gap-1">
-                <span className="text-heading-3 font-heading-3 text-default-font">
-                  8 Chrome Extensions I Use Daily as a Developer (And Why You
-                  Should Too!)
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherHash />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  Use numbers when they add value
                 </span>
-                <span className="text-caption font-caption text-subtext-color">
-                  As a developer, your toolkit can make or break your
-                  productivity. Chrome extensions are small yet powerful tools
-                  that simplify complex tasks, help debug issues, and make your
-                  workflow more efficient. In this blog, let&#39;s dive into
-                  some must-have Chrome extensions for developers
-                </span>
-              </div>
-              <div className="flex w-full flex-col items-start gap-1">
-                <span className="text-heading-3 font-heading-3 text-default-font">
-                  The 5 Best No code AI Tools to use in 2025
-                </span>
-                <span className="text-caption font-caption text-subtext-color">
-                  and why you shouldn&#39;t be worried about your job.
+                <span className="text-body font-body text-subtext-color">
+                  Numbers create expectations and make content more scannable
                 </span>
               </div>
-              <div className="flex w-full flex-col items-start gap-1">
-                <span className="text-heading-3 font-heading-3 text-default-font">
-                  Countries I&#39;ve visited so far in my lifetime
+            </div>
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherMessageSquare />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  Add a compelling subtitle
                 </span>
-                <span className="text-caption font-caption text-subtext-color">
-                  A journey through cultures, landscapes, and unexpected
-                  adventures across continents.
-                </span>
-              </div>
-              <div className="flex w-full flex-col items-start gap-1">
-                <span className="text-heading-3 font-heading-3 text-default-font">
-                  Top 10 Programming Language Trends in 2024
-                </span>
-                <span className="text-caption font-caption text-subtext-color">
-                  Exploring the evolving landscape of programming languages and
-                  their impact on software development.
+                <span className="text-body font-body text-subtext-color">
+                  Use the subtitle to explain why readers should care about your
+                  list
                 </span>
               </div>
-              <div className="flex w-full flex-col items-start gap-1">
-                <span className="text-heading-3 font-heading-3 text-default-font">
-                  Altcoins that are poised to explode in the 2025 bull market
+            </div>
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherImage />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  Visual content matters
                 </span>
-                <span className="text-caption font-caption text-subtext-color">
-                  Is your portfolio ready for the upcoming bull run?
+                <span className="text-body font-body text-subtext-color">
+                  Plan to add images, videos, or graphics to each list item
+                </span>
+              </div>
+            </div>
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherTrendingUp />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  Start strong, end stronger
+                </span>
+                <span className="text-body font-body text-subtext-color">
+                  Your first and last items should be your most compelling
+                </span>
+              </div>
+            </div>
+            <div className="flex w-full items-start gap-4">
+              <IconWithBackground
+                variant="brand"
+                size="medium"
+                icon={<FeatherEdit3 />}
+              />
+              <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+                <span className="text-body-bold font-body-bold text-default-font">
+                  You can change this later
+                </span>
+                <span className="text-body font-body text-subtext-color">
+                  Don&apos;t worry about getting everything perfect now. You can
+                  always edit your listicle after creating it
                 </span>
               </div>
             </div>
@@ -187,4 +335,4 @@ function CreateList() {
   );
 }
 
-export default CreateList; 
+export default CreateList;
