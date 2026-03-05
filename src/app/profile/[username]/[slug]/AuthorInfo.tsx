@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar } from "@/ui/components/Avatar";
 import { Button } from "@/ui/components/Button";
@@ -18,8 +18,13 @@ interface AuthorInfoProps {
 }
 
 export function AuthorInfo({ username, authorUserId, authorName, authorAvatar, itemsCount, publishedAt }: AuthorInfoProps) {
+  const [mounted, setMounted] = useState(false);
   const { user: currentUser, loading: authLoading } = useAuth();
   const { isFollowing, isLoading: followLoading, isInitialLoading, followUser, unfollowUser } = useFollowUser(username);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleFollowClick = () => {
     if (!currentUser) {
@@ -36,17 +41,17 @@ export function AuthorInfo({ username, authorUserId, authorName, authorAvatar, i
 
   const profileUrl = `/profile/${username}`;
 
-  // Determine if we should show the follow button
   const isOwnProfile = currentUser?.id === authorUserId;
 
-  // Determine button state and text
   const getFollowButton = () => {
-    // Don't show follow button on own profile
+    if (!mounted) {
+      return null;
+    }
+
     if (isOwnProfile) {
       return null;
     }
 
-    // Show loading state while auth is loading
     if (authLoading) {
       return (
         <Button variant="brand-secondary" size="small" disabled>
@@ -55,7 +60,6 @@ export function AuthorInfo({ username, authorUserId, authorName, authorAvatar, i
       );
     }
 
-    // Show follow button for non-authenticated users
     if (!currentUser) {
       return (
         <Button variant="brand-secondary" size="small" onClick={handleFollowClick}>
@@ -64,7 +68,6 @@ export function AuthorInfo({ username, authorUserId, authorName, authorAvatar, i
       );
     }
 
-    // Show loading state while follow status is loading
     if (isInitialLoading) {
       return (
         <Button variant="brand-secondary" size="small" disabled>
@@ -73,7 +76,6 @@ export function AuthorInfo({ username, authorUserId, authorName, authorAvatar, i
       );
     }
 
-    // Show follow/following button based on current state
     return (
       <Button
         variant={isFollowing ? "neutral-secondary" : "brand-secondary"}
