@@ -187,7 +187,7 @@ export default function ReorderListModal({
             <Button 
               onClick={handleConfirm}
               loading={loading}
-              disabled={loading}
+              disabled={loading || reorderedItems.length === 0}
             >
               Save order
             </Button>
@@ -196,30 +196,43 @@ export default function ReorderListModal({
         
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto bg-default-background">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={reorderedItems.map(item => item.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {reorderedItems.map((item, index) => (
-                <SortableItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  onMoveUp={() => moveItem(index, 'up')}
-                  onMoveDown={() => moveItem(index, 'down')}
-                  isFirst={index === 0}
-                  isLast={index === reorderedItems.length - 1}
-                  disabled={loading}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-          <div className="h-4" /> {/* Bottom padding */}
+          {reorderedItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-16 px-4 text-center">
+              <span className="text-heading-3 font-heading-3 text-subtext-color">
+                No items yet
+              </span>
+              <span className="text-body font-body text-subtext-color">
+                Add items to your list before reordering.
+              </span>
+            </div>
+          ) : (
+            <>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={reorderedItems.map(item => item.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {reorderedItems.map((item, index) => (
+                    <SortableItem
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      onMoveUp={() => moveItem(index, 'up')}
+                      onMoveDown={() => moveItem(index, 'down')}
+                      isFirst={index === 0}
+                      isLast={index === reorderedItems.length - 1}
+                      disabled={loading}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+              <div className="h-4" />
+            </>
+          )}
         </div>
         </div>
       </Drawer.Content>
