@@ -7,6 +7,7 @@ import { SkeletonText } from "@/ui/components/SkeletonText";
 import { FeatherPlus } from "@subframe/core";
 import { EmojiPicker } from "frimousse";
 import NumberFlow from "@number-flow/react";
+import LoginModal from "@/client/components/auth/LoginModal";
 import { usePageReactions } from "./PageReactionsContext";
 
 interface ReactionBarProps {
@@ -26,6 +27,7 @@ function getMutationKey(targetId: string | null, emoji: string): string {
 export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProps) {
   const { reactions, isLoading: contextLoading, updatingReactions, startMutation, completeMutation } = usePageReactions();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLDivElement>(null);
   
@@ -82,7 +84,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
 
   const handleReactionClick = useCallback(async (emoji: string) => {
     if (!userId) {
-      console.log("User must be logged in to react");
+      setShowLoginModal(true);
       return;
     }
 
@@ -171,6 +173,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
 
   return (
     <div className="flex w-full items-start rounded-md border border-solid border-neutral-border px-2 py-2 relative">
+      <LoginModal open={showLoginModal} onOpenChange={setShowLoginModal} />
       <div className="flex items-center gap-1 flex-wrap">
         {/* Animated container for reactions only */}
         <div ref={animationParent} className="contents">
@@ -186,7 +189,6 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
                 variant="neutral-tertiary"
                 size="small"
                 onClick={() => handleReactionClick(reaction.emoji)}
-                disabled={!userId}
                 className={`py-3.5 transition-colors duration-150 ${
                   isUserReaction 
                     ? "!bg-brand-50 !border !border-transparent hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
@@ -220,7 +222,6 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
                 variant="neutral-tertiary"
                 size="small"
                 onClick={() => handleReactionClick(reaction.emoji)}
-                disabled={!userId}
                 className={`py-3.5 transition-colors duration-150 ${
                   isUserReaction 
                     ? "!bg-brand-50 !border !border-transparent hover:!bg-brand-100 dark:!bg-brand-950 dark:!border-brand-500" 
@@ -249,8 +250,13 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
             variant="neutral-tertiary"
             size="small"
             icon={<FeatherPlus />}
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            disabled={!userId}
+            onClick={() => {
+              if (!userId) {
+                setShowLoginModal(true);
+              } else {
+                setShowEmojiPicker(!showEmojiPicker);
+              }
+            }}
           />
 
           {/* Emoji Picker Popover */}
