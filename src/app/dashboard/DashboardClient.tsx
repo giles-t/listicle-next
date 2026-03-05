@@ -20,6 +20,7 @@ import {
   FeatherArrowRight,
 } from '@subframe/core';
 import { formatRelativeTime } from '@/shared/utils/date';
+import { extractPlainText } from '@/shared/utils/tiptap-text';
 import type { UserStats } from '@/server/db/queries/profiles';
 
 interface SerializedListPreview {
@@ -195,9 +196,9 @@ export function DashboardClient({
                     <Button variant="neutral-tertiary" icon={<FeatherEdit2 />} size="small" />
                   </Link>
                 </div>
-                {list.description && (
+                {list.description && extractPlainText(list.description) && (
                   <p className="text-caption font-caption text-subtext-color line-clamp-2">
-                    {list.description}
+                    {extractPlainText(list.description)}
                   </p>
                 )}
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-solid border-neutral-100">
