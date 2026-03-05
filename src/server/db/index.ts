@@ -41,19 +41,36 @@ export const getDbClient = () => {
   });
 };
 
-// Create database instance using the singleton client
-export const db = drizzle(getPostgresClient(), {
-  schema,
-  casing: 'snake_case'
+// Lazy database instance - defers initialization until first use to avoid build-time errors
+let _db: ReturnType<typeof drizzle<typeof schema>> | null = null;
+function getDb() {
+  if (!_db) {
+    _db = drizzle(getPostgresClient(), {
+      schema,
+      casing: 'snake_case'
+    });
+  }
+  return _db;
+}
+
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(_target, prop, receiver) {
+    const instance = getDb();
+    const value = Reflect.get(instance, prop, receiver);
+    if (typeof value === 'function') {
+      return value.bind(instance);
+    }
+    return value;
+  },
 });
 
 // Export type helper
-export type DbClient = typeof db;
+export type DbClient = ReturnType<typeof drizzle<typeof schema>>;
 
 // For use in Server Components with Supabase
 export const getServerClient = async () => {
   return supabaseAdmin;
 };
 
-// For migrations and schema generation only
-export const migrationClient = postgres(config.database.url, { max: 1 }); 
+// For migrations and schema generation only - lazy to avoid build-time errors
+export const getMigrationClient = () => postgres(config.database.url, { max: 1 }); 

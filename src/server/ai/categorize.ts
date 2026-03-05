@@ -3,10 +3,12 @@ import { db } from '@/server/db';
 import { categories, lists, listItems } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy OpenAI client to avoid build-time errors
+let _openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _openai;
+}
 
 export interface CategorySuggestion {
   id: string;
@@ -133,7 +135,7 @@ Important:
 - If the content doesn't clearly match any category, choose the most general applicable ones`;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {

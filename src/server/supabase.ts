@@ -55,8 +55,20 @@ export const createSupabaseAdminClient = () => {
   );
 };
 
-// Create a singleton instance for server-side admin usage
-export const supabaseAdmin = createSupabaseAdminClient();
+// Lazy singleton instance for server-side admin usage
+let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | null = null;
+export const supabaseAdmin = new Proxy({} as ReturnType<typeof createSupabaseAdminClient>, {
+  get(_target, prop, receiver) {
+    if (!_supabaseAdmin) {
+      _supabaseAdmin = createSupabaseAdminClient();
+    }
+    const value = Reflect.get(_supabaseAdmin, prop, receiver);
+    if (typeof value === 'function') {
+      return value.bind(_supabaseAdmin);
+    }
+    return value;
+  },
+});
 
 // ================================
 // Middleware Utility

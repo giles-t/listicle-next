@@ -1,9 +1,11 @@
 import OpenAI from 'openai';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy OpenAI client to avoid build-time errors
+let _openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _openai;
+}
 
 export interface ModerationResult {
   flagged: boolean;
@@ -140,7 +142,7 @@ export async function moderateContent(text: string): Promise<ModerationResult> {
   }
 
   try {
-    const response = await openai.moderations.create({
+    const response = await getOpenAI().moderations.create({
       model: 'omni-moderation-latest',
       input: text,
     });

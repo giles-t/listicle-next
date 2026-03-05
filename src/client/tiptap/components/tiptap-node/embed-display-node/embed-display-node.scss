@@ -1,16 +1,18 @@
 .embed-display-node-wrapper {
   // Remove any default background
   background: transparent !important;
-  
+
   &.ProseMirror-selectednode {
     > div {
-      @apply rounded-xl shadow-[0_0_0_2px_theme(colors.brand-primary)] transition-all duration-150;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 0 0 2px var(--color-brand-primary);
+      transition: all 150ms;
     }
-    
+
     // When embed content is focused, remove the outer selection shadow
     &:focus-within {
       > div {
-        @apply shadow-none;
+        box-shadow: none;
       }
     }
   }

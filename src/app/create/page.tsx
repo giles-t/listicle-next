@@ -106,23 +106,20 @@ function CreateList() {
               </span>
             </div>
             <div className="flex w-full flex-col items-start gap-4">
-              <TextFieldUnstyled className="h-auto w-full flex-none">
-                <TextFieldUnstyled.Input
-                  className="text-heading-2 font-heading-2"
-                  placeholder="Write a title..."
-                  value={title}
-                  onChange={handleTitleChange}
-                  maxLength={100}
-                />
-              </TextFieldUnstyled>
-              <TextFieldUnstyled className="h-auto w-full flex-none">
-                <TextFieldUnstyled.Input
-                  placeholder="Write a subtitle..."
-                  value={description}
-                  onChange={handleDescriptionChange}
-                  maxLength={500}
-                />
-              </TextFieldUnstyled>
+              <TextFieldUnstyled
+                className="h-auto w-full flex-none text-heading-2 font-heading-2"
+                placeholder="Write a title..."
+                value={title}
+                onChange={handleTitleChange}
+                maxLength={100}
+              />
+              <TextFieldUnstyled
+                className="h-auto w-full flex-none"
+                placeholder="Write a subtitle..."
+                value={description}
+                onChange={handleDescriptionChange}
+                maxLength={500}
+              />
             </div>
           </div>
           <div className="flex w-full flex-col items-center gap-8">

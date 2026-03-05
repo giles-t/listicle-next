@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@/src/server/supabase'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy OpenAI client to avoid build-time errors
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  return _openai
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate text with OpenAI
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: model,
       messages: [
         { role: 'system', content: systemMessage },

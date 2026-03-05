@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { DefaultPageLayout } from "@/ui/layouts/DefaultPageLayout";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Listicle",
   description: "Create and share beautiful list-based articles",
