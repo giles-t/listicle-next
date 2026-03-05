@@ -13,13 +13,13 @@ export default function TabsHeader() {
 
   return (
     <>
-      <div className="flex w-full flex-wrap items-center justify-between gap-2">
+      <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:items-start mobile:justify-start mobile:gap-4">
         <div className="flex flex-col items-start gap-1">
           <span className="text-heading-1 font-heading-1 text-default-font">Your Lists</span>
           <span className="text-heading-3 font-heading-3 text-neutral-400">Manage your drafts and published lists</span>
         </div>
-        <Link href="/create">
-          <Button>Create new list</Button>
+        <Link href="/create" className="mobile:w-full">
+          <Button className="mobile:w-full">Create new list</Button>
         </Link>
       </div>
       <Tabs>

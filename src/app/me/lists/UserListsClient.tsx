@@ -12,7 +12,19 @@ import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
 import { Loader } from "@/ui/components/Loader";
 import * as SubframeCore from "@subframe/core";
-import { FeatherEye, FeatherFileText, FeatherMoreHorizontal, FeatherEdit2, FeatherTrash } from "@subframe/core";
+import {
+  FeatherEye,
+  FeatherFileText,
+  FeatherMoreHorizontal,
+  FeatherEdit2,
+  FeatherTrash,
+  FeatherShare2,
+  FeatherList,
+  FeatherHeart,
+  FeatherMessageSquare,
+  FeatherPlus,
+  FeatherCheckCircle,
+} from "@subframe/core";
 import { formatRelativeTime, formatShortDate } from "@/shared/utils/date";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 import { toast } from "@subframe/core";
@@ -29,6 +41,10 @@ export type UserList = {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  view_count: number;
+  itemCount: number;
+  reactionsCount: number;
+  commentsCount: number;
 };
 
 export type UserProfileLite = {
@@ -112,117 +128,216 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
     setIsConfirmOpen(true);
   };
 
+  const formatCount = (count: number): string => {
+    if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
+    if (count >= 1_000) return `${(count / 1_000).toFixed(1).replace(/\.0$/, "")}k`;
+    return String(count);
+  };
+
   const ListRow: React.FC<{ list: UserList; isDraft: boolean }> = ({ list, isDraft }) => {
     const editHref = `/me/list/${list.id}/edit`;
 
+    const dateLabel = isDraft
+      ? `Created ${isClient ? formatRelativeTime(list.created_at) : formatShortDate(list.created_at)}`
+      : `Published ${isClient ? formatRelativeTime(list.published_at || list.created_at) : formatShortDate(list.published_at || list.created_at)}`;
+
+    const editedLabel =
+      isDraft && isClient
+        ? `Edited ${formatRelativeTime(list.updated_at)}`
+        : isDraft
+          ? `Edited ${formatShortDate(list.updated_at)}`
+          : null;
+
     return (
-      <div className="flex w-full items-start gap-4 rounded-md border border-solid border-neutral-border bg-default-background px-4 py-4 mobile:flex-col mobile:flex-nowrap mobile:gap-4">
-        {list.cover_image ? (
-          <Link href={editHref} className="flex-none">
+      <Link
+        href={editHref}
+        className="flex w-full overflow-hidden rounded-lg bg-default-background shadow-md items-stretch mobile:flex-col mobile:flex-nowrap mobile:gap-0 hover:shadow-lg transition-shadow"
+      >
+        <div className="flex w-80 flex-none flex-col items-start relative mobile:h-48 mobile:w-full mobile:flex-none">
+          {list.cover_image ? (
             <img
-              className="h-20 w-20 rounded-sm object-cover cursor-pointer"
+              className="min-h-[0px] w-full grow shrink-0 basis-0 object-cover"
               src={list.cover_image}
               alt={list.title}
             />
-          </Link>
-        ) : (
-          <Link
-            href={editHref}
-            className="h-20 w-20 flex-none rounded-sm bg-neutral-100 flex items-center justify-center cursor-pointer"
-            aria-label="Edit list"
-          >
-            <FeatherFileText className="w-6 h-6 text-neutral-400" />
-          </Link>
-        )}
-        <div className="flex flex-col items-start justify-center gap-2 self-stretch grow">
-          <div className="flex flex-col items-start gap-1">
-            <Link href={editHref} className="text-body-bold font-body-bold text-default-font cursor-pointer hover:underline">
-              {list.title}
-            </Link>
-            <span className="text-caption font-caption text-subtext-color">
-              {isDraft
-                ? `Created ${isClient ? formatRelativeTime(list.created_at) : formatShortDate(list.created_at)}`
-                : `Published ${isClient ? formatRelativeTime(list.published_at || list.created_at) : formatShortDate(list.published_at || list.created_at)}`}
-            </span>
+          ) : (
+            <div className="flex min-h-[0px] w-full grow shrink-0 basis-0 items-center justify-center bg-neutral-100">
+              <FeatherFileText className="text-heading-1 font-heading-1 text-neutral-400" />
+            </div>
+          )}
+          {isDraft ? (
+            <Badge
+              className="absolute top-3 left-3 bg-white/90 border border-solid border-neutral-300"
+              variant="neutral"
+              icon={null}
+            >
+              Draft
+            </Badge>
+          ) : (
+            <Badge className="absolute top-3 left-3" variant="success" icon={null}>
+              Published
+            </Badge>
+          )}
+        </div>
+        <div className="flex grow shrink-0 basis-0 flex-col items-start gap-4 px-6 py-6">
+          <div className="flex w-full items-start justify-between">
+            <div className="flex grow shrink-0 basis-0 flex-col items-start gap-1">
+              <span className="text-heading-3 font-heading-3 text-default-font">
+                {list.title}
+              </span>
+              <span className="text-caption font-caption text-subtext-color">
+                {dateLabel}
+                {editedLabel && ` · ${editedLabel}`}
+              </span>
+            </div>
+            <SubframeCore.DropdownMenu.Root>
+              <SubframeCore.DropdownMenu.Trigger asChild={true}>
+                <IconButton
+                  variant="neutral-tertiary"
+                  size="medium"
+                  icon={<FeatherMoreHorizontal />}
+                  loading={isDeleting === list.id}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault()}
+                />
+              </SubframeCore.DropdownMenu.Trigger>
+              <SubframeCore.DropdownMenu.Portal>
+                <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
+                  <DropdownMenu>
+                    {isDraft ? (
+                      <>
+                        <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
+                          Edit
+                        </DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownDivider />
+                        <DropdownMenu.DropdownItem
+                          className="text-error-600"
+                          icon={<FeatherTrash />}
+                          onClick={() => requestDelete(list)}
+                        >
+                          Delete
+                        </DropdownMenu.DropdownItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
+                          Edit
+                        </DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem
+                          icon={<FeatherEye />}
+                          onClick={() => router.push(`/@${profile.username || "user"}/${list.slug}`)}
+                        >
+                          View
+                        </DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownItem
+                          icon={<FeatherShare2 />}
+                          onClick={() => handleShareList(list.slug)}
+                        >
+                          Share
+                        </DropdownMenu.DropdownItem>
+                        <DropdownMenu.DropdownDivider />
+                        <DropdownMenu.DropdownItem
+                          className="text-error-600"
+                          icon={<FeatherTrash />}
+                          onClick={() => requestDelete(list)}
+                        >
+                          Delete
+                        </DropdownMenu.DropdownItem>
+                      </>
+                    )}
+                  </DropdownMenu>
+                </SubframeCore.DropdownMenu.Content>
+              </SubframeCore.DropdownMenu.Portal>
+            </SubframeCore.DropdownMenu.Root>
           </div>
           {list.description ? (
-            <Link href={editHref} className="text-body font-body text-subtext-color line-clamp-2 cursor-pointer">
+            <span className="line-clamp-2 text-body font-body text-subtext-color">
               {extractPlainText(list.description)}
-            </Link>
+            </span>
           ) : null}
+          <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-1">
+              <FeatherList className="text-caption font-caption text-subtext-color" />
+              <span className="text-caption font-caption text-subtext-color">
+                {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
+              </span>
+            </div>
+            {!isDraft && (
+              <>
+                <div className="flex items-center gap-1">
+                  <FeatherEye className="text-caption font-caption text-subtext-color" />
+                  <span className="text-caption font-caption text-subtext-color">
+                    {formatCount(list.view_count)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FeatherHeart className="text-caption font-caption text-subtext-color" />
+                  <span className="text-caption font-caption text-subtext-color">
+                    {formatCount(list.reactionsCount)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FeatherMessageSquare className="text-caption font-caption text-subtext-color" />
+                  <span className="text-caption font-caption text-subtext-color">
+                    {formatCount(list.commentsCount)}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-        <div className="flex grow shrink-0 basis-0 items-center justify-end gap-2 self-stretch mobile:items-center mobile:justify-start">
-          <Badge variant={isDraft ? "neutral" : "success"}>{isDraft ? "Draft" : "Published"}</Badge>
-          <SubframeCore.DropdownMenu.Root>
-            <SubframeCore.DropdownMenu.Trigger asChild={true}>
-              <IconButton icon={<FeatherMoreHorizontal />} loading={isDeleting === list.id} />
-            </SubframeCore.DropdownMenu.Trigger>
-            <SubframeCore.DropdownMenu.Portal>
-              <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
-                <DropdownMenu>
-                 {isDraft ? (
-                  <>
-                    <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
-                      Edit Draft
-                    </DropdownMenu.DropdownItem>
-                    <DropdownMenu.DropdownItem
-                      className="text-error-700"
-                      icon={<FeatherTrash className="text-error-700" />}
-                      onClick={() => requestDelete(list)}
-                    >
-                      <span className="text-error-700">Delete Draft</span>
-                    </DropdownMenu.DropdownItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenu.DropdownItem icon={<FeatherEye />} onClick={() => router.push(`/@${profile.username || "user"}/${list.slug}`)}>
-                      View List
-                    </DropdownMenu.DropdownItem>
-                    <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
-                      Edit List
-                    </DropdownMenu.DropdownItem>
-                    <DropdownMenu.DropdownItem
-                      className="text-error-700"
-                      icon={<FeatherTrash className="text-error-700" />}
-                      onClick={() => requestDelete(list)}
-                    >
-                      <span className="text-error-700">Delete List</span>
-                    </DropdownMenu.DropdownItem>
-                  </>
-                )}
-                </DropdownMenu>
-              </SubframeCore.DropdownMenu.Content>
-            </SubframeCore.DropdownMenu.Portal>
-          </SubframeCore.DropdownMenu.Root>
+      </Link>
+    );
+  };
+
+  const EmptyState: React.FC = () => {
+    const icon =
+      filter === "drafts" ? (
+        <FeatherEdit2 className="text-heading-1 font-heading-1 text-neutral-400" />
+      ) : filter === "published" ? (
+        <FeatherCheckCircle className="text-heading-1 font-heading-1 text-neutral-400" />
+      ) : (
+        <FeatherFileText className="text-heading-1 font-heading-1 text-neutral-400" />
+      );
+
+    const heading =
+      filter === "drafts"
+        ? "Your drafts will appear here"
+        : filter === "published"
+          ? "No published lists yet"
+          : "No lists yet";
+
+    const description =
+      filter === "drafts"
+        ? "Create a new list and work on it at your own pace. Your unfinished lists will be automatically saved here as drafts until you\u2019re ready to publish."
+        : filter === "published"
+          ? "Publish your first list to share it with the world. All your published content will be displayed here for easy access."
+          : "Start creating your first list and share your ideas with the world. Your drafts and published lists will appear here.";
+
+    return (
+      <div className="flex w-full flex-col items-center justify-center gap-4 rounded-md border border-dashed border-neutral-border px-6 py-12">
+        <div className="flex flex-col items-center justify-center gap-2 px-2 py-2">
+          {icon}
         </div>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-heading-3 font-heading-3 text-default-font text-center">
+            {heading}
+          </span>
+          <span className="max-w-[448px] text-body font-body text-subtext-color text-center">
+            {description}
+          </span>
+        </div>
+        <Button icon={<FeatherPlus />} onClick={handleCreateNewList}>
+          Create new list
+        </Button>
       </div>
     );
   };
 
-  const EmptyState: React.FC<{ isDraft: boolean }> = ({ isDraft }) => (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="mb-4">
-        <IconWithBackground variant="neutral" size="large" square={true} />
-      </div>
-      <h3 className="text-heading-3 font-heading-3 text-default-font mb-2">
-        {filter === "all" ? "No lists yet" : isDraft ? "No draft lists yet" : "No published lists yet"}
-      </h3>
-      <p className="text-body font-body text-subtext-color mb-6 max-w-md">
-        {filter === "all"
-          ? "Start creating your first list and save it as a draft to work on later."
-          : isDraft
-          ? "Start creating your first list and save it as a draft to work on later."
-          : "Publish your first list to share it with the world."}
-      </p>
-      <Button onClick={handleCreateNewList}>Create new list</Button>
-    </div>
-  );
-
   return (
-      <div className="flex w-full flex-col items-start gap-4">
+      <div className="flex w-full flex-col items-start gap-6">
         {filteredLists.length === 0 ? (
           <div className="w-full">
-            <EmptyState isDraft={filter === "drafts"} />
+            <EmptyState />
           </div>
         ) : (
           filteredLists.map((list) => (

@@ -1,7 +1,7 @@
 import { createClient } from "@/src/server/supabase";
 import { db } from "@/src/server/db";
-import { lists as listsTable, profiles } from "@/src/server/db/schema";
-import { eq } from "drizzle-orm";
+import { lists as listsTable, listItems, reactions, comments, profiles } from "@/src/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 import UserListsClient, { type UserList as UserListType, type UserProfileLite } from "../UserListsClient";
 
 export default async function PublishedListsPage() {
@@ -25,6 +25,10 @@ export default async function PublishedListsPage() {
       created_at: listsTable.created_at,
       updated_at: listsTable.updated_at,
       published_at: listsTable.published_at,
+      view_count: listsTable.view_count,
+      itemCount: sql<number>`(SELECT COUNT(*) FROM ${listItems} WHERE ${listItems.list_id} = ${listsTable.id})::int`.as('itemCount'),
+      reactionsCount: sql<number>`(SELECT COUNT(*) FROM ${reactions} WHERE ${reactions.list_id} = ${listsTable.id})::int`.as('reactionsCount'),
+      commentsCount: sql<number>`(SELECT COUNT(*) FROM ${comments} WHERE ${comments.list_id} = ${listsTable.id})::int`.as('commentsCount'),
     })
     .from(listsTable)
     .where(eq(listsTable.user_id, user.id))
