@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/ui/components/Button";
 import { Tabs } from "@/ui/components/Tabs";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
@@ -149,9 +148,12 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
           : null;
 
     return (
-      <Link
-        href={editHref}
-        className="flex w-full overflow-hidden rounded-lg bg-default-background shadow-md items-stretch mobile:flex-col mobile:flex-nowrap mobile:gap-0 hover:shadow-lg transition-shadow"
+      <div
+        role="link"
+        tabIndex={0}
+        onClick={() => router.push(editHref)}
+        onKeyDown={(e) => { if (e.key === "Enter") router.push(editHref); }}
+        className="flex w-full overflow-hidden rounded-lg bg-default-background shadow-md items-stretch mobile:flex-col mobile:flex-nowrap mobile:gap-0 hover:shadow-lg transition-shadow cursor-pointer"
       >
         <div className="flex w-80 flex-none flex-col items-start relative mobile:h-48 mobile:w-full mobile:flex-none">
           {list.cover_image ? (
@@ -197,12 +199,12 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
                   size="medium"
                   icon={<FeatherMoreHorizontal />}
                   loading={isDeleting === list.id}
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault()}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
                 />
               </SubframeCore.DropdownMenu.Trigger>
               <SubframeCore.DropdownMenu.Portal>
                 <SubframeCore.DropdownMenu.Content side="bottom" align="end" sideOffset={4} asChild={true}>
-                  <DropdownMenu>
+                  <DropdownMenu onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                     {isDraft ? (
                       <>
                         <DropdownMenu.DropdownItem icon={<FeatherEdit2 />} onClick={() => handleEditList(list.id)}>
@@ -285,7 +287,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
             )}
           </div>
         </div>
-      </Link>
+      </div>
     );
   };
 
@@ -350,8 +352,8 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
           onConfirm={async () => {
             if (!deleteTarget) return;
             const id = deleteTarget.id;
-            setIsConfirmOpen(false);
             await onDeleteList(id);
+            setIsConfirmOpen(false);
             setDeleteTarget(null);
           }}
         />
