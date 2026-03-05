@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { FeatherBell } from "@subframe/core";
 import { FeatherBookmark } from "@subframe/core";
+import { FeatherLayoutDashboard } from "@subframe/core";
 import { FeatherList } from "@subframe/core";
 import { FeatherLogOut } from "@subframe/core";
 import { FeatherPlusCircle } from "@subframe/core";
@@ -13,8 +14,8 @@ import { FeatherUser } from "@subframe/core";
 import * as SubframeCore from "@subframe/core";
 import { Avatar } from "../../ui/components/Avatar";
 import { Button } from "../../ui/components/Button";
-import { DropdownMenu } from "../../ui/components/DropdownMenu";
 import { IconButton } from "../../ui/components/IconButton";
+import { ProfileMenuDropdown2 } from "../../ui/components/ProfileMenuDropdown2";
 import { TopbarWithSearch } from "../../ui/components/TopbarWithSearch";
 import LoginModal from "./auth/LoginModal";
 import SignupModal from "./auth/SignupModal";
@@ -204,7 +205,7 @@ export function TopNav() {
                 <SubframeCore.DropdownMenu.Trigger asChild={true}>
                   <Avatar 
                     image={profile?.avatar || undefined}
-                    className=""
+                    className="cursor-pointer"
                   >
                     {!profile?.username ? (
                       <div className="w-full h-full bg-gray-200 animate-pulse rounded-full" />
@@ -220,54 +221,60 @@ export function TopNav() {
                     sideOffset={4}
                     asChild={true}
                   >
-                    <DropdownMenu>
-                          <Link className="w-full" href={getProfileLink()}>
-                            <DropdownMenu.DropdownItem 
-                              icon={<FeatherUser />}
-                            >
-                              Profile
-                            </DropdownMenu.DropdownItem>
-                          </Link>
-                          <Link className="w-full" href="/me/lists">
-                            <DropdownMenu.DropdownItem 
-                              icon={<FeatherList />}
-                            >
-                              My Lists
-                            </DropdownMenu.DropdownItem>
-                          </Link>
-                          <Link className="w-full" href="/me/bookmarks">
-                            <DropdownMenu.DropdownItem 
-                              icon={<FeatherBookmark />}
-                            >
-                              Bookmarks
-                            </DropdownMenu.DropdownItem>
-                          </Link>
-                          <Link className="w-full" href="/notifications">
-                            <DropdownMenu.DropdownItem 
-                              icon={<FeatherBell />}
-                            >
-                              Notifications
-                              {unreadCount > 0 && (
-                                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-error-600 px-1.5 text-xs font-medium text-white">
-                                  {unreadCount > 99 ? '99+' : unreadCount}
-                                </span>
-                              )}
-                            </DropdownMenu.DropdownItem>
-                          </Link>
-                          <Link className="w-full" href="/settings">
-                            <DropdownMenu.DropdownItem 
-                              icon={<FeatherSettings />}
-                            >
-                              Settings
-                            </DropdownMenu.DropdownItem>
-                          </Link>
-                          <DropdownMenu.DropdownItem 
-                            icon={<FeatherLogOut />}
-                            onClick={handleLogoutClick}
+                    <ProfileMenuDropdown2
+                      image={profile?.avatar || undefined}
+                      name={profile?.name || user.email?.split('@')[0] || 'User'}
+                      username={profile?.username ? `@${profile.username}` : user.email}
+                    >
+                      <ProfileMenuDropdown2.ProfileMenuDivider />
+                      <Link className="w-full" href="/dashboard">
+                        <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherLayoutDashboard />}>
+                          Dashboard
+                        </ProfileMenuDropdown2.ProfileMenuItem>
+                      </Link>
+                      <Link className="w-full" href={getProfileLink()}>
+                        <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherUser />}>
+                          Profile
+                        </ProfileMenuDropdown2.ProfileMenuItem>
+                      </Link>
+                      <Link className="w-full" href="/me/lists">
+                        <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherList />}>
+                          My Lists
+                        </ProfileMenuDropdown2.ProfileMenuItem>
+                      </Link>
+                      <Link className="w-full" href="/me/bookmarks">
+                        <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherBookmark />}>
+                          Bookmarks
+                        </ProfileMenuDropdown2.ProfileMenuItem>
+                      </Link>
+                      <ProfileMenuDropdown2.ProfileMenuDivider />
+                      <Link className="w-full" href="/notifications">
+                        {unreadCount > 0 ? (
+                          <ProfileMenuDropdown2.ProfileMenuNotificationItem
+                            icon={<FeatherBell />}
+                            badgeCount={unreadCount > 99 ? '99+' : unreadCount}
                           >
-                            Log out
-                          </DropdownMenu.DropdownItem>
-                    </DropdownMenu>
+                            Notifications
+                          </ProfileMenuDropdown2.ProfileMenuNotificationItem>
+                        ) : (
+                          <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherBell />}>
+                            Notifications
+                          </ProfileMenuDropdown2.ProfileMenuItem>
+                        )}
+                      </Link>
+                      <Link className="w-full" href="/settings">
+                        <ProfileMenuDropdown2.ProfileMenuItem icon={<FeatherSettings />}>
+                          Settings
+                        </ProfileMenuDropdown2.ProfileMenuItem>
+                      </Link>
+                      <ProfileMenuDropdown2.ProfileMenuDivider />
+                      <ProfileMenuDropdown2.ProfileMenuItem
+                        icon={<FeatherLogOut />}
+                        onClick={handleLogoutClick}
+                      >
+                        Log out
+                      </ProfileMenuDropdown2.ProfileMenuItem>
+                    </ProfileMenuDropdown2>
                   </SubframeCore.DropdownMenu.Content>
                 </SubframeCore.DropdownMenu.Portal>
               </SubframeCore.DropdownMenu.Root>
