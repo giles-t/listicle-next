@@ -173,8 +173,16 @@ export default function BookmarksClient({
     }
   }, []);
 
-  // Debounced search
+  // Skip the initial fetch since we already have server-provided data
+  const isInitialMount = React.useRef(true);
+
+  // Debounced search — only fetches when filters change, not on first mount
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     const timer = setTimeout(() => {
       fetchBookmarks();
     }, 300);
