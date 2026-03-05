@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { FilterSidebar, type CategoryOption, type SortOption, type TimeFilter, type FeaturedFilter, type ForYouFilter } from "./FilterSidebar";
 import { MobileFilterDrawer } from "./MobileFilterDrawer";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { useBookmarkStatuses } from "@/client/hooks/use-bookmark-statuses";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 
 interface ListItem {
@@ -56,6 +57,8 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
   // Mobile drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
   
+  const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
+
   // Temporary filter state for mobile drawer (applied on "Apply" button)
   const [tempCategory, setTempCategory] = useState<string | null>(null);
   const [tempTime, setTempTime] = useState<TimeFilter>("all");
@@ -234,6 +237,8 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
                           <AddBookmarkButton
                             listId={list.id}
                             size="small"
+                            initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                            initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                           />
                         </div>
                       }
@@ -264,6 +269,8 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
                           <AddBookmarkButton
                             listId={list.id}
                             size="small"
+                            initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                            initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                           />
                         </div>
                       }

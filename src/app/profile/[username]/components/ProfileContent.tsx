@@ -20,6 +20,7 @@ import { SocialLinks } from "./SocialLinks";
 import { FollowStats } from "./FollowStats";
 import { EmptyListsState } from "./EmptyListsState";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { useBookmarkStatuses } from "@/client/hooks/use-bookmark-statuses";
 
 type SortOption = "recent" | "popular" | "oldest";
 
@@ -89,6 +90,7 @@ export function ProfileContent({
   const [sort, setSort] = useState<SortOption>("recent");
   const [isLoading, setIsLoading] = useState(false);
   const perPage = 10;
+  const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
   const totalPages = Math.ceil(total / perPage);
 
   const fetchLists = useCallback(async (newPage: number, newSort: SortOption) => {
@@ -278,6 +280,8 @@ export function ProfileContent({
                         <AddBookmarkButton
                           listId={list.id}
                           size="small"
+                          initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                          initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                         />
                       </div>
                     }
@@ -304,6 +308,8 @@ export function ProfileContent({
                         <AddBookmarkButton
                           listId={list.id}
                           size="small"
+                          initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                          initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                         />
                       </div>
                     }

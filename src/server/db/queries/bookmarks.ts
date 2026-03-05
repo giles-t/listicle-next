@@ -535,3 +535,32 @@ export async function deleteBookmarkById(
   return result.length > 0;
 }
 
+/**
+ * Batch check bookmark status for multiple lists at once.
+ * Returns a map of listId -> { bookmarked, collectionId } for bookmarked lists only.
+ */
+export async function getBookmarkStatusBatch(
+  userId: string,
+  listIds: string[]
+): Promise<Map<string, { bookmarked: true; collectionId: string | null }>> {
+  if (listIds.length === 0) return new Map();
+
+  const rows = await db
+    .select({
+      list_id: bookmarks.list_id,
+      collection_id: bookmarks.collection_id,
+    })
+    .from(bookmarks)
+    .where(
+      and(
+        eq(bookmarks.user_id, userId),
+        inArray(bookmarks.list_id, listIds),
+        isNull(bookmarks.list_item_id)
+      )
+    );
+
+  return new Map(
+    rows.map((r) => [r.list_id, { bookmarked: true as const, collectionId: r.collection_id }])
+  );
+}
+

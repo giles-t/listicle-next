@@ -7,6 +7,7 @@ import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { ListicleCardComponent as ListicleCard } from "@/ui/components/ListicleCardComponent";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { useBookmarkStatuses } from "@/client/hooks/use-bookmark-statuses";
 import {
   FeatherChevronDown,
   FeatherChevronRight,
@@ -64,6 +65,7 @@ export function CategoryListsClient({
 }: CategoryListsClientProps) {
   const [category, setCategory] = useState(initialCategory);
   const [lists, setLists] = useState<CategoryList[]>(initialLists);
+  const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
   const [sortBy, setSortBy] = useState<SortOption>("trending");
   const [isLoading, setIsLoading] = useState(false);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
@@ -349,6 +351,8 @@ export function CategoryListsClient({
                       <AddBookmarkButton
                         listId={list.id}
                         size="small"
+                        initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                        initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                       />
                     </div>
                   }

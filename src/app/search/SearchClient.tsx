@@ -13,6 +13,7 @@ import { SearchListComponent } from "@/ui/components/SearchListComponent";
 import { Tabs } from "@/ui/components/Tabs";
 import { TextField } from "@/ui/components/TextField";
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
+import { useBookmarkStatuses } from "@/client/hooks/use-bookmark-statuses";
 import { useFollowUser } from "@/client/hooks/use-profile";
 import { useAuth } from "@/client/hooks/use-auth";
 import { formatNumber } from "@/shared/utils/format";
@@ -208,6 +209,7 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
   // Results state
   const [lists, setLists] = useState<SearchListItem[]>([]);
   const [users, setUsers] = useState<SearchUserItem[]>([]);
+  const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -791,6 +793,8 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                 <AddBookmarkButton
                                   listId={list.id}
                                   size="small"
+                                  initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                                  initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                                 />
                               </div>
                             }
@@ -837,6 +841,8 @@ export function SearchClient({ categories, initialQuery = "" }: SearchClientProp
                                 <AddBookmarkButton
                                   listId={list.id}
                                   size="small"
+                                  initialBookmarked={bookmarkStatuses.get(list.id)?.bookmarked ?? false}
+                                  initialCollectionId={bookmarkStatuses.get(list.id)?.collectionId ?? null}
                                 />
                               </div>
                             }
