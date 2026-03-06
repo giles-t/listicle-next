@@ -124,7 +124,7 @@ function StaticEmbedComponent({ node }: { node: any }) {
     if (!url) return null;
     
     return (
-      <div className="border border-gray-200 rounded-lg p-3 my-2 bg-gray-50">
+      <div className="border border-neutral-200 rounded-lg p-3 my-2 bg-neutral-50">
         <div className="flex items-start gap-3">
           {thumbnail && (
             <img 
@@ -138,7 +138,7 @@ function StaticEmbedComponent({ node }: { node: any }) {
               {title || url}
             </h3>
             {site && (
-              <p className="text-gray-500 text-xs mt-1">{site}</p>
+              <p className="text-neutral-500 text-xs mt-1">{site}</p>
             )}
           </div>
         </div>
@@ -225,7 +225,7 @@ export function StaticContentRenderer({
           },
           // Handle unhandled nodes gracefully
           unhandledNode: ({ node }) => (
-            <div className="text-gray-500 text-sm italic">
+            <div className="text-neutral-500 text-sm italic">
               [Unsupported content: {node.type?.name || 'unknown'}]
             </div>
           ),
@@ -243,7 +243,7 @@ export function StaticContentRenderer({
 
   if (error) {
     return (
-      <div className="py-2 text-gray-500 text-sm italic">
+      <div className="py-2 text-neutral-500 text-sm italic">
         {error}
       </div>
     );
@@ -251,7 +251,7 @@ export function StaticContentRenderer({
 
   if (!content) {
     return (
-      <div className="py-2 text-gray-500 text-sm italic">
+      <div className="py-2 text-neutral-500 text-sm italic">
         {emptyMessage}
       </div>
     );

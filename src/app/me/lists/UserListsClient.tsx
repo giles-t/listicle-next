@@ -153,7 +153,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
         tabIndex={0}
         onClick={() => router.push(editHref)}
         onKeyDown={(e) => { if (e.key === "Enter") router.push(editHref); }}
-        className="flex w-full overflow-hidden rounded-lg bg-default-background shadow-md items-stretch mobile:flex-col mobile:flex-nowrap mobile:gap-0 hover:shadow-lg transition-shadow cursor-pointer"
+        className="flex w-full overflow-hidden rounded-lg border border-solid border-neutral-border bg-default-background shadow-md items-stretch mobile:flex-col mobile:flex-nowrap mobile:gap-0 hover:shadow-lg transition-shadow cursor-pointer"
       >
         <div className="flex w-80 flex-none flex-col items-start relative mobile:h-48 mobile:w-full mobile:flex-none">
           {list.cover_image ? (
@@ -169,7 +169,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
           )}
           {isDraft ? (
             <Badge
-              className="absolute top-3 left-3 bg-white/90 border border-solid border-neutral-300"
+              className="absolute top-3 left-3 bg-default-background/90 border border-solid border-neutral-300"
               variant="neutral"
               icon={null}
             >

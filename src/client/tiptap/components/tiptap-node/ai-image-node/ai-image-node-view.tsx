@@ -356,7 +356,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
           Generation Failed
         </span>
       </div>
-      <div className="text-sm text-red-700 bg-white rounded-md p-3 border border-red-200 w-full">
+      <div className="text-sm text-red-700 bg-default-background rounded-md p-3 border border-red-200 w-full">
         {error}
       </div>
       <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:gap-4">
@@ -462,7 +462,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const renderGeneratedImage = () => (
     <div 
-      className="relative bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-gray-300 transition-colors"
+      className="relative bg-default-background border border-neutral-200 rounded-xl overflow-hidden cursor-pointer hover:border-neutral-300 transition-colors"
       onClick={() => setShowPreview(true)}
     >
       <img 
@@ -474,7 +474,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <span className="text-white text-sm italic">"{prompt}"</span>
       </div>
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs rounded-full p-2">
-        <FeatherImage className="w-4 h-4 text-gray-600" />
+        <FeatherImage className="w-4 h-4 text-neutral-600" />
       </div>
     </div>
   )
@@ -503,13 +503,13 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     // Show collapsed state with existing prompt
     return (
       <div 
-        className="p-4 bg-white border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+        className="p-4 bg-default-background border border-neutral-200 rounded-xl cursor-pointer hover:bg-neutral-50 transition-colors"
         onClick={() => setIsExpanded(true)}
       >
         <div className="flex items-center gap-3">
           <FeatherSparkles className="w-4 h-4 text-blue-600 shrink-0" />
-          <span className="flex-1 text-sm text-gray-900 italic truncate">"{prompt}"</span>
-          <span className="text-xs text-gray-400 shrink-0">Click to edit</span>
+          <span className="flex-1 text-sm text-neutral-900 italic truncate">"{prompt}"</span>
+          <span className="text-xs text-neutral-400 shrink-0">Click to edit</span>
         </div>
       </div>
     )

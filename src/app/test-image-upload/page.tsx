@@ -12,14 +12,14 @@ export default function TestImageUploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-neutral-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-default-background rounded-lg shadow-sm border p-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
               Image Upload Test
             </h1>
-            <p className="text-gray-600">
+            <p className="text-neutral-600">
               Test the Tiptap image upload functionality with Vercel Blob storage.
               Try dragging and dropping images or clicking to select files.
             </p>
@@ -36,10 +36,10 @@ export default function TestImageUploadPage() {
 
           {content && (
             <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-neutral-900 mb-2">
                 Editor Content (JSON):
               </h3>
-              <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-40">
+              <pre className="bg-neutral-100 p-4 rounded text-sm overflow-auto max-h-40">
                 {JSON.stringify(JSON.parse(content || '{}'), null, 2)}
               </pre>
             </div>

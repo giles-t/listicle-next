@@ -89,8 +89,8 @@ export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
       "flex items-center gap-1 tiptap-toolbar"
     const variantClasses =
       variant === "fixed"
-        ? "sticky top-0 z-10 w-full min-h-[2.75rem] bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-2 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-[480px]:absolute max-[480px]:top-auto max-[480px]:h-[calc(2.75rem+env(safe-area-inset-bottom,0px))] max-[480px]:border-t max-[480px]:border-b-0 max-[480px]:pb-[env(safe-area-inset-bottom,0px)] max-[480px]:flex-nowrap max-[480px]:justify-start"
-        : "p-[0.188rem] rounded-[calc(0.125rem+0.5rem+1px)] border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-md outline-none overflow-hidden data-[plain=true]:p-0 data-[plain=true]:rounded-none data-[plain=true]:border-none data-[plain=true]:shadow-none data-[plain=true]:bg-transparent max-[480px]:w-full max-[480px]:rounded-none max-[480px]:border-none max-[480px]:shadow-none"
+        ? "sticky top-0 z-10 w-full min-h-[2.75rem] bg-default-background dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-2 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-[480px]:absolute max-[480px]:top-auto max-[480px]:h-[calc(2.75rem+env(safe-area-inset-bottom,0px))] max-[480px]:border-t max-[480px]:border-b-0 max-[480px]:pb-[env(safe-area-inset-bottom,0px)] max-[480px]:flex-nowrap max-[480px]:justify-start"
+        : "p-[0.188rem] rounded-[calc(0.125rem+0.5rem+1px)] border border-neutral-200 dark:border-neutral-700 bg-default-background dark:bg-neutral-900 shadow-md outline-none overflow-hidden data-[plain=true]:p-0 data-[plain=true]:rounded-none data-[plain=true]:border-none data-[plain=true]:shadow-none data-[plain=true]:bg-transparent max-[480px]:w-full max-[480px]:rounded-none max-[480px]:border-none max-[480px]:shadow-none"
 
     return (
       <div

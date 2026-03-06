@@ -1,3 +1,3 @@
-module.exports = {
-  presets: [require("./src/ui/tailwind.config.js")]
-};
+// @subframe/sync-disable
+// Theme is defined via @theme in src/app/globals.css
+module.exports = {};

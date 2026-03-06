@@ -39,7 +39,7 @@ export function ResponsiveImage({
         {/* Thumbnail placeholder for progressive loading */}
         {!isLoaded && (
           <div
-            className="absolute inset-0 bg-gray-100"
+            className="absolute inset-0 bg-neutral-100"
             style={{
               backgroundImage: `url(${sizes.thumbnail.url})`,
               backgroundSize: 'cover',
@@ -67,8 +67,8 @@ export function ResponsiveImage({
         
         {/* Error fallback */}
         {hasError && (
-          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-            <span className="text-gray-400 text-sm">Failed to load image</span>
+          <div className="absolute inset-0 bg-neutral-100 flex items-center justify-center">
+            <span className="text-neutral-400 text-sm">Failed to load image</span>
           </div>
         )}
       </div>
@@ -90,8 +90,8 @@ export function ResponsiveImage({
       />
       
       {hasError && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-          <span className="text-gray-400 text-sm">Failed to load image</span>
+        <div className="absolute inset-0 bg-neutral-100 flex items-center justify-center">
+          <span className="text-neutral-400 text-sm">Failed to load image</span>
         </div>
       )}
     </div>

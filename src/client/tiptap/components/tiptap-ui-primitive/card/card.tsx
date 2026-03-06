@@ -10,7 +10,7 @@ const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
         ref={ref}
         className={cn(
           "flex flex-col items-center outline-none relative min-w-0 break-words bg-clip-border",
-          "rounded-xl shadow-lg bg-white border border-neutral-200",
+          "rounded-xl shadow-lg bg-default-background border border-neutral-200",
           "tiptap-card",
           className
         )}

@@ -116,17 +116,17 @@ export default function TestAiImagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-neutral-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <div className="bg-default-background rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-neutral-900 mb-8">
             🎨 AI Image Generation Test
           </h1>
           
           <div className="space-y-6">
             {/* Prompt Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
                 Image Prompt
               </label>
               <TextArea className="w-full">
@@ -142,7 +142,7 @@ export default function TestAiImagePage() {
             {/* Style and Size Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Style
                 </label>
                 <Select
@@ -161,7 +161,7 @@ export default function TestAiImagePage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Size
                 </label>
                 <Select
@@ -211,8 +211,8 @@ export default function TestAiImagePage() {
 
             {/* Generated Image */}
             {imageUrl && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Generated Image</h3>
+              <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-neutral-900 mb-4">Generated Image</h3>
                 
                 <div className="mb-4">
                   <img 
@@ -224,20 +224,20 @@ export default function TestAiImagePage() {
 
                 {revisedPrompt && revisedPrompt !== prompt && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    <h4 className="text-sm font-medium text-neutral-700 mb-2">
                       OpenAI's Enhanced Prompt:
                     </h4>
-                    <p className="text-sm text-gray-600 italic bg-blue-50 border border-blue-200 rounded p-3">
+                    <p className="text-sm text-neutral-600 italic bg-blue-50 border border-blue-200 rounded p-3">
                       "{revisedPrompt}"
                     </p>
                   </div>
                 )}
                 
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  <h4 className="text-sm font-medium text-neutral-700 mb-2">
                     Your Original Prompt:
                   </h4>
-                  <p className="text-sm text-gray-600 italic">
+                  <p className="text-sm text-neutral-600 italic">
                     "{prompt}"
                   </p>
                 </div>

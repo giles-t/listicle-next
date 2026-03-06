@@ -20,6 +20,7 @@ import { TopbarWithSearch } from "../../ui/components/TopbarWithSearch";
 import LoginModal from "./auth/LoginModal";
 import SignupModal from "./auth/SignupModal";
 import { useAuth } from "../hooks/use-auth";
+import { ThemeToggle } from "./ThemeToggle";
 import Link from "next/link";
 
 interface UserProfile {
@@ -199,6 +200,7 @@ export function TopNav() {
                 icon={<FeatherSearch />}
                 onClick={handleSearchClick}
               />
+              <ThemeToggle />
             </div>
             {mounted && user ? (
               <SubframeCore.DropdownMenu.Root>
@@ -208,7 +210,7 @@ export function TopNav() {
                     className="cursor-pointer"
                   >
                     {!profile?.username ? (
-                      <div className="w-full h-full bg-gray-200 animate-pulse rounded-full" />
+                      <div className="w-full h-full bg-neutral-200 animate-pulse rounded-full" />
                     ) : (
                       profile?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"
                     )}

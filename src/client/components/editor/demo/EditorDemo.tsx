@@ -37,7 +37,7 @@ export function EditorDemo() {
           <h2 className="text-heading-2 font-heading-2 text-default-font">
             Editor
           </h2>
-          <div className="border border-neutral-border rounded-lg bg-white shadow-sm">
+          <div className="border border-neutral-border rounded-lg bg-default-background shadow-sm">
             <MinimalEditor
               content={content}
               placeholder="Start writing your list item..."
@@ -72,7 +72,7 @@ export function EditorDemo() {
               Slash Commands
             </h4>
             <ul className="text-body font-body text-subtext-color space-y-1">
-              <li>• Type <code className="bg-white px-1 rounded">/</code> for quick access</li>
+              <li>• Type <code className="bg-default-background px-1 rounded">/</code> for quick access</li>
               <li>• Headings, lists, quotes</li>
               <li>• Images and embeds</li>
               <li>• AI-generated content</li>

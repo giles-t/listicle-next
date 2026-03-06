@@ -83,7 +83,7 @@ export const LazyEmbed = memo(function LazyEmbed({
     <div ref={containerRef} className="my-2">
       {!isInView ? (
         // Fallback preview card before embed loads
-        <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+        <div className="border border-neutral-200 rounded-lg p-4 bg-neutral-50 hover:bg-neutral-100 transition-colors">
           <div className="flex items-start gap-3">
             {thumbnail && (
               <img 
@@ -100,7 +100,7 @@ export const LazyEmbed = memo(function LazyEmbed({
                 </h3>
               )}
               {site && (
-                <p className="text-gray-500 text-xs">{site}</p>
+                <p className="text-neutral-500 text-xs">{site}</p>
               )}
               {url && (
                 <a 

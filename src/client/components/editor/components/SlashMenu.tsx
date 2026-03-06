@@ -135,7 +135,7 @@ export function SlashMenu({ items, selectedIndex, onSelect, className }: SlashMe
   return (
     <div 
       className={classNames(
-        "bg-white rounded-lg border border-neutral-200 shadow-lg p-2 max-h-80 overflow-y-auto min-w-64",
+        "bg-default-background rounded-lg border border-neutral-200 shadow-lg p-2 max-h-80 overflow-y-auto min-w-64",
         className
       )}
     >

@@ -266,7 +266,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
               className="absolute top-full left-0 mt-2 z-50 shadow-lg rounded-lg border border-neutral-border animate-in fade-in-0 zoom-in-95 duration-150"
             >
               <EmojiPicker.Root 
-                className="isolate flex h-[368px] w-fit flex-col bg-white dark:bg-neutral-900 rounded-lg"
+                className="isolate flex h-[368px] w-fit flex-col bg-default-background dark:bg-neutral-900 rounded-lg"
                 onEmojiSelect={handleEmojiSelect}
               >
                 <EmojiPicker.Search className="z-10 mx-2 mt-2 appearance-none rounded-md bg-neutral-100 px-2.5 py-2 text-sm dark:bg-neutral-800" />
@@ -282,7 +282,7 @@ export function ReactionBar({ listId, targetId = null, userId }: ReactionBarProp
                     components={{
                       CategoryHeader: ({ category, ...props }) => (
                         <div
-                          className="bg-white px-3 pt-3 pb-1.5 font-medium text-neutral-600 text-xs dark:bg-neutral-900 dark:text-neutral-400"
+                          className="bg-default-background px-3 pt-3 pb-1.5 font-medium text-neutral-600 text-xs dark:bg-neutral-900 dark:text-neutral-400"
                           {...props}
                         >
                           {category.label}

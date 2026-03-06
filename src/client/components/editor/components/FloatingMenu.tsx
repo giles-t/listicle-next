@@ -59,7 +59,7 @@ export function FloatingMenu({ editor, className }: FloatingMenuProps) {
   if (showLinkInput) {
       return (
     <div className={classNames(
-      "bg-white rounded-lg border border-neutral-200 shadow-lg p-2 flex items-center gap-2",
+      "bg-default-background rounded-lg border border-neutral-200 shadow-lg p-2 flex items-center gap-2",
       className
     )}>
       <input
@@ -100,7 +100,7 @@ export function FloatingMenu({ editor, className }: FloatingMenuProps) {
   
   return (
     <div className={classNames(
-      "bg-white rounded-lg border border-neutral-200 shadow-lg p-1 flex items-center gap-1",
+      "bg-default-background rounded-lg border border-neutral-200 shadow-lg p-1 flex items-center gap-1",
       className
     )}>
       {/* AI Enhance Button */}

@@ -360,7 +360,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllAsRead}
             disabled={isMarkingRead}
-            className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-4 py-2 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-default-background px-4 py-2 hover:bg-neutral-50 transition-colors disabled:opacity-50"
           >
             {isMarkingRead ? (
               <Loader size="small" />
@@ -420,7 +420,7 @@ export default function NotificationsPage() {
                 <button
                   onClick={handleLoadMore}
                   disabled={isLoadingMore}
-                  className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-white px-6 py-2.5 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-2.5 hover:bg-neutral-50 transition-colors disabled:opacity-50"
                 >
                   {isLoadingMore ? (
                     <>

@@ -1,75 +1,419 @@
+/* @subframe/sync-disable */
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
-@config '../../tailwind.config.js';
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* ============================================================
+   Dark mode: class-based toggling via next-themes
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant mobile (@media (max-width: 767px));
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* ============================================================
+   Light / Dark CSS variables
+   Neutral scale is inverted so semantic meaning is preserved:
+   neutral-50 = "subtle surface", neutral-900 = "strong text"
+   ============================================================ */
+html {
+  /* --- Neutral --- */
+  --neutral-0: rgb(255 255 255);
+  --neutral-50: rgb(250 250 250);
+  --neutral-100: rgb(245 245 245);
+  --neutral-200: rgb(229 229 229);
+  --neutral-300: rgb(212 212 212);
+  --neutral-400: rgb(163 163 163);
+  --neutral-500: rgb(115 115 115);
+  --neutral-600: rgb(82 82 82);
+  --neutral-700: rgb(64 64 64);
+  --neutral-800: rgb(38 38 38);
+  --neutral-900: rgb(23 23 23);
+  --neutral-950: rgb(10 10 10);
+
+  /* --- Brand (indigo) --- */
+  --brand-50: rgb(238 242 255);
+  --brand-100: rgb(224 231 255);
+  --brand-200: rgb(199 210 254);
+  --brand-300: rgb(165 180 252);
+  --brand-400: rgb(129 140 248);
+  --brand-500: rgb(99 102 241);
+  --brand-600: rgb(79 70 229);
+  --brand-700: rgb(67 56 202);
+  --brand-800: rgb(55 48 163);
+  --brand-900: rgb(49 46 129);
+
+  /* --- Error --- */
+  --error-50: rgb(254 242 242);
+  --error-100: rgb(254 226 226);
+  --error-200: rgb(254 202 202);
+  --error-300: rgb(252 165 165);
+  --error-400: rgb(248 113 113);
+  --error-500: rgb(239 68 68);
+  --error-600: rgb(220 38 38);
+  --error-700: rgb(185 28 28);
+  --error-800: rgb(153 27 27);
+  --error-900: rgb(127 29 29);
+
+  /* --- Warning --- */
+  --warning-50: rgb(255 251 235);
+  --warning-100: rgb(254 243 199);
+  --warning-200: rgb(253 230 138);
+  --warning-300: rgb(252 211 77);
+  --warning-400: rgb(251 191 36);
+  --warning-500: rgb(245 158 11);
+  --warning-600: rgb(217 119 6);
+  --warning-700: rgb(180 83 9);
+  --warning-800: rgb(146 64 14);
+  --warning-900: rgb(120 53 15);
+
+  /* --- Success --- */
+  --success-50: rgb(240 253 244);
+  --success-100: rgb(220 252 231);
+  --success-200: rgb(187 247 208);
+  --success-300: rgb(134 239 172);
+  --success-400: rgb(74 222 128);
+  --success-500: rgb(34 197 94);
+  --success-600: rgb(22 163 74);
+  --success-700: rgb(21 128 61);
+  --success-800: rgb(22 101 52);
+  --success-900: rgb(20 83 45);
+
+  /* --- Semantic tokens --- */
+  --brand-primary: rgb(79 70 229);
+  --default-font: rgb(23 23 23);
+  --subtext-color: rgb(115 115 115);
+  --neutral-border: rgb(229 229 229);
+  --default-background: rgb(255 255 255);
+
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+html.dark {
+  /* --- Neutral (inverted) --- */
+  --neutral-0: rgb(10 10 10);
+  --neutral-50: rgb(23 23 23);
+  --neutral-100: rgb(38 38 38);
+  --neutral-200: rgb(64 64 64);
+  --neutral-300: rgb(82 82 82);
+  --neutral-400: rgb(115 115 115);
+  --neutral-500: rgb(163 163 163);
+  --neutral-600: rgb(212 212 212);
+  --neutral-700: rgb(229 229 229);
+  --neutral-800: rgb(245 245 245);
+  --neutral-900: rgb(250 250 250);
+  --neutral-950: rgb(255 255 255);
+
+  /* --- Brand: keep core vibrant, adjust tints/shades for dark surfaces --- */
+  --brand-50: rgb(28 25 72);
+  --brand-100: rgb(35 32 95);
+  --brand-200: rgb(50 44 140);
+  --brand-300: rgb(165 180 252);
+  --brand-400: rgb(129 140 248);
+  --brand-500: rgb(99 102 241);
+  --brand-600: rgb(79 70 229);
+  --brand-700: rgb(129 140 248);
+  --brand-800: rgb(165 180 252);
+  --brand-900: rgb(199 210 254);
+
+  /* --- Error: keep core vibrant, adjust tints/shades --- */
+  --error-50: rgb(50 15 15);
+  --error-100: rgb(65 18 18);
+  --error-200: rgb(85 25 25);
+  --error-300: rgb(252 165 165);
+  --error-400: rgb(248 113 113);
+  --error-500: rgb(239 68 68);
+  --error-600: rgb(220 38 38);
+  --error-700: rgb(248 113 113);
+  --error-800: rgb(252 165 165);
+  --error-900: rgb(254 202 202);
+
+  /* --- Warning: keep core vibrant, adjust tints/shades --- */
+  --warning-50: rgb(42 22 6);
+  --warning-100: rgb(58 30 8);
+  --warning-200: rgb(80 40 10);
+  --warning-300: rgb(252 211 77);
+  --warning-400: rgb(251 191 36);
+  --warning-500: rgb(245 158 11);
+  --warning-600: rgb(217 119 6);
+  --warning-700: rgb(251 191 36);
+  --warning-800: rgb(252 211 77);
+  --warning-900: rgb(253 230 138);
+
+  /* --- Success: keep core vibrant, adjust tints/shades --- */
+  --success-50: rgb(8 32 18);
+  --success-100: rgb(12 42 25);
+  --success-200: rgb(16 56 33);
+  --success-300: rgb(134 239 172);
+  --success-400: rgb(74 222 128);
+  --success-500: rgb(34 197 94);
+  --success-600: rgb(22 163 74);
+  --success-700: rgb(74 222 128);
+  --success-800: rgb(134 239 172);
+  --success-900: rgb(187 247 208);
+
+  /* --- Semantic tokens (dark) --- */
+  --brand-primary: rgb(129 140 248);
+  --default-font: rgb(245 245 245);
+  --subtext-color: rgb(163 163 163);
+  --neutral-border: rgb(64 64 64);
+  --default-background: rgb(10 10 10);
+}
+
+/* ============================================================
+   Subframe theme (Tailwind v4 @theme)
+   All color values reference CSS variables for light/dark support
+   ============================================================ */
+@theme {
+  /* Colors */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-neutral-0: var(--neutral-0);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  --color-error-50: var(--error-50);
+  --color-error-100: var(--error-100);
+  --color-error-200: var(--error-200);
+  --color-error-300: var(--error-300);
+  --color-error-400: var(--error-400);
+  --color-error-500: var(--error-500);
+  --color-error-600: var(--error-600);
+  --color-error-700: var(--error-700);
+  --color-error-800: var(--error-800);
+  --color-error-900: var(--error-900);
+
+  --color-warning-50: var(--warning-50);
+  --color-warning-100: var(--warning-100);
+  --color-warning-200: var(--warning-200);
+  --color-warning-300: var(--warning-300);
+  --color-warning-400: var(--warning-400);
+  --color-warning-500: var(--warning-500);
+  --color-warning-600: var(--warning-600);
+  --color-warning-700: var(--warning-700);
+  --color-warning-800: var(--warning-800);
+  --color-warning-900: var(--warning-900);
+
+  --color-success-50: var(--success-50);
+  --color-success-100: var(--success-100);
+  --color-success-200: var(--success-200);
+  --color-success-300: var(--success-300);
+  --color-success-400: var(--success-400);
+  --color-success-500: var(--success-500);
+  --color-success-600: var(--success-600);
+  --color-success-700: var(--success-700);
+  --color-success-800: var(--success-800);
+  --color-success-900: var(--success-900);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-default-font: var(--default-font);
+  --color-subtext-color: var(--subtext-color);
+  --color-neutral-border: var(--neutral-border);
+  --color-white: rgb(255 255 255);
+  --color-default-background: var(--default-background);
+
+  /* Fonts */
+  --text-caption: 12px;
+  --text-caption--font-weight: 400;
+  --text-caption--letter-spacing: 0em;
+  --text-caption--line-height: 16px;
+  --text-caption-bold: 12px;
+  --text-caption-bold--font-weight: 500;
+  --text-caption-bold--letter-spacing: 0em;
+  --text-caption-bold--line-height: 16px;
+  --text-body: 14px;
+  --text-body--font-weight: 400;
+  --text-body--letter-spacing: 0em;
+  --text-body--line-height: 20px;
+  --text-body-bold: 14px;
+  --text-body-bold--font-weight: 500;
+  --text-body-bold--letter-spacing: 0em;
+  --text-body-bold--line-height: 20px;
+  --text-heading-3: 16px;
+  --text-heading-3--font-weight: 500;
+  --text-heading-3--letter-spacing: 0em;
+  --text-heading-3--line-height: 20px;
+  --text-heading-2: 20px;
+  --text-heading-2--font-weight: 500;
+  --text-heading-2--letter-spacing: 0em;
+  --text-heading-2--line-height: 24px;
+  --text-heading-1: 30px;
+  --text-heading-1--font-weight: 500;
+  --text-heading-1--letter-spacing: 0em;
+  --text-heading-1--line-height: 36px;
+  --text-monospace-body: 14px;
+  --text-monospace-body--font-weight: 400;
+  --text-monospace-body--letter-spacing: 0em;
+  --text-monospace-body--line-height: 20px;
+
+  /* Font families */
+  --font-caption: Inter;
+  --font-caption-bold: Inter;
+  --font-body: Inter;
+  --font-body-bold: Inter;
+  --font-heading-3: Inter;
+  --font-heading-2: Inter;
+  --font-heading-1: Inter;
+  --font-monospace-body: monospace;
+
+  /* Box shadows */
+  --shadow-sm: 0px 1px 2px 0px rgb(0 0 0 / 0.05);
+  --shadow-default: 0px 1px 2px 0px rgb(0 0 0 / 0.05);
+  --shadow-md: 0px 4px 16px -2px rgb(0 0 0 / 0.08),
+    0px 2px 4px -1px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0px 12px 32px -4px rgb(0 0 0 / 0.08),
+    0px 4px 8px -2px rgb(0 0 0 / 0.08);
+  --shadow-overlay: 0px 12px 32px -4px rgb(0 0 0 / 0.08),
+    0px 4px 8px -2px rgb(0 0 0 / 0.08);
+
+  /* Border radiuses */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-DEFAULT: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-112: 28rem;
+  --spacing-144: 36rem;
+  --spacing-192: 48rem;
+  --spacing-256: 64rem;
+  --spacing-320: 80rem;
+}
+
+/* Dark shadow overrides (more visible on dark backgrounds) */
+html.dark {
+  --shadow-sm: 0px 1px 2px 0px rgb(0 0 0 / 0.3);
+  --shadow-default: 0px 1px 2px 0px rgb(0 0 0 / 0.3);
+  --shadow-md: 0px 4px 16px -2px rgb(0 0 0 / 0.4),
+    0px 2px 4px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0px 12px 32px -4px rgb(0 0 0 / 0.5),
+    0px 4px 8px -2px rgb(0 0 0 / 0.4);
+  --shadow-overlay: 0px 12px 32px -4px rgb(0 0 0 / 0.5),
+    0px 4px 8px -2px rgb(0 0 0 / 0.4);
+}
+
+/* Container utility */
+@utility container {
+  padding-left: 16px;
+  padding-right: 16px;
+
+  @media (width >= theme(--breakpoint-sm)) {
+    padding-left: calc((100vw + 16px - 640px) / 2);
+    padding-right: calc((100vw + 16px - 640px) / 2);
+  }
+
+  @media (width >= theme(--breakpoint-md)) {
+    padding-left: calc((100vw + 16px - 768px) / 2);
+    padding-right: calc((100vw + 16px - 768px) / 2);
+  }
+
+  @media (width >= theme(--breakpoint-lg)) {
+    padding-left: calc((100vw + 16px - 1024px) / 2);
+    padding-right: calc((100vw + 16px - 1024px) / 2);
+  }
+
+  @media (width >= theme(--breakpoint-xl)) {
+    padding-left: calc((100vw + 16px - 1280px) / 2);
+    padding-right: calc((100vw + 16px - 1280px) / 2);
+  }
+
+  @media (width >= theme(--breakpoint-2xl)) {
+    padding-left: calc((100vw + 16px - 1536px) / 2);
+    padding-right: calc((100vw + 16px - 1536px) / 2);
+  }
+}
+
+/* ============================================================
+   Base styles
+   ============================================================ */
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-neutral-border, currentcolor);
   }
-}
-
-html {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 body {
   flex-grow: 1;
+  background-color: var(--default-background);
+  color: var(--default-font);
 }
 
 /* Page-level text scaling - override Tailwind text classes with em units */
 .page-scalable {
-  /* Main title */
   h1 {
     font-size: 2.5em !important;
     line-height: 1.1 !important;
   }
-  
-  /* List item titles */
+
   h2 {
     font-size: 1.5em !important;
     line-height: 1.2 !important;
   }
-  
-  /* Description text - same size as body text */
+
   .description-text {
     font-size: 1em !important;
     line-height: 1.6 !important;
   }
 
-  /* Custom list marker sizing to match list item text styling */
   .list-item-marker::marker {
     font-size: 1.5em !important;
     font-weight: bold !important;
     line-height: 1.2 !important;
   }
-  
-  /* Inline editable elements - no visible focus ring */
+
   [contenteditable] {
     outline: none;
     cursor: text;
   }
 
-  /* Override responsive text classes */
-  .sm\\:text-4xl,
-  .lg\\:text-5xl,
-  .sm\\:text-2xl,
-  .lg\\:text-3xl,
-  .sm\\:text-xl,
-  .lg\\:text-2xl {
+  .sm\:text-4xl,
+  .lg\:text-5xl,
+  .sm\:text-2xl,
+  .lg\:text-3xl,
+  .sm\:text-xl,
+  .lg\:text-2xl {
     font-size: inherit !important;
   }
+}
+
+/* ============================================================
+   Scrollbar styling for dark mode
+   ============================================================ */
+@layer base {
+  * {
+    scrollbar-color: var(--neutral-300) transparent;
+  }
+}
+
+html.dark * {
+  scrollbar-color: var(--neutral-300) transparent;
+}
+
+/* ============================================================
+   Image handling in dark mode — reduce brightness slightly
+   ============================================================ */
+html.dark img:not([data-no-dark-adjust]) {
+  filter: brightness(0.92);
 }
