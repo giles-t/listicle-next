@@ -211,10 +211,17 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({
-      lists: formattedLists,
-      hasMore: result.length === limit,
-    });
+    return NextResponse.json(
+      {
+        lists: formattedLists,
+        hasMore: result.length === limit,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=300',
+        },
+      }
+    );
 
   } catch (error) {
     return NextResponse.json(

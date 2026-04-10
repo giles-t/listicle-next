@@ -107,7 +107,9 @@ export const listItems = pgTable('list_items', {
   updated_at: timestamp('updated_at').defaultNow().notNull(),
   view_count: integer('view_count').notNull().default(0),
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
-});
+}, (t) => ({
+  list_id_idx: index('list_items_list_id_idx').on(t.list_id),
+}));
 
 // List items relations
 export const listItemsRelations = relations(listItems, ({ one, many }) => ({
@@ -323,6 +325,8 @@ export const follows = pgTable('follows', {
   created_at: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({
   unique_follow: uniqueIndex('unique_follow_idx').on(t.follower_id, t.following_id),
+  follower_id_idx: index('follows_follower_id_idx').on(t.follower_id),
+  following_id_idx: index('follows_following_id_idx').on(t.following_id),
 }));
 
 // Follows relations
@@ -350,7 +354,11 @@ export const notifications = pgTable('notifications', {
   milestone_count: integer('milestone_count'),
   is_read: boolean('is_read').notNull().default(false),
   created_at: timestamp('created_at').defaultNow().notNull(),
-});
+}, (t) => ({
+  user_id_idx: index('notifications_user_id_idx').on(t.user_id),
+  user_id_is_read_idx: index('notifications_user_id_is_read_idx').on(t.user_id, t.is_read),
+  created_at_idx: index('notifications_created_at_idx').on(t.created_at),
+}));
 
 // Notifications relations
 export const notificationsRelations = relations(notifications, ({ one }) => ({
@@ -399,6 +407,7 @@ export const categoryFollows = pgTable('category_follows', {
   created_at: timestamp('created_at').defaultNow().notNull(),
 }, (t) => ({
   unique_category_follow: uniqueIndex('unique_category_follow_idx').on(t.user_id, t.category_id),
+  category_id_idx: index('category_follows_category_id_idx').on(t.category_id),
 }));
 
 // Category follows relations
