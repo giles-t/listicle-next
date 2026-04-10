@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { put } from '@vercel/blob'
 import { createClient } from '@/src/server/supabase'
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 import sharp from 'sharp'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
@@ -66,6 +67,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Rate limit check
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.UPLOAD_IMAGE);
+    if (limited) return limited;
+
     // Get the form data
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -98,13 +103,6 @@ export async function POST(request: NextRequest) {
     const randomSuffix = Math.random().toString(36).substring(2, 8)
     const baseName = `editor-images/${user.id}/${timestamp}-${randomSuffix}`
 
-    console.log('📤 Processing and uploading image:', { 
-      baseName, 
-      fileSize: file.size, 
-      fileType: file.type,
-      userId: user.id 
-    })
-
     // Process and upload multiple sizes
     const uploadPromises = Object.entries(IMAGE_SIZES).map(async ([sizeName, config]) => {
       const processed = await processImage(file, config.width, config.height, config.quality)
@@ -134,9 +132,7 @@ export async function POST(request: NextRequest) {
         format: upload.format
       }
       return acc
-    }, {} as Record<string, any>)
-
-    console.log('✅ All image sizes uploaded successfully')
+    }, {} as Record<string, { url: string; width: number; height: number; format: string }>)
 
     return NextResponse.json({
       url: sizes.main.url, // Main image for editor
@@ -148,8 +144,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ Image upload error:', error)
-    
     return NextResponse.json(
       { 
         error: error instanceof Error ? error.message : 'Failed to upload image' 

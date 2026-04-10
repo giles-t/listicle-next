@@ -7,8 +7,23 @@ import { DefaultPageLayout } from "@/ui/layouts/DefaultPageLayout";
 import { ThemeProvider } from "@/client/components/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "Subframe Next.js Starter",
-  description: "Your starter kit for integrating Subframe into Next.js",
+  title: {
+    default: "Listicle",
+    template: "%s | Listicle",
+  },
+  description: "Create and share engaging list-based articles. The content platform for listicles.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    siteName: "Listicle",
+    title: "Listicle",
+    description: "Create and share engaging list-based articles.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Listicle",
+    description: "Create and share engaging list-based articles.",
+  },
 };
 
 export default function RootLayout({

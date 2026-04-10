@@ -49,7 +49,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error((data as any)?.error || "Failed to add item");
+        throw new Error((data as { error?: string })?.error || "Failed to add item");
       }
       const data = (await res.json()) as { item: { id: string; title: string; content: string; sort_order: number } };
       setNewItemTitle("");

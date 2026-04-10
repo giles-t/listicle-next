@@ -41,7 +41,6 @@ export class ApiError extends Error {
 }
 
 export const handleApiError = (error: unknown) => {
-  console.error('API error:', error);
   
   if (error instanceof ApiError) {
     return new Response(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
-import { 
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
+import {
   getExistingBookmark,
   addBookmark,
   removeBookmark,
@@ -23,6 +24,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id: listId } = await params;
 
     if (!listId) {
@@ -39,7 +43,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error checking bookmark status:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -63,6 +66,9 @@ export async function POST(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const { id: listId } = await params;
 
@@ -107,7 +113,6 @@ export async function POST(
     });
 
   } catch (error) {
-    console.error('Error toggling bookmark:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -131,6 +136,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id: listId } = await params;
 
     if (!listId) {
@@ -142,7 +150,6 @@ export async function DELETE(
     return NextResponse.json({ bookmarked: false });
 
   } catch (error) {
-    console.error('Error removing bookmark:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

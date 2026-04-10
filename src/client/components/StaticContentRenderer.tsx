@@ -101,7 +101,7 @@ const displayExtensions = [
 ];
 
 // Custom embed component for static renderer
-function StaticEmbedComponent({ node }: { node: any }) {
+function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown> } }) {
   const embedRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {

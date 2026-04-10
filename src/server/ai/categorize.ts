@@ -176,8 +176,8 @@ Important:
     );
 
     const suggestions: CategorySuggestion[] = (parsed.suggestions || [])
-      .filter((s: any) => categoryMap.has(s.slug))
-      .map((s: any) => {
+      .filter((s: { slug: string; confidence?: number }) => categoryMap.has(s.slug))
+      .map((s: { slug: string; confidence?: number }) => {
         const cat = categoryMap.get(s.slug)!;
         return {
           id: cat.id,

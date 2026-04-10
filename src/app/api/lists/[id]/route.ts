@@ -4,6 +4,7 @@ import { db } from '@/src/server/db';
 import { lists, tags, listToTags, listToCategories } from '@/src/server/db/schema';
 import { eq, and, count } from 'drizzle-orm';
 import { suggestCategoriesForList } from '@/server/ai/categorize';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function DELETE(
   request: NextRequest,
@@ -16,6 +17,9 @@ export async function DELETE(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -52,7 +56,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Error deleting list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -131,7 +134,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -150,6 +152,9 @@ export async function PUT(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -175,7 +180,7 @@ export async function PUT(
     }
 
     // Update the list
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date(),
     };
 
@@ -223,8 +228,6 @@ export async function PUT(
 
         // Only auto-categorize if no categories are set
         if (existingCategoryCount.count === 0) {
-          console.log(`Auto-categorizing list ${listId} on first publish...`);
-          
           const result = await suggestCategoriesForList(listId, 3);
           
           if (result.suggestions.length > 0) {
@@ -244,12 +247,10 @@ export async function PUT(
               reasoning: result.reasoning,
             };
             
-            console.log(`Auto-categorized list ${listId} with categories:`, result.suggestions.map(s => s.name));
           }
         }
       } catch (catError) {
         // Log but don't fail the publish operation
-        console.error('Auto-categorization failed (publish will continue):', catError);
         autoCategorization = { applied: false, error: 'Auto-categorization failed' };
       }
     }
@@ -261,7 +262,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Error updating list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/ui/components/Button";
 import { ListicleCardComponent as ListicleCard } from "@/ui/components/ListicleCardComponent";
@@ -58,6 +58,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Temporary filter state for mobile drawer (applied on "Apply" button)
   const [tempCategory, setTempCategory] = useState<string | null>(null);
@@ -75,6 +76,11 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
     currentOffset: number = 0,
     append: boolean = false
   ) => {
+    // Cancel any in-flight request
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
@@ -83,24 +89,26 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
         limit: "10",
         offset: currentOffset.toString(),
       });
-      
+
       if (category) {
         params.set("category", category);
       }
-      
+
       if (featured !== "all") {
         params.set("featured", featured);
       }
-      
+
       if (forYou) {
         params.set("forYou", forYou);
       }
 
-      const response = await fetch(`/api/feed?${params.toString()}`);
+      const response = await fetch(`/api/feed?${params.toString()}`, {
+        signal: controller.signal,
+      });
       if (!response.ok) throw new Error("Failed to fetch");
-      
+
       const data = await response.json();
-      
+
       if (append) {
         setLists(prev => [...prev, ...data.lists]);
       } else {
@@ -109,7 +117,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
       setHasMore(data.hasMore);
       setOffset(currentOffset + data.lists.length);
     } catch (error) {
-      console.error("Error fetching lists:", error);
+      if (error instanceof DOMException && error.name === "AbortError") return;
     } finally {
       setIsLoading(false);
     }

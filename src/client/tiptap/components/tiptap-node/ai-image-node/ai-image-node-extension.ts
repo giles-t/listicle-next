@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react'
 import { AiImageNodeView } from './ai-image-node-view'
 
 export interface AiImageNodeOptions {
-  HTMLAttributes: Record<string, any>
+  HTMLAttributes: Record<string, string>
 }
 
 declare module '@tiptap/core' {

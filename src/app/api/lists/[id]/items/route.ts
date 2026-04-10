@@ -4,6 +4,7 @@ import { db } from '@/src/server/db';
 import { listItems, lists } from '@/src/server/db/schema';
 import { and, asc, desc, eq } from 'drizzle-orm';
 import { extractImagesFromContent } from '@/shared/utils/extract-images';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function GET(
   request: NextRequest,
@@ -16,6 +17,9 @@ export async function GET(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
     if (!listId) {
@@ -56,7 +60,6 @@ export async function GET(
       items,
     }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching list items:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -75,6 +78,9 @@ export async function POST(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
     if (!listId) {
@@ -129,7 +135,6 @@ export async function POST(
       item: created,
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating list item:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -149,13 +154,16 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
     const listId = params.id;
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
     }
 
     const body = await request.json();
-    
+
     // Check if this is a bulk update request
     if (body.bulk && Array.isArray(body.items)) {
       return await handleBulkUpdate(listId, body.items, user.id);
@@ -196,7 +204,7 @@ export async function PUT(
     }
 
     // Build update object
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (content !== undefined) {
       updateData.content = content;
       // Automatically extract and save the first image from the content
@@ -221,7 +229,6 @@ export async function PUT(
       item: updated,
     }, { status: 200 });
   } catch (error) {
-    console.error('Error updating list item:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -277,7 +284,6 @@ async function handleBulkUpdate(listId: string, items: Array<{id: string, sort_o
       items: updatedItems,
     }, { status: 200 });
   } catch (error) {
-    console.error('Error in bulk update:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByUsername, getUserStats, getUserRecentLists } from '@/server/db/queries/profiles';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@supabase/supabase-js';
 
 export async function GET(
@@ -8,6 +9,9 @@ export async function GET(
   { params }: { params: { username: string } }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { username } = await params;
 
     if (!username) {
@@ -55,7 +59,6 @@ export async function GET(
       );
     }
 
-    console.error('Profile API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

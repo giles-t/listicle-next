@@ -119,54 +119,24 @@ export async function updateUserProfile(
  * Get user statistics for profile page
  */
 export async function getUserStats(userId: string): Promise<UserStats> {
-  // Get lists count
-  const [listsCountResult] = await db
-    .select({ count: count() })
-    .from(lists)
-    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
-
-  // Get total reactions on user's lists (all emoji reactions)
-  const [likesResult] = await db
-    .select({ count: count() })
-    .from(reactions)
-    .innerJoin(lists, eq(reactions.list_id, lists.id))
-    .where(and(
-      eq(lists.user_id, userId),
-      eq(lists.is_published, true)
-    ));
-
-  // Get total comments on user's lists
-  const [commentsResult] = await db
-    .select({ count: count() })
-    .from(comments)
-    .innerJoin(lists, eq(comments.list_id, lists.id))
-    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
-
-  // Get total views across all user's published lists
-  const [viewsResult] = await db
-    .select({ total: sql<number>`coalesce(sum(${lists.view_count}), 0)::int` })
-    .from(lists)
-    .where(and(eq(lists.user_id, userId), eq(lists.is_published, true)));
-
-  // Get followers count (people following this user)
-  const [followersResult] = await db
-    .select({ count: count() })
-    .from(follows)
-    .where(eq(follows.following_id, userId));
-
-  // Get following count (people this user is following)
-  const [followingResult] = await db
-    .select({ count: count() })
-    .from(follows)
-    .where(eq(follows.follower_id, userId));
+  const [result] = await db
+    .select({
+      listsCount: sql<number>`(SELECT COUNT(*) FROM lists WHERE user_id = ${userId} AND is_published = true)`,
+      totalLikes: sql<number>`(SELECT COUNT(*) FROM reactions r INNER JOIN lists l ON r.list_id = l.id WHERE l.user_id = ${userId} AND l.is_published = true)`,
+      totalComments: sql<number>`(SELECT COUNT(*) FROM comments c INNER JOIN lists l ON c.list_id = l.id WHERE l.user_id = ${userId} AND l.is_published = true)`,
+      totalViews: sql<number>`(SELECT COALESCE(SUM(view_count), 0)::int FROM lists WHERE user_id = ${userId} AND is_published = true)`,
+      followersCount: sql<number>`(SELECT COUNT(*) FROM follows WHERE following_id = ${userId})`,
+      followingCount: sql<number>`(SELECT COUNT(*) FROM follows WHERE follower_id = ${userId})`,
+    })
+    .from(sql`(SELECT 1) as dummy`);
 
   return {
-    listsCount: listsCountResult?.count || 0,
-    totalViews: viewsResult?.total || 0,
-    totalLikes: likesResult?.count || 0,
-    totalComments: commentsResult?.count || 0,
-    followersCount: followersResult?.count || 0,
-    followingCount: followingResult?.count || 0,
+    listsCount: result?.listsCount || 0,
+    totalViews: result?.totalViews || 0,
+    totalLikes: result?.totalLikes || 0,
+    totalComments: result?.totalComments || 0,
+    followersCount: result?.followersCount || 0,
+    followingCount: result?.followingCount || 0,
   };
 }
 
@@ -312,10 +282,32 @@ export async function getUserLists(
 /**
  * Get a published list by username and slug
  */
+export interface ListByUsernameAndSlug {
+  id: string;
+  title: string;
+  description: string | null;
+  slug: string;
+  list_type: 'ordered' | 'unordered' | 'reversed';
+  cover_image: string | null;
+  is_published: boolean;
+  is_visible: boolean;
+  allow_comments: boolean;
+  created_at: Date;
+  updated_at: Date;
+  published_at: Date | null;
+  user_id: string;
+  publication_id: string | null;
+  username: string;
+  author_name: string;
+  author_avatar: string | null;
+  likesCount: number;
+  commentsCount: number;
+}
+
 export async function getListByUsernameAndSlug(
   username: string,
   slug: string
-): Promise<any | null> {
+): Promise<ListByUsernameAndSlug | null> {
   const [list] = await db
     .select({
       id: lists.id,

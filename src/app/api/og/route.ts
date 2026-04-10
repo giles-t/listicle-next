@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error generating OG image:', error);
     return new NextResponse('Error generating image', { status: 500 });
   }
 }

@@ -8,6 +8,7 @@ import {
   getListContext,
 } from '@/src/server/db/queries/comments';
 import { moderateContent } from '@/src/server/ai/moderate';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 /**
  * GET /api/lists/[id]/comments
@@ -46,7 +47,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error fetching comments:', error);
     return NextResponse.json(
       { error: 'Failed to fetch comments' },
       { status: 500 }
@@ -79,6 +79,9 @@ export async function POST(
       );
     }
 
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.CREATE_COMMENT);
+    if (limited) return limited;
+
     const { id: listId } = await context.params;
     const body = await request.json();
     const { content, itemId, parentId } = body;
@@ -101,7 +104,6 @@ export async function POST(
     // Moderate comment content for abuse/inappropriate content
     const moderation = await moderateContent(content.trim());
     if (moderation.flagged) {
-      console.log(`[comments] Content flagged for user ${user.id}: ${moderation.reason}`);
       return NextResponse.json(
         { 
           error: 'Your comment could not be posted because it may contain inappropriate content.',
@@ -122,7 +124,6 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error adding comment:', error);
     return NextResponse.json(
       { error: 'Failed to add comment' },
       { status: 500 }
@@ -175,7 +176,6 @@ export async function DELETE(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error deleting comment:', error);
     return NextResponse.json(
       { error: 'Failed to delete comment' },
       { status: 500 }

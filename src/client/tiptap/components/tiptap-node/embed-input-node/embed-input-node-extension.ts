@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react'
 import { EmbedInputNodeView } from './embed-input-node-view'
 
 export interface EmbedInputOptions {
-  HTMLAttributes: Record<string, any>
+  HTMLAttributes: Record<string, string>
 }
 
 declare module '@tiptap/core' {

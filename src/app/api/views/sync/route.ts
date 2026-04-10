@@ -21,15 +21,7 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    console.log('[views/sync] Starting view count sync...');
-    
     const result = await syncViewCountsToDatabase();
-    
-    console.log(`[views/sync] Completed: ${result.listsUpdated} lists, ${result.itemsUpdated} items updated`);
-    
-    if (result.errors.length > 0) {
-      console.warn('[views/sync] Errors:', result.errors);
-    }
     
     return NextResponse.json({
       success: true,
@@ -38,7 +30,6 @@ export async function POST(request: NextRequest) {
       errors: result.errors.length > 0 ? result.errors : undefined,
     });
   } catch (error) {
-    console.error('[POST /api/views/sync] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
