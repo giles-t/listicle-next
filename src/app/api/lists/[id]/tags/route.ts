@@ -3,6 +3,7 @@ import { createClient } from '@/src/server/supabase';
 import { db } from '@/src/server/db';
 import { lists, tags, listToTags } from '@/src/server/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function GET(
   request: NextRequest,
@@ -53,7 +54,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -72,6 +72,9 @@ export async function PUT(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -107,7 +110,7 @@ export async function PUT(
       const createSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       
       // Find existing tags or create new ones
-      const tagNames = categoriesArray.map((cat: any) => cat.name || cat);
+      const tagNames = categoriesArray.map((cat: string | { name: string }) => typeof cat === 'string' ? cat : cat.name);
       const existingTags = await db
         .select()
         .from(tags)
@@ -168,7 +171,6 @@ export async function PUT(
     }
 
   } catch (error) {
-    console.error('Error updating list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -187,6 +189,9 @@ export async function DELETE(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -220,7 +225,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Error removing list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

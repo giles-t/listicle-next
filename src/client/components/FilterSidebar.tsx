@@ -52,6 +52,76 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest" },
 ];
 
+const FilterOptionItem = React.memo(function FilterOptionItem({
+  label,
+  isSelected,
+  onClick,
+}: {
+  label: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      role="option"
+      aria-selected={isSelected}
+      tabIndex={0}
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
+        isSelected
+          ? "bg-brand-50"
+          : "bg-neutral-50 hover:bg-neutral-100"
+      }`}
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+    >
+      <span
+        className={`grow shrink-0 basis-0 ${
+          isSelected
+            ? "text-body-bold font-body-bold text-brand-primary"
+            : "text-body font-body text-default-font"
+        }`}
+      >
+        {label}
+      </span>
+    </div>
+  );
+});
+
+const CategoryItem = React.memo(function CategoryItem({
+  category,
+  isSelected,
+  onClick,
+}: {
+  category: CategoryOption;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      role="option"
+      aria-selected={isSelected}
+      tabIndex={0}
+      className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
+        isSelected
+          ? "bg-brand-50"
+          : "bg-neutral-50 hover:bg-neutral-100"
+      }`}
+      onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
+    >
+      <span
+        className={`grow shrink-0 basis-0 ${
+          isSelected
+            ? "text-body-bold font-body-bold text-brand-primary"
+            : "text-body font-body text-default-font"
+        }`}
+      >
+        {category.name}
+      </span>
+    </div>
+  );
+});
+
 export function FilterSidebar({
   categories,
   selectedCategory,
@@ -66,7 +136,7 @@ export function FilterSidebar({
   onForYouChange,
 }: FilterSidebarProps) {
   return (
-    <div className="flex w-64 flex-none flex-col items-start gap-4 mobile:hidden">
+    <nav aria-label="Feed filters" className="flex w-64 flex-none flex-col items-start gap-4 mobile:hidden">
       <div className="flex w-full flex-col items-start gap-4">
         <div className="flex w-full items-center justify-between">
           <span className="text-heading-3 font-heading-3 text-default-font">
@@ -90,25 +160,12 @@ export function FilterSidebar({
       >
         <div className="flex w-full flex-col items-start gap-2 pt-3">
           {featuredOptions.map((option) => (
-            <div
+            <FilterOptionItem
               key={option.value}
-              className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
-                selectedFeatured === option.value
-                  ? "bg-brand-50"
-                  : "bg-neutral-50 hover:bg-neutral-100"
-              }`}
+              label={option.label}
+              isSelected={selectedFeatured === option.value}
               onClick={() => onFeaturedChange(option.value)}
-            >
-              <span
-                className={`grow shrink-0 basis-0 ${
-                  selectedFeatured === option.value
-                    ? "text-body-bold font-body-bold text-brand-primary"
-                    : "text-body font-body text-default-font"
-                }`}
-              >
-                {option.label}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </Accordion>
@@ -129,25 +186,12 @@ export function FilterSidebar({
       >
         <div className="flex w-full flex-col items-start gap-2 pt-3">
           {forYouOptions.map((option) => (
-            <div
+            <FilterOptionItem
               key={option.value}
-              className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
-                selectedForYou === option.value
-                  ? "bg-brand-50"
-                  : "bg-neutral-50 hover:bg-neutral-100"
-              }`}
+              label={option.label}
+              isSelected={selectedForYou === option.value}
               onClick={() => onForYouChange(selectedForYou === option.value ? null : option.value)}
-            >
-              <span
-                className={`grow shrink-0 basis-0 ${
-                  selectedForYou === option.value
-                    ? "text-body-bold font-body-bold text-brand-primary"
-                    : "text-body font-body text-default-font"
-                }`}
-              >
-                {option.label}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </Accordion>
@@ -167,29 +211,16 @@ export function FilterSidebar({
       >
         <div className="flex max-h-[256px] w-full flex-col items-start gap-2 pt-3 overflow-y-auto">
           {categories.map((category) => (
-            <div
+            <CategoryItem
               key={category.id}
-              className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
-                selectedCategory === category.slug
-                  ? "bg-brand-50"
-                  : "bg-neutral-50 hover:bg-neutral-100"
-              }`}
-              onClick={() => 
+              category={category}
+              isSelected={selectedCategory === category.slug}
+              onClick={() =>
                 onCategoryChange(
                   selectedCategory === category.slug ? null : category.slug
                 )
               }
-            >
-              <span
-                className={`grow shrink-0 basis-0 ${
-                  selectedCategory === category.slug
-                    ? "text-body-bold font-body-bold text-brand-primary"
-                    : "text-body font-body text-default-font"
-                }`}
-              >
-                {category.name}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </Accordion>
@@ -209,25 +240,12 @@ export function FilterSidebar({
       >
         <div className="flex w-full flex-col items-start gap-2 pt-3">
           {timeOptions.map((option) => (
-            <div
+            <FilterOptionItem
               key={option.value}
-              className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
-                selectedTime === option.value
-                  ? "bg-brand-50"
-                  : "bg-neutral-50 hover:bg-neutral-100"
-              }`}
+              label={option.label}
+              isSelected={selectedTime === option.value}
               onClick={() => onTimeChange(option.value)}
-            >
-              <span
-                className={`grow shrink-0 basis-0 ${
-                  selectedTime === option.value
-                    ? "text-body-bold font-body-bold text-brand-primary"
-                    : "text-body font-body text-default-font"
-                }`}
-              >
-                {option.label}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </Accordion>
@@ -247,28 +265,15 @@ export function FilterSidebar({
       >
         <div className="flex w-full flex-col items-start gap-2 pt-3">
           {sortOptions.map((option) => (
-            <div
+            <FilterOptionItem
               key={option.value}
-              className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors ${
-                selectedSort === option.value
-                  ? "bg-brand-50"
-                  : "bg-neutral-50 hover:bg-neutral-100"
-              }`}
+              label={option.label}
+              isSelected={selectedSort === option.value}
               onClick={() => onSortChange(option.value)}
-            >
-              <span
-                className={`grow shrink-0 basis-0 ${
-                  selectedSort === option.value
-                    ? "text-body-bold font-body-bold text-brand-primary"
-                    : "text-body font-body text-default-font"
-                }`}
-              >
-                {option.label}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </Accordion>
-    </div>
+    </nav>
   );
 }

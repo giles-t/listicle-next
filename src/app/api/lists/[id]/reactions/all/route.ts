@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getAllListReactionsAggregate, getUserListReactionsAll } from '@/src/server/db/queries/reactions';
 
 /**
@@ -15,6 +16,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { id: listId } = await context.params;
     const { searchParams } = new URL(request.url);
     const includeUser = searchParams.get('includeUser') === 'true';
@@ -40,7 +44,6 @@ export async function GET(
       userReactions,
     });
   } catch (error) {
-    console.error('Error fetching all reactions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch reactions' },
       { status: 500 }

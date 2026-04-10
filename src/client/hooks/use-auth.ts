@@ -5,6 +5,7 @@ import { toast } from "@subframe/core";
 import { captureException } from '../../shared/sentry';
 import { Session, User as SupabaseUser, AuthError } from '@supabase/supabase-js';
 import { authManager } from '../auth/auth-manager';
+import { getBaseUrl } from '@/shared/utils/url';
 
 export function useAuth() {
   const [user, setUser] = useState<SupabaseUser | null>(authManager.getUser());
@@ -90,7 +91,7 @@ export function useAuth() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${getBaseUrl()}/auth/callback`,
         },
       });
 
@@ -134,7 +135,7 @@ export function useAuth() {
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${getBaseUrl()}/reset-password`,
       });
       
       if (error) {

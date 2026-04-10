@@ -16,7 +16,7 @@ export const initSentry = () => {
   });
 };
 
-export const captureException = (error: unknown, context?: Record<string, any>) => {
+export const captureException = (error: unknown, context?: Record<string, unknown>) => {
   Sentry.captureException(error, {
     extra: context,
   });

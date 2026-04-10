@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/ui/components/Button";
 import { FullscreenDialog } from "@/ui/components/FullscreenDialog";
 import { IconButton } from "@/ui/components/IconButton";
 import { FeatherX } from "@subframe/core";
 import * as Dialog from "@radix-ui/react-dialog";
-import RichTextEditor from "@/client/components/NotionEditor";
+
+const RichTextEditor = dynamic(() => import("@/client/components/NotionEditor"), { ssr: false });
 
 type ListItem = {
   id: string;

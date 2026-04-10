@@ -65,26 +65,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     generationMessage,
     revisedPrompt
   } = node.attrs as AiImageData
-  
-  // Debug logging for initial state
-  console.log('🔍 DEBUG: AiImageNodeView rendered with:', {
-    'node.attrs.prompt': node.attrs.prompt,
-    'localPrompt': localPrompt,
-    'prompt (from attrs)': prompt,
-    'isExpanded': isExpanded,
-    'showPreview': showPreview,
-    'editor': editor,
-    'getPos': getPos,
-    'node.type.name': node.type.name,
-  })
-  
-  // Check if editor has AI capabilities
-  console.log('🔍 DEBUG: Editor capabilities:', {
-    'editor exists': !!editor,
-    'editor.chain exists': !!editor?.chain,
-    'aiImagePrompt exists': typeof editor?.chain?.().aiImagePrompt,
-    'editor extensions': editor?.extensionManager?.extensions?.map(ext => ext.name),
-  })
 
   // Focus textarea when component mounts with empty prompt
   useEffect(() => {
@@ -96,16 +76,11 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   // No need to monitor AI storage anymore - we handle everything directly
 
   const handleGenerateImage = useCallback(async () => {
-    console.log('🔍 DEBUG: handleGenerateImage called')
-    console.log('🔍 DEBUG: localPrompt:', JSON.stringify(localPrompt))
-    
     if (!localPrompt.trim()) {
-      console.log('❌ DEBUG: No prompt provided, returning early')
       return
     }
 
     const trimmedPrompt = localPrompt.trim()
-    console.log('✅ DEBUG: Using prompt:', JSON.stringify(trimmedPrompt))
 
     // Update node attributes to show generating state
     updateAttributes({
@@ -118,12 +93,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     })
 
     try {
-      console.log('🚀 DEBUG: Calling AI image API with:', {
-        prompt: trimmedPrompt,
-        size,
-        quality: quality || 'auto',
-      })
-      
       const response = await fetch('/api/ai-image', {
         method: 'POST',
         headers: {
@@ -142,7 +111,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       }
 
       const { imageUrl, revisedPrompt: apiRevisedPrompt } = await response.json()
-      console.log('✅ DEBUG: AI image generated successfully')
 
       // Update node with the blob storage URL
       updateAttributes({
@@ -159,7 +127,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       setIsExpanded(false)
       
     } catch (error) {
-      console.error('❌ DEBUG: Error in handleGenerateImage:', error)
       updateAttributes({
         isGenerating: false,
         error: error instanceof Error ? error.message : 'Image generation failed',
@@ -171,25 +138,12 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const handlePromptChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.target.value
-    console.log('🔍 DEBUG: TextArea onChange:', {
-      'previous localPrompt': localPrompt,
-      'new value': newValue,
-      'event.target.value': event.target.value,
-    })
     setLocalPrompt(newValue)
   }, [localPrompt])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    console.log('🔍 DEBUG: KeyDown event:', {
-      'key': e.key,
-      'metaKey': e.metaKey,
-      'ctrlKey': e.ctrlKey,
-      'current localPrompt': localPrompt,
-    })
-    
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
-      console.log('🚀 DEBUG: Keyboard shortcut triggered generation')
       handleGenerateImage()
     }
   }, [handleGenerateImage, localPrompt])
@@ -216,36 +170,29 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const handleInsert = useCallback(async () => {
     if (!generatedImageSrc || !getPos) return
-    
-    console.log('🔍 DEBUG: Inserting image into editor')
-    
+
     const { view } = editor
     const { tr } = view.state
     const pos = getPos()
-    
+
     if (typeof pos === 'number') {
       // Insert the image (already stored in blob storage)
       tr.replaceWith(pos, pos + node.nodeSize, view.state.schema.nodes.image.create({
         src: generatedImageSrc,
         alt: prompt || 'AI generated image',
       }))
-      
+
       view.dispatch(tr)
-      
-      console.log('✅ DEBUG: Image inserted into editor')
     }
   }, [generatedImageSrc, prompt, editor, getPos, node])
 
   const handleRegenerate = useCallback(() => {
-    console.log('🔍 DEBUG: Regenerating image')
-    
     // Simply call handleGenerateImage again with the current settings
     setShowPreview(false)
     handleGenerateImage()
   }, [handleGenerateImage, setShowPreview])
 
   const renderPromptInput = () => {
-    console.log('🔍 DEBUG: renderPromptInput called')
     return (
     <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6">
       <span className="text-heading-3 font-heading-3 text-default-font">
@@ -280,23 +227,8 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <Button
           className="mobile:h-8 mobile:w-full mobile:flex-none"
           icon={<FeatherSparkles />}
-          onClick={(event) => {
-            console.log('🔍 DEBUG: Generate button clicked - RAW EVENT')
-            console.log('🔍 DEBUG: Event:', event)
-            console.log('🔍 DEBUG: Button click - localPrompt:', JSON.stringify(localPrompt))
-            console.log('🔍 DEBUG: Button click - localPrompt length:', localPrompt.length)
-            console.log('🔍 DEBUG: Button click - localPrompt.trim():', JSON.stringify(localPrompt.trim()))
-            console.log('🔍 DEBUG: Button click - disabled state:', !localPrompt.trim() || isGenerating)
-            console.log('🔍 DEBUG: Button click - isGenerating:', isGenerating)
-            console.log('🔍 DEBUG: Button click - editor:', editor)
-            console.log('🔍 DEBUG: Button click - editor.chain:', editor?.chain)
-            console.log('🔍 DEBUG: Button click - aiImagePrompt available:', typeof editor?.chain?.().aiImagePrompt)
-            
-            try {
-              handleGenerateImage()
-            } catch (error) {
-              console.error('❌ DEBUG: Error in button click handler:', error)
-            }
+          onClick={() => {
+            handleGenerateImage()
           }}
           disabled={!localPrompt.trim() || isGenerating}
         >

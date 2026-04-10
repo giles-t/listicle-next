@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { db } from '@/src/server/db';
 import { publications, publicationMembers } from '@/src/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -12,6 +13,9 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     // Get all publications where the user is a member
     const userPublications = await db
@@ -34,7 +38,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(userPublications);
 
   } catch (error) {
-    console.error('Error fetching publications:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

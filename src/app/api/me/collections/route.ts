@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getUserCollections, createCollection, collectionNameExists } from '@/server/db/queries/collections';
 
 /**
@@ -15,12 +16,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const collections = await getUserCollections(user.id);
 
     return NextResponse.json({ collections });
 
   } catch (error) {
-    console.error('Error fetching collections:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -40,6 +43,9 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const body = await request.json();
     const { name } = body;
@@ -74,7 +80,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ collection }, { status: 201 });
 
   } catch (error) {
-    console.error('Error creating collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -60,8 +60,7 @@ const nextConfig = {
   // Performance optimizations
   poweredByHeader: false,
 
-  // Security headers - COMMENTED OUT FOR DEVELOPMENT
-  /*
+  // Security headers
   async headers() {
     return [
       {
@@ -75,9 +74,9 @@ const nextConfig = {
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://images.unsplash.com https://img.youtube.com https://pbs.twimg.com https://res.cloudinary.com",
+              "img-src 'self' data: blob: https://images.unsplash.com https://img.youtube.com https://pbs.twimg.com https://res.cloudinary.com https://*.supabase.co https://*.vercel-storage.com",
               "media-src 'self' blob:",
-              "connect-src 'self' https://api.unsplash.com https://*.supabase.co",
+              "connect-src 'self' https://api.unsplash.com https://*.supabase.co https://*.upstash.io",
               "frame-src 'self' https://www.youtube.com https://platform.twitter.com",
               "object-src 'none'",
               "base-uri 'self'",
@@ -123,19 +122,8 @@ const nextConfig = {
           },
         ],
       },
-      // Cache API responses
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=60, s-maxage=86400',
-          },
-        ],
-      },
     ];
   },
-  */
 
   // Redirects for SEO
   async redirects() {
@@ -188,14 +176,12 @@ const nextConfig = {
 
   // TypeScript configuration
   typescript: {
-    // Only run type checking in development
-    ignoreBuildErrors: process.env.NODE_ENV === 'production',
+    ignoreBuildErrors: false,
   },
 
   // ESLint configuration
   eslint: {
-    // Only run ESLint in development
-    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
+    ignoreDuringBuilds: false,
   },
 };
 

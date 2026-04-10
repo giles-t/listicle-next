@@ -4,6 +4,7 @@ import { db } from '@/server/db';
 import { lists, categories, listToCategories } from '@/server/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { suggestCategoriesForList } from '@/server/ai/categorize';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 /**
  * GET /api/lists/[id]/categories
@@ -38,7 +39,6 @@ export async function GET(
       categories: listCategories,
     });
   } catch (error) {
-    console.error('Error fetching list categories:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -61,6 +61,9 @@ export async function PUT(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -136,7 +139,6 @@ export async function PUT(
       message: 'Categories updated successfully',
     });
   } catch (error) {
-    console.error('Error updating list categories:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -159,6 +161,9 @@ export async function POST(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const listId = params.id;
 
@@ -222,8 +227,6 @@ export async function POST(
       message: 'Category suggestions generated',
     });
   } catch (error) {
-    console.error('Error auto-categorizing list:', error);
-    
     // Handle specific errors
     if (error instanceof Error) {
       if (error.message === 'List not found') {

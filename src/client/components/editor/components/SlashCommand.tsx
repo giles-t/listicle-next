@@ -1,12 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Editor } from "@tiptap/react"
+import { Editor, type Range } from "@tiptap/react"
 import { Extension } from "@tiptap/core"
 import { PluginKey } from "@tiptap/pm/state"
-import Suggestion from "@tiptap/suggestion"
+import Suggestion, { type SuggestionProps, type SuggestionKeyDownProps } from "@tiptap/suggestion"
 import { SlashMenu, useSlashMenuItems, type SlashMenuItem } from "./SlashMenu"
-import { createRoot } from "react-dom/client"
+import { createRoot, type Root } from "react-dom/client"
 
 export const SlashCommand = Extension.create({
   name: 'slash-command',
@@ -21,7 +21,7 @@ export const SlashCommand = Extension.create({
         decorationTag: 'span',
         decorationClass: 'slash-command',
         pluginKey: new PluginKey('slash-command'),
-        command: ({ editor, range, props }: { editor: Editor, range: any, props: SlashMenuItem }) => {
+        command: ({ editor, range, props }: { editor: Editor, range: Range, props: SlashMenuItem }) => {
           // Delete the slash and execute command
           editor.chain()
             .deleteRange(range)
@@ -42,37 +42,37 @@ export const SlashCommand = Extension.create({
           )
         },
         render: () => {
-          let component: any
+          let component: SlashCommandList
           let popup: HTMLElement
-          let root: any
-          
+          let root: Root
+
           return {
-            onStart: (props: any) => {
+            onStart: (props: SuggestionProps<SlashMenuItem>) => {
               component = new SlashCommandList({
                 items: props.items,
                 command: props.command,
                 editor: props.editor,
               })
-              
+
               popup = document.createElement('div')
               popup.className = 'slash-command-popup'
               document.body.appendChild(popup)
-              
+
               root = createRoot(popup)
               root.render(component.render())
             },
-            
-            onUpdate(props: any) {
+
+            onUpdate(props: SuggestionProps<SlashMenuItem>) {
               component.updateProps(props)
               root.render(component.render())
             },
-            
-            onKeyDown(props: any) {
+
+            onKeyDown(props: SuggestionKeyDownProps) {
               if (props.event.key === 'Escape') {
                 popup.remove()
                 return true
               }
-              
+
               return component.onKeyDown(props)
             },
             

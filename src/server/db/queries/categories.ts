@@ -193,9 +193,9 @@ export async function followCategory(userId: string, categoryId: string): Promis
       category_id: categoryId,
     });
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If unique constraint violation, user already follows
-    if (error.code === '23505') {
+    if (error instanceof Error && 'code' in error && (error as { code: string }).code === '23505') {
       return false;
     }
     throw error;

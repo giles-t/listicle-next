@@ -247,7 +247,7 @@ export function generateHomepageMetadata(): Metadata {
  */
 export function generateOGImageUrl(
   type: 'list' | 'profile' | 'publication' | 'homepage',
-  params: Record<string, any>
+  params: Record<string, string | number | boolean>
 ): string {
   const baseUrl = `${config.app.url}/api/og`;
   const searchParams = new URLSearchParams({

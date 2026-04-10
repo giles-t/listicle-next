@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getBookmarkStatusBatch } from '@/server/db/queries/bookmarks';
 
 const MAX_LIST_IDS = 50;
@@ -18,6 +19,9 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({});
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const body = await request.json();
     const listIds: unknown = body.listIds;
@@ -39,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error batch checking bookmark status:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

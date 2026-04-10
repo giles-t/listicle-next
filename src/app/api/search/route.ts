@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/src/server/db';
 import { lists, profiles, reactions, comments, listToCategories, categories, follows } from '@/src/server/db/schema';
 import { eq, desc, sql, and, or, ilike, gte, lte } from 'drizzle-orm';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@/server/supabase';
 
 export type SearchSortOption = 'relevance' | 'newest' | 'popular';
@@ -69,6 +70,9 @@ function getDateThreshold(dateFilter: DateFilter): Date | null {
 
 export async function GET(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
     const type = searchParams.get('type') || 'lists'; // 'lists' | 'users'
@@ -364,7 +368,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error searching:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

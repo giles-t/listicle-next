@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trackListView, getVisitorId, getListViewCount } from '@/src/server/db/queries/views';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { headers } from 'next/headers';
 
 interface RouteParams {
@@ -13,6 +14,9 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { id: listId } = await params;
     
     if (!listId) {
@@ -37,7 +41,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[POST /api/views/list/[id]] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -48,6 +51,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { id: listId } = await params;
     
     if (!listId) {
@@ -58,7 +64,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     
     return NextResponse.json({ count });
   } catch (error) {
-    console.error('[GET /api/views/list/[id]] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
