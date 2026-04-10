@@ -8,6 +8,7 @@ class AuthManager {
   private session: Session | null = null;
   private loading = true;
   private initialized = false;
+  private subscription: { unsubscribe: () => void } | null = null;
 
   static getInstance(): AuthManager {
     if (!AuthManager.instance) {
@@ -22,19 +23,25 @@ class AuthManager {
 
   private async init() {
     if (this.initialized) return;
-    
-    console.log('AuthManager - setting up auth listener (singleton)');
+
     const supabase = createClient();
-    
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed (singleton):', _event, session?.user?.email || 'no user');
       this.user = session?.user || null;
       this.session = session;
       this.loading = false;
       this.notifyListeners();
     });
 
+    this.subscription = subscription;
     this.initialized = true;
+  }
+
+  destroy() {
+    this.subscription?.unsubscribe();
+    this.subscription = null;
+    this.listeners.clear();
+    this.initialized = false;
   }
 
   subscribe(callback: (user: SupabaseUser | null, session: Session | null, loading: boolean) => void) {

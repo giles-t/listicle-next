@@ -8,9 +8,12 @@
  */
 
 import { db } from '../index';
-import { categories } from '../schema';
+import { categories, categoryIconEnum, categoryColorEnum } from '../schema';
 import { CATEGORIES } from './categories';
 import { sql } from 'drizzle-orm';
+
+type CategoryIcon = (typeof categoryIconEnum.enumValues)[number];
+type CategoryColor = (typeof categoryColorEnum.enumValues)[number];
 
 async function seedCategories() {
   console.log('🌱 Seeding categories...');
@@ -23,8 +26,8 @@ async function seedCategories() {
           name: category.name,
           slug: category.slug,
           description: category.description,
-          icon: category.icon as any,
-          color: category.color as any,
+          icon: category.icon as CategoryIcon,
+          color: category.color as CategoryColor,
           sort_order: category.sort_order,
         })
         .onConflictDoUpdate({
@@ -32,8 +35,8 @@ async function seedCategories() {
           set: {
             name: category.name,
             description: category.description,
-            icon: category.icon as any,
-            color: category.color as any,
+            icon: category.icon as CategoryIcon,
+            color: category.color as CategoryColor,
             sort_order: category.sort_order,
             updated_at: new Date(),
           },

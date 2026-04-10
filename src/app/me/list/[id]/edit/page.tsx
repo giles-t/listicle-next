@@ -55,7 +55,7 @@ export default async function EditList({ params }: { params: { id: string } }) {
   return (
     <EditListClient
       listId={row.id}
-      listType={row.list_type as any}
+      listType={row.list_type}
       isPublished={row.is_published}
       isVisible={row.is_visible}
       title={row.title}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { deleteBookmarkById } from '@/server/db/queries/bookmarks';
 
 /**
@@ -18,6 +19,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id: bookmarkId } = await params;
 
     if (!bookmarkId) {
@@ -33,7 +37,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('Error deleting bookmark:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

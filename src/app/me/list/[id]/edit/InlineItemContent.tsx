@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import RichTextEditor from "@/client/components/NotionEditor";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(() => import("@/client/components/NotionEditor"), { ssr: false });
 import { StaticContentRenderer } from "@/client/components/StaticContentRenderer";
 import { Button } from "@/ui/components/Button";
 import { FeatherCheck, FeatherX, toast } from "@subframe/core";
@@ -25,11 +27,17 @@ interface InlineItemContentProps {
 /**
  * Check if tiptap JSON content has meaningful text or media
  */
+interface TipTapNode {
+  type: string;
+  text?: string;
+  content?: TipTapNode[];
+}
+
 function contentHasText(raw: string | undefined): boolean {
   if (!raw?.trim()) return false;
   try {
-    const doc = JSON.parse(raw);
-    const hasText = (node: any): boolean => {
+    const doc: TipTapNode = JSON.parse(raw);
+    const hasText = (node: TipTapNode): boolean => {
       if (node.type === "text" && node.text?.trim()) return true;
       if (node.type === "image" || node.type === "embedDisplay" || node.type === "aiImage") return true;
       return node.content?.some(hasText) ?? false;

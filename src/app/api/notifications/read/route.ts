@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/server/supabase';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { markAsRead } from '@/server/db/queries/notifications';
 
 /**
@@ -18,6 +19,9 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       throw ApiError.unauthorized('Authentication required');
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     // Parse request body
     let notificationIds: string[] | undefined;
@@ -56,7 +60,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Mark notifications read API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

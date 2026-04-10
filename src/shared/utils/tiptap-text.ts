@@ -13,7 +13,13 @@ export function extractPlainText(content: string | null | undefined): string {
   }
 }
 
-function collectText(node: any): string {
+interface TiptapNode {
+  type?: string;
+  text?: string;
+  content?: TiptapNode[];
+}
+
+function collectText(node: TiptapNode): string {
   if (!node) return "";
   if (node.type === "text") return node.text ?? "";
   if (!Array.isArray(node.content)) return "";

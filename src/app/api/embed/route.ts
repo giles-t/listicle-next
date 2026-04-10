@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null)
+    if (limited) return limited
+
     const { url } = await request.json()
 
     if (!url) {
@@ -36,7 +40,7 @@ export async function POST(request: NextRequest) {
       headers: { Accept: 'application/json' },
     })
 
-    let data: any
+    let data: Record<string, unknown>
     try {
       data = await response.json()
     } catch {

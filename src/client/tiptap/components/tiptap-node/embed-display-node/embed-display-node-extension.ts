@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react'
 import { EmbedDisplayNodeView } from './embed-display-node-view'
 
 export interface EmbedDisplayOptions {
-  HTMLAttributes: Record<string, any>
+  HTMLAttributes: Record<string, string>
 }
 
 declare module '@tiptap/core' {

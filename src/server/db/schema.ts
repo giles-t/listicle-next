@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, timestamp, boolean, integer, pgEnum, json, uuid, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, varchar, timestamp, boolean, integer, pgEnum, json, uuid, primaryKey, uniqueIndex, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums
@@ -68,7 +68,12 @@ export const lists = pgTable('lists', {
   view_count: integer('view_count').notNull().default(0),
   user_id: text('user_id').notNull().references(() => profiles.id, { onDelete: 'cascade' }),
   publication_id: uuid('publication_id').references(() => publications.id),
-});
+}, (t) => ({
+  user_id_idx: index('lists_user_id_idx').on(t.user_id),
+  published_idx: index('lists_is_published_idx').on(t.is_published),
+  user_published_idx: index('lists_user_published_idx').on(t.user_id, t.is_published),
+  published_at_idx: index('lists_published_at_idx').on(t.published_at),
+}));
 
 // Lists relations
 export const listsRelations = relations(lists, ({ one, many }) => ({
@@ -159,7 +164,9 @@ export const comments = pgTable('comments', {
   list_id: uuid('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
   list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
   parent_id: uuid('parent_id'),
-});
+}, (t) => ({
+  list_id_idx: index('comments_list_id_idx').on(t.list_id),
+}));
 
 // Comments relations
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -193,6 +200,7 @@ export const reactions = pgTable('reactions', {
   list_item_id: uuid('list_item_id').references(() => listItems.id, { onDelete: 'cascade' }),
 }, (t) => ({
   unique_reaction: uniqueIndex('unique_reaction_idx').on(t.user_id, t.list_id, t.list_item_id, t.emoji),
+  list_id_idx: index('reactions_list_id_idx').on(t.list_id),
 }));
 
 // Reactions relations
@@ -284,6 +292,7 @@ export const bookmarks = pgTable('bookmarks', {
 }, (t) => ({
   // Note: Unique constraints are handled via partial unique indexes in the migration
   // to properly handle NULL values for list_item_id
+  user_id_idx: index('bookmarks_user_id_idx').on(t.user_id),
 }));
 
 // Bookmarks relations
