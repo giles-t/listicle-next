@@ -24,7 +24,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { signInWithMagicLink } = useAuth();
 
-  const handleEmailSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleEmailSubmit = async () => {
     if (email && !isLoading) {
       setIsLoading(true);
       try {
@@ -150,12 +150,18 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleEmailSubmit();
+                    }
+                  }}
                 />
               </TextField>
               <Button
                 className="h-10 w-full flex-none"
                 size="large"
-                onClick={handleEmailSubmit}
+                onClick={() => handleEmailSubmit()}
                 disabled={isLoading || !email.trim()}
               >
                 {isLoading ? 'Sending...' : 'Continue'}

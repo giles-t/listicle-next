@@ -8,7 +8,7 @@ import { Tabs } from "@/ui/components/Tabs";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { FeatherCheckCheck, FeatherEye, FeatherHeart, FeatherBell, FeatherInbox, FeatherBellOff } from "@subframe/core";
 import { useAuth } from "@/client/hooks/use-auth";
-import { Loader } from "@/ui/components/Loader";
+import { Button } from "@/ui/components/Button";
 import { SkeletonText } from "@/ui/components/SkeletonText";
 import { SkeletonCircle } from "@/ui/components/SkeletonCircle";
 
@@ -357,20 +357,15 @@ export default function NotificationsPage() {
           </span>
         </div>
         {unreadCount > 0 && (
-          <button
+          <Button
+            variant="neutral-secondary"
+            icon={<FeatherCheckCheck />}
             onClick={handleMarkAllAsRead}
             disabled={isMarkingRead}
-            className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-default-background px-4 py-2 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+            loading={isMarkingRead}
           >
-            {isMarkingRead ? (
-              <Loader size="small" />
-            ) : (
-              <FeatherCheckCheck className="text-body font-body text-default-font" />
-            )}
-            <span className="text-body-bold font-body-bold text-default-font">
-              Mark all as read
-            </span>
-          </button>
+            Mark all as read
+          </Button>
         )}
       </div>
       <Tabs>
@@ -396,12 +391,12 @@ export default function NotificationsPage() {
               <p className="text-body font-body text-subtext-color mb-4">
                 {error}
               </p>
-              <button
+              <Button
+                variant="brand-tertiary"
                 onClick={() => fetchNotifications()}
-                className="text-body-bold font-body-bold text-brand-primary hover:underline"
               >
                 Try again
-              </button>
+              </Button>
             </div>
           </div>
         ) : filteredNotifications.length === 0 ? (
@@ -417,24 +412,14 @@ export default function NotificationsPage() {
             ))}
             {hasMore && (
               <div className="flex w-full justify-center py-6">
-                <button
+                <Button
+                  variant="neutral-secondary"
                   onClick={handleLoadMore}
                   disabled={isLoadingMore}
-                  className="flex items-center gap-2 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-2.5 hover:bg-neutral-50 transition-colors disabled:opacity-50"
+                  loading={isLoadingMore}
                 >
-                  {isLoadingMore ? (
-                    <>
-                      <Loader size="small" />
-                      <span className="text-body-bold font-body-bold text-default-font">
-                        Loading...
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-body-bold font-body-bold text-default-font">
-                      Show more
-                    </span>
-                  )}
-                </button>
+                  {isLoadingMore ? "Loading..." : "Show more"}
+                </Button>
               </div>
             )}
           </>
