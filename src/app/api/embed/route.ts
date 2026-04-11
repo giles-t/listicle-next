@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 
-// Lazy Sentry import to avoid loading @sentry/nextjs at module scope
-// (which validates SENTRY_DSN and warns when it's a placeholder)
+// Only load @sentry/nextjs when DSN is a valid URL, preventing
+// "Invalid Sentry Dsn" warnings when the env var is a placeholder.
+const _sentryDsn = process.env.SENTRY_DSN;
+const _hasSentryDsn = Boolean(_sentryDsn && _sentryDsn.startsWith('https://'));
+
 function captureSentryException(error: Error, options?: Record<string, unknown>) {
+  if (!_hasSentryDsn) return;
   import('@sentry/nextjs').then((Sentry) => {
     Sentry.captureException(error, options);
   }).catch(() => {});
