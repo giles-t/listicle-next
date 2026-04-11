@@ -1,31 +1,40 @@
-import * as Sentry from '@sentry/nextjs';
 import { config } from './config';
 
-export const initSentry = () => {
-  if (!config.sentry.dsn) {
+const isValidDsn = (dsn: string | undefined): boolean =>
+  typeof dsn === 'string' && dsn.startsWith('https://');
+
+export const initSentry = async () => {
+  if (!config.sentry.dsn || !isValidDsn(config.sentry.dsn)) {
     console.warn('Sentry DSN not provided, error tracking disabled');
     return;
   }
 
+  const Sentry = await import('@sentry/nextjs');
   Sentry.init({
     dsn: config.sentry.dsn,
-    tracesSampleRate: config.app.isProduction ? 0.2 : 1.0, // Sample 20% of transactions in production
+    tracesSampleRate: config.app.isProduction ? 0.2 : 1.0,
     environment: config.app.environment,
-    // Don't send errors in development
     enabled: config.app.isProduction,
   });
 };
 
-export const captureException = (error: unknown, context?: Record<string, any>) => {
+export const captureException = async (error: unknown, context?: Record<string, any>) => {
+  if (!isValidDsn(config.sentry.dsn)) return;
+
+  const Sentry = await import('@sentry/nextjs');
   Sentry.captureException(error, {
     extra: context,
   });
 };
 
-export const captureMessage = (message: string, level: Sentry.SeverityLevel = 'info') => {
+export const captureMessage = async (
+  message: string,
+  level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug' = 'info'
+) => {
+  if (!isValidDsn(config.sentry.dsn)) return;
+
+  const Sentry = await import('@sentry/nextjs');
   Sentry.captureMessage(message, {
     level,
   });
 };
-
-export { Sentry }; 
