@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { put } from '@vercel/blob';
 import sharp from 'sharp';
-import { createClient, supabaseAdmin } from '@/server/supabase';
+import { createClient, getSupabaseAdmin } from '@/server/supabase';
 import { updateUserProfile } from '@/server/db/queries/profiles';
 import { profileFormSchema, type ProfileFormData } from '@/shared/validation/user';
 
@@ -70,7 +70,7 @@ export async function updateProfile(formData: FormData) {
 
     // Sync critical fields to auth metadata using admin client (avoids session warning)
     try {
-      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      await getSupabaseAdmin().auth.admin.updateUserById(user.id, {
         user_metadata: {
           username: profileData.username,
           name: profileData.displayName ?? undefined,
@@ -180,7 +180,7 @@ export async function uploadAvatar(formData: FormData) {
 
     // Sync avatar to auth metadata using admin client (avoids session warning)
     try {
-      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      await getSupabaseAdmin().auth.admin.updateUserById(user.id, {
         user_metadata: {
           avatar: blob.url,
         }

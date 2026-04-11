@@ -7,6 +7,7 @@ import Script from "next/script";
 import { Toaster } from "@subframe/core";
 import { DefaultPageLayout } from "@/ui/layouts/DefaultPageLayout";
 import { ThemeProvider } from "@/client/components/ThemeProvider";
+import { ensureProtocol } from "@/shared/utils/url";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Listicle",
   },
   description: "Create and share engaging list-based articles. The content platform for listicles.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(ensureProtocol(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")),
   openGraph: {
     type: "website",
     siteName: "Listicle",
