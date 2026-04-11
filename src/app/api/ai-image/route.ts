@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build request parameters for gpt-image-1
-    const requestParams: Parameters<typeof openai.images.generate>[0] = {
+    const requestParams: Parameters<OpenAI.Images['generate']>[0] = {
       model: 'gpt-image-1',
       prompt: prompt,
       n: 1,
