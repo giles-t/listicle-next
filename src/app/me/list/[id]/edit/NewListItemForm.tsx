@@ -27,6 +27,7 @@ export default function NewListItemForm({ listId, onAdded }: Props) {
       const id = requestAnimationFrame(() => inputRef.current?.focus());
       return () => cancelAnimationFrame(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

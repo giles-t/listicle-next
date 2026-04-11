@@ -159,6 +159,7 @@ export function TopNav() {
             <img
               className="h-6 flex-none object-cover"
               src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"
+              alt="Listicle"
             />
           </Link>
         }

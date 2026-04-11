@@ -45,6 +45,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
     if (open && availableCategories.length === 0) {
       fetchCategories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Reset selected categories when modal opens

@@ -165,7 +165,7 @@ const ProfileMenuDropdown2Root = React.forwardRef<
       <div className="flex w-full items-center gap-3 px-4 py-4">
         <div className="flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-full bg-brand-100">
           {image ? (
-            <img className="h-12 w-12 flex-none object-cover" src={image} />
+            <img alt="" className="h-12 w-12 flex-none object-cover" src={image} />
           ) : null}
         </div>
         <div className="flex grow shrink-0 basis-0 flex-col items-start">

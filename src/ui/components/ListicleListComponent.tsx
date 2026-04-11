@@ -59,6 +59,7 @@ const ListicleListComponentRoot = React.forwardRef<
       <div className="flex h-24 w-32 flex-none items-start">
         {image ? (
           <img
+            alt=""
             className="grow shrink-0 basis-0 self-stretch rounded-md object-cover"
             src={image}
           />

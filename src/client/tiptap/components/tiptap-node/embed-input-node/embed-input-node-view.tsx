@@ -61,7 +61,7 @@ export function EmbedInputNodeView({ node, updateAttributes, deleteNode, editor,
     } finally {
       setIsLoading(false)
     }
-  }, [editor, node.attrs.id])
+  }, [editor, node.attrs.id, node.nodeSize])
 
   const handleUrlSubmit = useCallback(() => {
     const trimmed = inputUrl.trim()

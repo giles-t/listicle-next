@@ -63,6 +63,7 @@ const BookmarkListComponentRoot = React.forwardRef<
         <img
           className="h-24 w-32 flex-none rounded-md object-cover"
           src={image}
+          alt=""
         />
       ) : null}
       <div className="flex grow shrink-0 basis-0 flex-col items-start gap-2">

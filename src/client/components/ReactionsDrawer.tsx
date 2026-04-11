@@ -54,6 +54,7 @@ export function ReactionsDrawer({
       // Reset state when drawer closes
       setSearchQuery("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, listId, itemId]);
 
   async function fetchReactions() {

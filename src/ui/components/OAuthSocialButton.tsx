@@ -42,7 +42,7 @@ const OAuthSocialButtonRoot = React.forwardRef<
       {...otherProps}
     >
       {logo ? (
-        <img className="h-5 w-5 flex-none object-cover" src={logo} />
+        <img alt="" className="h-5 w-5 flex-none object-cover" src={logo} />
       ) : null}
       {children ? (
         <span className="text-body-bold font-body-bold text-neutral-700 group-disabled/f1948f75:text-neutral-400">

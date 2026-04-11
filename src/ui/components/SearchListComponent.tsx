@@ -58,6 +58,7 @@ const SearchListComponentRoot = React.forwardRef<
     >
       {image ? (
         <img
+          alt=""
           className="h-32 w-48 flex-none rounded-sm object-cover"
           src={image}
         />

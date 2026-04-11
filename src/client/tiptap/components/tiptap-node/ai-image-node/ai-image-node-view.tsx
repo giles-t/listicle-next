@@ -71,6 +71,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     if (!prompt && textareaRef.current) {
       textareaRef.current.focus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // No need to monitor AI storage anymore - we handle everything directly
@@ -139,14 +140,14 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
   const handlePromptChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.target.value
     setLocalPrompt(newValue)
-  }, [localPrompt])
+  }, [])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       handleGenerateImage()
     }
-  }, [handleGenerateImage, localPrompt])
+  }, [handleGenerateImage])
 
   const handleStyleChange = useCallback((value: string) => {
     updateAttributes({ style: value })

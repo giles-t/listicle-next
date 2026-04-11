@@ -52,6 +52,7 @@ export function FollowersDrawer({
       // Reset state when drawer closes
       setSearchQuery("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, username, type]);
 
   async function fetchUsers() {

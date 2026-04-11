@@ -187,7 +187,7 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, {
+const sentryConfig = withSentryConfig(nextConfig, {
   // Suppress source map upload logs during build
   silent: true,
 
@@ -207,3 +207,11 @@ module.exports = withSentryConfig(nextConfig, {
   // Include all client files for source map upload
   widenClientFileUpload: true,
 });
+
+// Remove deprecated clientInstrumentationHook injected by Sentry SDK.
+// Next.js 15.5+ uses src/instrumentation-client.ts instead.
+if (sentryConfig.experimental) {
+  delete sentryConfig.experimental.clientInstrumentationHook;
+}
+
+module.exports = sentryConfig;
