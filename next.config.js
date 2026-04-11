@@ -187,31 +187,38 @@ const nextConfig = {
   },
 };
 
-const sentryConfig = withSentryConfig(nextConfig, {
-  // Suppress source map upload logs during build
-  silent: true,
+const sentryDsn = process.env.SENTRY_DSN;
+const hasSentryDsn = sentryDsn && sentryDsn.startsWith("https://");
 
-  // Upload source maps for production debugging, then delete them from the build output
-  sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
-  },
+if (hasSentryDsn) {
+  const sentryConfig = withSentryConfig(nextConfig, {
+    // Suppress source map upload logs during build
+    silent: true,
 
-  // Automatically instrument server functions, middleware, and app router
-  autoInstrumentServerFunctions: true,
-  autoInstrumentMiddleware: true,
-  autoInstrumentAppDirectory: true,
+    // Upload source maps for production debugging, then delete them from the build output
+    sourcemaps: {
+      deleteSourcemapsAfterUpload: true,
+    },
 
-  // Remove Sentry SDK debug logger from client bundles
-  disableLogger: true,
+    // Automatically instrument server functions, middleware, and app router
+    autoInstrumentServerFunctions: true,
+    autoInstrumentMiddleware: true,
+    autoInstrumentAppDirectory: true,
 
-  // Include all client files for source map upload
-  widenClientFileUpload: true,
-});
+    // Remove Sentry SDK debug logger from client bundles
+    disableLogger: true,
 
-// Remove deprecated clientInstrumentationHook injected by Sentry SDK.
-// Next.js 15.5+ uses src/instrumentation-client.ts instead.
-if (sentryConfig.experimental) {
-  delete sentryConfig.experimental.clientInstrumentationHook;
+    // Include all client files for source map upload
+    widenClientFileUpload: true,
+  });
+
+  // Remove deprecated clientInstrumentationHook injected by Sentry SDK.
+  // Next.js 15.5+ uses src/instrumentation-client.ts instead.
+  if (sentryConfig.experimental) {
+    delete sentryConfig.experimental.clientInstrumentationHook;
+  }
+
+  module.exports = sentryConfig;
+} else {
+  module.exports = nextConfig;
 }
-
-module.exports = sentryConfig;
