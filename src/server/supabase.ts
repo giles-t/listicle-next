@@ -55,8 +55,17 @@ export const createSupabaseAdminClient = () => {
   );
 };
 
-// Create a singleton instance for server-side admin usage
-export const supabaseAdmin = createSupabaseAdminClient();
+// Lazy singleton for server-side admin usage.
+// Must not be created at module scope because env vars are unavailable during
+// the Next.js build step, which causes the Supabase constructor to throw.
+let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | null = null;
+
+export function getSupabaseAdmin() {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createSupabaseAdminClient();
+  }
+  return _supabaseAdmin;
+}
 
 // ================================
 // Middleware Utility

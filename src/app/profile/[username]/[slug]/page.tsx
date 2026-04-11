@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from "next/navigation";
 import { getListByUsernameAndSlug } from "@/server/db/queries/profiles";
 import { db } from "@/src/server/db";

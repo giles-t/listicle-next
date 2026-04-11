@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import NotionPageClient from './NotionPageClient'
 import { generateAiToken } from '@/src/server/ai-token'
 import { createClient } from '@/src/server/supabase'

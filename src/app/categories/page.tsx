@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import { CategoryBrowseClient, type Category } from './CategoryBrowseClient';
 import { getAllCategories } from '@/server/db/queries/categories';

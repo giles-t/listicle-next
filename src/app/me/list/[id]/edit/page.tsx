@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { db } from "@/src/server/db";
 import { listItems, lists, categories, listToCategories, profiles } from "@/src/server/db/schema";
 import { asc, desc, eq } from "drizzle-orm";

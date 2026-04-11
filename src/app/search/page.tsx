@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from "react";
 import { SearchClient } from "./SearchClient";
 import { getAllCategories } from "@/server/db/queries/categories";
