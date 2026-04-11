@@ -3,6 +3,8 @@ import { CategoryBrowseClient, type Category } from './CategoryBrowseClient';
 import { getAllCategories } from '@/server/db/queries/categories';
 import { createClient } from '@/server/supabase';
 
+export const dynamic = 'force-dynamic';
+
 // SEO Metadata
 export const metadata: Metadata = {
   title: 'Browse Categories | Listicle',

@@ -4,6 +4,8 @@ import { createClient } from "@/server/supabase";
 import { getUserById } from "@/server/db/queries/profiles";
 import { ProfileForm } from "./ProfileForm";
 
+export const dynamic = 'force-dynamic';
+
 interface Profile {
   id: string;
   username: string;

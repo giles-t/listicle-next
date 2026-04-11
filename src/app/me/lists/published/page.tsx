@@ -4,6 +4,8 @@ import { lists as listsTable, listItems, reactions, comments, profiles } from "@
 import { eq, sql } from "drizzle-orm";
 import UserListsClient, { type UserList as UserListType, type UserProfileLite } from "../UserListsClient";
 
+export const dynamic = 'force-dynamic';
+
 export default async function PublishedListsPage() {
   const supabase = await createClient();
   const {
