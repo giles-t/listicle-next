@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/server/supabase';
 import OnboardingProfileSetup from './OnboardingProfileSetup';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OnboardingPage({
   searchParams,
 }: {

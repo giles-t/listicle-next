@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { getUserByUsername, getUserStats } from '@/server/db/queries/profiles';
 import { generateUserMetadata } from '@/shared/utils/metadata';
 
+export const dynamic = 'force-dynamic';
+
 interface ProfileLayoutProps {
   children: React.ReactNode;
   params: Promise<{ username: string }>;

@@ -19,6 +19,8 @@ import { ViewTracker, ListViewTracker } from "./ViewTracker";
 import { getListViewCount, getItemViewCounts } from "@/src/server/db/queries/views";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 
+export const dynamic = 'force-dynamic';
+
 interface ViewListPageProps {
   params: Promise<{ username: string; slug: string }>;
 }

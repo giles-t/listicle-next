@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { SearchClient } from "./SearchClient";
 import { getAllCategories } from "@/server/db/queries/categories";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Search - Listicle",
   description: "Search for lists, topics, and creators on Listicle",

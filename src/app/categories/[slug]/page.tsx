@@ -4,6 +4,8 @@ import { CategoryListsClient } from './CategoryListsClient';
 import { getCategoryBySlug, getListsByCategorySlug, isFollowingCategory } from '@/server/db/queries/categories';
 import { createClient } from '@/server/supabase';
 
+export const dynamic = 'force-dynamic';
+
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
