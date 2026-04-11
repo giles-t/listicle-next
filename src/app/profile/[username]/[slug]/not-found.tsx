@@ -11,7 +11,7 @@ export default function NotFound() {
               List Not Found
             </span>
             <span className="text-body font-body text-subtext-color">
-              This list doesn't exist or may have been removed by the author.
+              This list doesn&apos;t exist or may have been removed by the author.
             </span>
           </div>
           <div className="flex items-center gap-3 pt-4">

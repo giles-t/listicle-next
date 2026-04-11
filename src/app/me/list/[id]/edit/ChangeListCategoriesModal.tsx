@@ -178,7 +178,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
                 ))
               ) : searchQuery ? (
                 <span className="text-body font-body text-subtext-color">
-                  No categories found matching "{searchQuery}"
+                  No categories found matching &ldquo;{searchQuery}&rdquo;
                 </span>
               ) : (
                 <span className="text-body font-body text-subtext-color">

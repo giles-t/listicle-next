@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use gpt-image-1 model
-    const response = await openai.images.generate(requestParams)
+    const response = await openai.images.generate(requestParams) as { data: Array<{ b64_json?: string; revised_prompt?: string }> }
 
     // gpt-image-1 returns base64-encoded images
     const imageB64 = response.data?.[0]?.b64_json

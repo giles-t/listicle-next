@@ -7,13 +7,13 @@ import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -63,7 +63,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -76,7 +76,7 @@ export async function PUT(
     const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
     if (limited) return limited;
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -180,7 +180,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -193,7 +193,7 @@ export async function DELETE(
     const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
     if (limited) return limited;
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });

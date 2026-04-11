@@ -4,8 +4,8 @@ import { asc, desc, eq } from "drizzle-orm";
 import EditListClient from "./EditListClient";
 import { notFound } from "next/navigation";
 
-export default async function EditList({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function EditList({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const [row] = await db
     .select({
       id: lists.id,

@@ -85,7 +85,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
             </div>
             <div className="flex w-full flex-col items-center gap-2">
               <span className="text-body font-body text-default-font text-center">
-                We've sent a magic link to your email address. Click the link to
+                We&apos;ve sent a magic link to your email address. Click the link to
                 sign in to your account.
               </span>
               <Badge variant="success" icon={<FeatherClock />}>
@@ -163,7 +163,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
             </div>
             <div className="flex flex-wrap items-start gap-2">
               <span className="text-body font-body text-subtext-color">
-                Don't have an account?
+                Don&apos;t have an account?
               </span>
               <LinkButton
                 variant="brand"

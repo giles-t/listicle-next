@@ -70,10 +70,9 @@ export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 
 // Helper: optional string field that accepts empty strings and null (common in form inputs)
 const optionalFormString = (schema: z.ZodString) =>
-  z.preprocess(
-    (val) => (val === '' || val === null ? undefined : val),
-    schema.optional()
-  );
+  schema.optional().or(z.literal('')).transform(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val)
+  ) as z.ZodType<string | undefined>;
 
 // Profile form schema for client-side
 export const profileFormSchema = z.object({

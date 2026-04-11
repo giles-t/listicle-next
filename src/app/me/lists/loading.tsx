@@ -18,7 +18,7 @@ export default function Loading() {
               </div>
               <div className="h-8 w-8 rounded-md bg-neutral-100" />
             </div>
-            <SkeletonText size="body" className="max-w-[400px]" />
+            <SkeletonText size="default" className="max-w-[400px]" />
             <div className="flex items-center gap-4 pt-2">
               <SkeletonText size="label" className="w-16" />
               <SkeletonText size="label" className="w-12" />

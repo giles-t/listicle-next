@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       const readable = new ReadableStream({
         async start(controller) {
           try {
-            for await (const chunk of response as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
+            for await (const chunk of response as unknown as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
               const content = chunk.choices?.[0]?.delta?.content || ''
               if (content) {
                 // Send raw content chunks, not SSE format

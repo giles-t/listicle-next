@@ -48,7 +48,7 @@ export default function TestImageUploadPage() {
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <h3 className="font-medium text-blue-900 mb-2">How to test:</h3>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• Type "/" to open the slash command menu and select "Image Upload"</li>
+              <li>• Type &ldquo;/&rdquo; to open the slash command menu and select &ldquo;Image Upload&rdquo;</li>
               <li>• Drag and drop image files directly into the editor</li>
               <li>• Click on the image upload area to select files</li>
               <li>• Supported formats: JPEG, PNG, WebP, GIF (max 5MB)</li>

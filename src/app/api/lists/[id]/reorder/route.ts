@@ -15,7 +15,7 @@ const reorderSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -28,7 +28,7 @@ export async function PUT(
     const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
     if (limited) return limited;
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });

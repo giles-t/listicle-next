@@ -109,7 +109,7 @@ function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown
     if (!container || !node.attrs?.html) return;
     
     // Set the HTML content from the node attributes
-    container.innerHTML = node.attrs.html;
+    container.innerHTML = String(node.attrs.html);
     
     // Load iframely if available
     if (window.iframely) {
@@ -119,7 +119,8 @@ function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown
 
   // Fallback if no embed HTML available
   if (!node.attrs?.html) {
-    const { url, title, site, thumbnail } = node.attrs || {};
+    const attrs = (node.attrs || {}) as Record<string, string>;
+    const { url, title, site, thumbnail } = attrs;
     
     if (!url) return null;
     
