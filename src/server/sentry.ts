@@ -1,3 +1,3 @@
 // Server-side Sentry utilities
-// Initialization is handled by sentry.server.config.ts via the instrumentation hook
+// Re-export from shared module which handles DSN validation and dynamic imports
 export { captureException, captureMessage } from '@/shared/sentry';

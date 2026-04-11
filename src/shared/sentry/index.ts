@@ -1,47 +1,44 @@
-// Check DSN validity once at module load (no SDK import, just env read).
-// This prevents loading @sentry/nextjs entirely when the DSN is a
-// placeholder like "your_sentry_dsn", which would trigger the
-// "Invalid Sentry Dsn" runtime warning on every dynamic import.
-const _dsn = typeof process !== 'undefined' ? process.env?.SENTRY_DSN ?? process.env?.NEXT_PUBLIC_SENTRY_DSN : undefined;
-const _hasDsn = Boolean(_dsn && _dsn.startsWith('https://'));
+const isValidDsn = (dsn: string | undefined): boolean =>
+  typeof dsn === 'string' && dsn.startsWith('https://');
 
 /**
  * Captures an exception in Sentry. Safe to use in both client and server environments.
- * Skips the import entirely when the DSN is not a valid URL.
+ * Only loads the Sentry SDK if a valid DSN is configured.
+ * @param error The error to capture
+ * @param context Additional context to include with the error
  */
-export const captureException = (error: Error | unknown, context?: Record<string, unknown>) => {
-  if (!_hasDsn) return;
-  import('@sentry/nextjs').then((Sentry) => {
-    if (error instanceof Error) {
-      Sentry.captureException(error, {
-        extra: context,
-      });
-    } else {
-      Sentry.captureException(new Error(String(error)), {
-        extra: context,
-      });
-    }
-  }).catch(() => {
-    // Sentry not available, silently ignore
-  });
+export const captureException = async (error: Error | unknown, context?: Record<string, unknown>) => {
+  if (!isValidDsn(process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN)) return;
+
+  const Sentry = await import('@sentry/nextjs');
+  if (error instanceof Error) {
+    Sentry.captureException(error, {
+      extra: context,
+    });
+  } else {
+    Sentry.captureException(new Error(String(error)), {
+      extra: context,
+    });
+  }
 };
 
 /**
  * Captures a message in Sentry. Safe to use in both client and server environments.
- * Skips the import entirely when the DSN is not a valid URL.
+ * Only loads the Sentry SDK if a valid DSN is configured.
+ * @param message The message to capture
+ * @param level The severity level of the message
+ * @param context Additional context to include with the message
  */
-export const captureMessage = (
+export const captureMessage = async (
   message: string,
   level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug' = 'info',
   context?: Record<string, unknown>
 ) => {
-  if (!_hasDsn) return;
-  import('@sentry/nextjs').then((Sentry) => {
-    Sentry.captureMessage(message, {
-      level,
-      extra: context,
-    });
-  }).catch(() => {
-    // Sentry not available, silently ignore
+  if (!isValidDsn(process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN)) return;
+
+  const Sentry = await import('@sentry/nextjs');
+  Sentry.captureMessage(message, {
+    level,
+    extra: context,
   });
 };

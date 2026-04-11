@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
-
-// Only load @sentry/nextjs when DSN is a valid URL, preventing
-// "Invalid Sentry Dsn" warnings when the env var is a placeholder.
-const _sentryDsn = process.env.SENTRY_DSN;
-const _hasSentryDsn = Boolean(_sentryDsn && _sentryDsn.startsWith('https://'));
-
-function captureSentryException(error: Error, options?: Record<string, unknown>) {
-  if (!_hasSentryDsn) return;
-  import('@sentry/nextjs').then((Sentry) => {
-    Sentry.captureException(error, options);
-  }).catch(() => {});
-}
+import { captureException } from '@/shared/sentry'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,10 +21,10 @@ export async function POST(request: NextRequest) {
 
     const IFRAMELY_API_KEY = process.env.IFRAMELY_API_KEY
     if (!IFRAMELY_API_KEY) {
-      const error = new Error('Iframely API key not configured')
-      captureSentryException(error, {
-        tags: { feature: 'embed', error_type: 'configuration' },
-        extra: { url },
+      captureException(new Error('Iframely API key not configured'), {
+        feature: 'embed',
+        error_type: 'configuration',
+        url,
       })
       return NextResponse.json({ error: 'Embed service not configured' }, { status: 500 })
     }
@@ -55,10 +44,12 @@ export async function POST(request: NextRequest) {
     try {
       data = await response.json()
     } catch {
-      const error = new Error(`Failed to parse Iframely response: ${response.status}`)
-      captureSentryException(error, {
-        tags: { feature: 'embed', error_type: 'parse_error', status_code: response.status },
-        extra: { url, iframely_url: iframelyUrl.toString() },
+      captureException(new Error(`Failed to parse Iframely response: ${response.status}`), {
+        feature: 'embed',
+        error_type: 'parse_error',
+        status_code: response.status,
+        url,
+        iframely_url: iframelyUrl.toString(),
       })
       return NextResponse.json({ error: 'Invalid response from embed service' }, { status: 502 })
     }
@@ -89,7 +80,7 @@ export async function POST(request: NextRequest) {
           break
         case 417:
           if (data[':error']) {
-            userMessage = 'Could not connect to the URL. Please check if it\u2019s accessible'
+            userMessage = 'Could not connect to the URL. Please check if it\'s accessible'
           } else if (data[':status']) {
             userMessage = `The URL returned an error (${data[':status']})`
           } else {
@@ -101,15 +92,16 @@ export async function POST(request: NextRequest) {
           break
       }
 
-      captureSentryException(new Error(`Iframely error ${status}: ${data.error}`), {
-        tags: { feature: 'embed', error_type: 'iframely_error', iframely_status: status, should_cache: shouldCache },
-        extra: {
-          url,
-          iframely_response: data,
-          iframely_url: iframelyUrl.toString(),
-          connection_error: data[':error'],
-          http_status: data[':status'],
-        },
+      captureException(new Error(`Iframely error ${status}: ${data.error}`), {
+        feature: 'embed',
+        error_type: 'iframely_error',
+        iframely_status: status,
+        should_cache: shouldCache,
+        url,
+        iframely_response: data,
+        iframely_url: iframelyUrl.toString(),
+        connection_error: data[':error'],
+        http_status: data[':status'],
       })
 
       return NextResponse.json(
@@ -119,9 +111,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (!response.ok) {
-      captureSentryException(new Error(`Iframely HTTP error: ${response.status}`), {
-        tags: { feature: 'embed', error_type: 'iframely_http_error', status_code: response.status },
-        extra: { url, response_data: data, iframely_url: iframelyUrl.toString() },
+      captureException(new Error(`Iframely HTTP error: ${response.status}`), {
+        feature: 'embed',
+        error_type: 'iframely_http_error',
+        status_code: response.status,
+        url,
+        response_data: data,
+        iframely_url: iframelyUrl.toString(),
       })
       return NextResponse.json({ error: 'Embed service temporarily unavailable' }, { status: 502 })
     }
@@ -150,9 +146,11 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    captureSentryException(error instanceof Error ? error : new Error(String(error)), {
-      tags: { feature: 'embed', error_type: 'unexpected' },
-      extra: { url: request.url, method: request.method },
+    captureException(error, {
+      feature: 'embed',
+      error_type: 'unexpected',
+      url: request.url,
+      method: request.method,
     })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
