@@ -1,5 +1,3 @@
-const { withSentryConfig } = require("@sentry/nextjs");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // External packages that should be treated as external in server components
@@ -191,6 +189,7 @@ const sentryDsn = process.env.SENTRY_DSN;
 const hasSentryDsn = sentryDsn && sentryDsn.startsWith("https://");
 
 if (hasSentryDsn) {
+  const { withSentryConfig } = require("@sentry/nextjs");
   const sentryConfig = withSentryConfig(nextConfig, {
     // Suppress source map upload logs during build
     silent: true,

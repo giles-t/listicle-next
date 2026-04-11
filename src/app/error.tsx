@@ -1,10 +1,10 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { FeatherAlertTriangle } from "@subframe/core";
+import { captureException } from "@/shared/sentry";
 import Link from "next/link";
 
 export default function Error({
@@ -15,7 +15,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    captureException(error);
   }, [error]);
 
   return (
