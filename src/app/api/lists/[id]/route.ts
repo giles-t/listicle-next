@@ -4,10 +4,11 @@ import { db } from '@/src/server/db';
 import { lists, tags, listToTags, listToCategories } from '@/src/server/db/schema';
 import { eq, and, count } from 'drizzle-orm';
 import { suggestCategoriesForList } from '@/server/ai/categorize';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -17,7 +18,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -52,7 +56,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Error deleting list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -62,13 +65,13 @@ export async function DELETE(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -131,7 +134,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -141,7 +143,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -151,7 +153,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -175,7 +180,7 @@ export async function PUT(
     }
 
     // Update the list
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date(),
     };
 
@@ -223,8 +228,6 @@ export async function PUT(
 
         // Only auto-categorize if no categories are set
         if (existingCategoryCount.count === 0) {
-          console.log(`Auto-categorizing list ${listId} on first publish...`);
-          
           const result = await suggestCategoriesForList(listId, 3);
           
           if (result.suggestions.length > 0) {
@@ -244,12 +247,10 @@ export async function PUT(
               reasoning: result.reasoning,
             };
             
-            console.log(`Auto-categorized list ${listId} with categories:`, result.suggestions.map(s => s.name));
           }
         }
       } catch (catError) {
         // Log but don't fail the publish operation
-        console.error('Auto-categorization failed (publish will continue):', catError);
         autoCategorization = { applied: false, error: 'Auto-categorization failed' };
       }
     }
@@ -261,7 +262,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Error updating list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

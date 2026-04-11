@@ -45,6 +45,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
     if (open && availableCategories.length === 0) {
       fetchCategories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Reset selected categories when modal opens
@@ -178,7 +179,7 @@ function ChangeListCategoriesModal({ open, onOpenChange, initialCategories, onCo
                 ))
               ) : searchQuery ? (
                 <span className="text-body font-body text-subtext-color">
-                  No categories found matching "{searchQuery}"
+                  No categories found matching &ldquo;{searchQuery}&rdquo;
                 </span>
               ) : (
                 <span className="text-body font-body text-subtext-color">

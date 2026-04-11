@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/src/server/db';
 import { lists, profiles, reactions, comments, listToCategories, categories } from '@/src/server/db/schema';
 import { eq, desc, sql, and, gte } from 'drizzle-orm';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export type FeedSortOption = 'trending' | 'views' | 'likes' | 'newest';
 export type TimeFilter = 'today' | 'week' | 'month' | 'all';
@@ -48,6 +49,9 @@ function getDateThreshold(timeFilter: TimeFilter): Date | null {
 
 export async function GET(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { searchParams } = new URL(request.url);
     const sortBy = (searchParams.get('sortBy') as FeedSortOption) || 'trending';
     const timeFilter = (searchParams.get('time') as TimeFilter) || 'all';
@@ -168,30 +172,22 @@ export async function GET(request: NextRequest) {
         .orderBy(desc(lists.published_at))
         .limit(limit)
         .offset(offset);
+    } else if (sortBy === 'likes') {
+      result = await baseQuery
+        .orderBy(sql`(SELECT COUNT(*) FROM ${reactions} WHERE ${reactions.list_id} = ${lists.id}) DESC`)
+        .limit(limit)
+        .offset(offset);
     } else {
-      // For 'trending' and 'likes', fetch all and sort in memory
-      const allResults = await baseQuery;
-      
-      // Sort in memory
-      if (sortBy === 'likes') {
-        allResults.sort((a, b) => Number(b.likesCount) - Number(a.likesCount));
-      } else if (sortBy === 'trending') {
-        // Trending: combination of views, likes, and recency
-        allResults.sort((a, b) => {
-          const scoreA = 
-            a.view_count * 0.1 + 
-            Number(a.likesCount) * 2 +
-            (a.published_at ? (Date.now() - new Date(a.published_at).getTime()) / (1000 * 60 * 60 * 24) * -0.1 : 0);
-          const scoreB = 
-            b.view_count * 0.1 + 
-            Number(b.likesCount) * 2 +
-            (b.published_at ? (Date.now() - new Date(b.published_at).getTime()) / (1000 * 60 * 60 * 24) * -0.1 : 0);
-          return scoreB - scoreA;
-        });
-      }
-      
-      // Apply pagination
-      result = allResults.slice(offset, offset + limit);
+      // sortBy === 'trending'
+      // Trending score: view_count * 0.1 + likesCount * 2 - days_since_published * 0.1
+      result = await baseQuery
+        .orderBy(sql`(
+          ${lists.view_count} * 0.1
+          + (SELECT COUNT(*) FROM ${reactions} WHERE ${reactions.list_id} = ${lists.id}) * 2
+          - EXTRACT(EPOCH FROM (NOW() - ${lists.published_at})) / 86400 * 0.1
+        ) DESC`)
+        .limit(limit)
+        .offset(offset);
     }
 
     const formattedLists: FeedListItem[] = result.map((list) => ({
@@ -215,13 +211,19 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({
-      lists: formattedLists,
-      hasMore: result.length === limit,
-    });
+    return NextResponse.json(
+      {
+        lists: formattedLists,
+        hasMore: result.length === limit,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=300',
+        },
+      }
+    );
 
   } catch (error) {
-    console.error('Error fetching feed:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

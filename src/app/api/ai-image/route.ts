@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@/src/server/supabase'
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 import { put } from '@vercel/blob'
 import sharp from 'sharp'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy-initialized OpenAI client to avoid build-time errors when env vars are unavailable
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  }
+  return _openai
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +27,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Rate limit check
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.AI_REQUEST);
+    if (limited) return limited;
+
     // Parse request body
     const { prompt, size, quality } = await request.json()
 
@@ -32,15 +41,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('🎨 Generating AI image:', { 
-      prompt, 
-      size, 
-      quality,
-      userId: user.id 
-    })
-
     // Build request parameters for gpt-image-1
-    const requestParams: any = {
+    const requestParams: Parameters<OpenAI.Images['generate']>[0] = {
       model: 'gpt-image-1',
       prompt: prompt,
       n: 1,
@@ -49,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use gpt-image-1 model
-    const response = await openai.images.generate(requestParams)
+    const response = await getOpenAI().images.generate(requestParams) as { data: Array<{ b64_json?: string; revised_prompt?: string }> }
 
     // gpt-image-1 returns base64-encoded images
     const imageB64 = response.data?.[0]?.b64_json
@@ -59,11 +61,7 @@ export async function POST(request: NextRequest) {
       throw new Error('No image data returned from OpenAI')
     }
 
-    console.log('✅ AI image generated successfully (base64)')
-
-    // Immediately upload to blob storage to avoid storing base64 in database
-    console.log('📤 Uploading AI-generated image to blob storage...')
-    
+    // Upload to blob storage
     const imageBuffer = Buffer.from(imageB64, 'base64')
 
     // Process image with sharp (optimize and convert to WebP)
@@ -86,9 +84,7 @@ export async function POST(request: NextRequest) {
       contentType: 'image/webp',
     })
 
-    console.log('✅ AI-generated image uploaded to blob storage:', blob.url)
-
-    // Return the blob storage URL instead of data URL
+    // Return the blob storage URL
     return NextResponse.json({ 
       imageUrl: blob.url,
       revisedPrompt,
@@ -96,8 +92,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('❌ AI image generation error:', error)
-    
     let errorMessage = 'Image generation failed'
     let statusCode = 500
 

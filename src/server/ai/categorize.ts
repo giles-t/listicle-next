@@ -3,10 +3,13 @@ import { db } from '@/server/db';
 import { categories, lists, listItems } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let _openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return _openai;
+}
 
 export interface CategorySuggestion {
   id: string;
@@ -133,7 +136,7 @@ Important:
 - If the content doesn't clearly match any category, choose the most general applicable ones`;
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -176,8 +179,8 @@ Important:
     );
 
     const suggestions: CategorySuggestion[] = (parsed.suggestions || [])
-      .filter((s: any) => categoryMap.has(s.slug))
-      .map((s: any) => {
+      .filter((s: { slug: string; confidence?: number }) => categoryMap.has(s.slug))
+      .map((s: { slug: string; confidence?: number }) => {
         const cat = categoryMap.get(s.slug)!;
         return {
           id: cat.id,

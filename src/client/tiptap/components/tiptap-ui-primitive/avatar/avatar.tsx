@@ -161,6 +161,7 @@ export const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(
         {...props}
         ref={ref}
         src={src}
+        alt=""
         className={cn(
           "w-full h-full object-cover rounded-full tiptap-avatar-image",
           className

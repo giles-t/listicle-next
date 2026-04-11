@@ -9,6 +9,7 @@ import { DrawerLayout } from "@/ui/layouts/DrawerLayout";
 import { FeatherSearch, FeatherX } from "@subframe/core";
 import { Loader } from "@/ui/components/Loader";
 import Link from "next/link";
+import { getBaseUrl } from "@/shared/utils/url";
 
 interface ReactionUser {
   id: string;
@@ -53,6 +54,7 @@ export function ReactionsDrawer({
       // Reset state when drawer closes
       setSearchQuery("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, listId, itemId]);
 
   async function fetchReactions() {
@@ -60,7 +62,7 @@ export function ReactionsDrawer({
     setError(null);
 
     try {
-      const url = new URL(`/api/lists/${listId}/reactions/users`, window.location.origin);
+      const url = new URL(`/api/lists/${listId}/reactions/users`, getBaseUrl());
       if (itemId) {
         url.searchParams.set("itemId", itemId);
       }

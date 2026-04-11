@@ -4,6 +4,8 @@ import { DashboardClient } from './DashboardClient';
 import { getUserStats, getUserRecentLists, getUserById } from '@/server/db/queries/profiles';
 import { getUnreadCount } from '@/server/db/queries/notifications';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

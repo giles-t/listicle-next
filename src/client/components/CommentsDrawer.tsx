@@ -22,6 +22,7 @@ import * as SubframeCore from "@subframe/core";
 import { toast } from "@subframe/core";
 import Link from "next/link";
 import { useAuth } from "@/client/hooks/use-auth";
+import { getBaseUrl } from "@/shared/utils/url";
 
 interface CommentUser {
   id: string;
@@ -80,7 +81,7 @@ function formatTimeAgo(dateString: string): string {
   return date.toLocaleDateString();
 }
 
-function CommentItem({
+const CommentItem = React.memo(function CommentItem({
   comment,
   listId,
   currentUserId,
@@ -99,7 +100,7 @@ function CommentItem({
   isReply?: boolean;
   topLevelParentId?: string; // The top-level comment ID for nested replies
 }) {
-  const canDelete = currentUserId && 
+  const canDelete = currentUserId &&
     (comment.user.id === currentUserId || listOwnerId === currentUserId);
 
   return (
@@ -144,8 +145,8 @@ function CommentItem({
                   asChild={true}
                 >
                   <DropdownMenu>
-                    <DropdownMenu.DropdownItem 
-                      icon={<FeatherTrash2 />} 
+                    <DropdownMenu.DropdownItem
+                      icon={<FeatherTrash2 />}
                       onClick={() => onDelete(comment.id)}
                     >
                       Delete
@@ -194,7 +195,7 @@ function CommentItem({
       </div>
     </div>
   );
-}
+});
 
 export function CommentsDrawer({
   listId,
@@ -221,7 +222,7 @@ export function CommentsDrawer({
     setError(null);
 
     try {
-      const url = new URL(`/api/lists/${listId}/comments`, window.location.origin);
+      const url = new URL(`/api/lists/${listId}/comments`, getBaseUrl());
       if (itemId) {
         url.searchParams.set("itemId", itemId);
       }
@@ -297,15 +298,19 @@ export function CommentsDrawer({
       
       // Notify parent component
       onCommentAdded?.();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error posting comment:", err);
-      toast.error(err.message || "Failed to post comment");
+      const message = err instanceof Error ? err.message : "Failed to post comment";
+      toast.error(message);
     } finally {
       setIsPosting(false);
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
+    const confirmed = window.confirm("Delete this comment? This action cannot be undone.");
+    if (!confirmed) return;
+
     try {
       const response = await fetch(
         `/api/lists/${listId}/comments?commentId=${commentId}`,
@@ -320,9 +325,10 @@ export function CommentsDrawer({
       await fetchComments();
       toast.success("Comment deleted");
       onCommentAdded?.();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error deleting comment:", err);
-      toast.error(err.message || "Failed to delete comment");
+      const message = err instanceof Error ? err.message : "Failed to delete comment";
+      toast.error(message);
     }
   };
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getReactionsWithProfiles } from '@/src/server/db/queries/reactions';
 
 /**
@@ -13,6 +14,9 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { id: listId } = await context.params;
     const { searchParams } = new URL(request.url);
     const itemId = searchParams.get('itemId');
@@ -24,7 +28,6 @@ export async function GET(
       total: reactions.length,
     });
   } catch (error) {
-    console.error('Error fetching reactions with users:', error);
     return NextResponse.json(
       { error: 'Failed to fetch reactions' },
       { status: 500 }

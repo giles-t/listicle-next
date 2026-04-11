@@ -33,7 +33,7 @@ export const EmojiDropdownMenu = (props: EmojiDropdownMenuProps) => {
       items={getSuggestionItems}
       {...props}
     >
-      {(props) => <EmojiList {...props} />}
+      {(props) => <EmojiList {...props as SuggestionMenuRenderProps<EmojiItem>} />}
     </SuggestionMenu>
   )
 }
@@ -50,10 +50,10 @@ const getSuggestionItems = async (props: { query: string; editor: Editor }) => {
       onSelect: (props: {
         editor: Editor
         range: Range
-        context?: EmojiItem
+        context?: unknown
       }) => {
         if (!props.editor || !props.range || !props.context) return
-        props.editor.chain().focus().setEmoji(props.context.name).run()
+        props.editor.chain().focus().setEmoji((props.context as EmojiItem).name).run()
       },
     })
   )

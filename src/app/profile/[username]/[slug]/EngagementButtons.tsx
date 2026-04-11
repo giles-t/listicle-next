@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/ui/components/Button";
 import { FeatherEye, FeatherMessageCircle, FeatherSmile } from "@subframe/core";
-import { ReactionsDrawer } from "@/client/components/ReactionsDrawer";
-import { CommentsDrawer } from "@/client/components/CommentsDrawer";
+
+const ReactionsDrawer = dynamic(() => import("@/client/components/ReactionsDrawer").then(m => m.ReactionsDrawer), { ssr: false });
+const CommentsDrawer = dynamic(() => import("@/client/components/CommentsDrawer").then(m => m.CommentsDrawer), { ssr: false });
 
 interface EngagementButtonsProps {
   listId: string;

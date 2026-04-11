@@ -101,7 +101,7 @@ const displayExtensions = [
 ];
 
 // Custom embed component for static renderer
-function StaticEmbedComponent({ node }: { node: any }) {
+function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown> } }) {
   const embedRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -109,7 +109,7 @@ function StaticEmbedComponent({ node }: { node: any }) {
     if (!container || !node.attrs?.html) return;
     
     // Set the HTML content from the node attributes
-    container.innerHTML = node.attrs.html;
+    container.innerHTML = String(node.attrs.html);
     
     // Load iframely if available
     if (window.iframely) {
@@ -119,20 +119,23 @@ function StaticEmbedComponent({ node }: { node: any }) {
 
   // Fallback if no embed HTML available
   if (!node.attrs?.html) {
-    const { url, title, site, thumbnail } = node.attrs || {};
+    const attrs = (node.attrs || {}) as Record<string, string>;
+    const { url, title, site, thumbnail } = attrs;
     
     if (!url) return null;
     
     return (
       <div className="border border-neutral-200 rounded-lg p-3 my-2 bg-neutral-50">
         <div className="flex items-start gap-3">
+          {/* eslint-disable @next/next/no-img-element */}
           {thumbnail && (
-            <img 
-              src={thumbnail} 
-              alt={title || 'Embed thumbnail'} 
+            <img
+              src={thumbnail}
+              alt={title || 'Embed thumbnail'}
               className="w-16 h-16 object-cover rounded"
             />
           )}
+          {/* eslint-enable @next/next/no-img-element */}
           <div className="flex-1 min-w-0">
             <h3 className="font-medium text-sm line-clamp-2">
               {title || url}

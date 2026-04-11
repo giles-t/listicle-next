@@ -80,6 +80,7 @@ export default function ChangeCoverImageModal({
                         <FeatherCheck className="w-4 h-4 text-white" />
                       </div>
                     )}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       className={`h-40 w-full flex-none rounded-md object-cover transition-all ${
                         isSelected ? 'ring-4 ring-brand-600 ring-offset-2' : 'hover:opacity-80'

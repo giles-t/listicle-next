@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserByUsername } from '@/server/db/queries/profiles';
 import { followUser, unfollowUser, isFollowing } from '@/server/db/queries/follows';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@/server/supabase';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { username } = params;
+    const { username } = await params;
 
     if (!username) {
       throw ApiError.badRequest('Username is required');
@@ -23,9 +24,12 @@ export async function POST(
       throw ApiError.unauthorized('Authentication required');
     }
 
+    const limited = await checkRateLimit(request, currentUser.id);
+    if (limited) return limited;
+
     // Get target user profile
     const targetUser = await getUserByUsername(username);
-    
+
     if (!targetUser) {
       throw ApiError.notFound('User not found');
     }
@@ -52,7 +56,6 @@ export async function POST(
       );
     }
 
-    console.error('Follow API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -62,10 +65,10 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { username } = params;
+    const { username } = await params;
 
     if (!username) {
       throw ApiError.badRequest('Username is required');
@@ -79,9 +82,12 @@ export async function DELETE(
       throw ApiError.unauthorized('Authentication required');
     }
 
+    const limited = await checkRateLimit(request, currentUser.id);
+    if (limited) return limited;
+
     // Get target user profile
     const targetUser = await getUserByUsername(username);
-    
+
     if (!targetUser) {
       throw ApiError.notFound('User not found');
     }
@@ -103,7 +109,6 @@ export async function DELETE(
       );
     }
 
-    console.error('Unfollow API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -117,10 +122,10 @@ export async function DELETE(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { username } = params;
+    const { username } = await params;
 
     if (!username) {
       throw ApiError.badRequest('Username is required');
@@ -135,9 +140,12 @@ export async function GET(
       return NextResponse.json({ isFollowing: false });
     }
 
+    const limited = await checkRateLimit(request, currentUser.id);
+    if (limited) return limited;
+
     // Get target user profile
     const targetUser = await getUserByUsername(username);
-    
+
     if (!targetUser) {
       throw ApiError.notFound('User not found');
     }
@@ -155,7 +163,6 @@ export async function GET(
       );
     }
 
-    console.error('Check follow status API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/ui/components/Button";
+import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { ListicleCardComponent as ListicleCard } from "@/ui/components/ListicleCardComponent";
 import { SearchListComponent } from "@/ui/components/SearchListComponent";
 import { Badge } from "@/ui/components/Badge";
-import { FeatherFilter } from "@subframe/core";
+import { FeatherFilter, FeatherSearch, FeatherRefreshCcw } from "@subframe/core";
 import { formatNumber } from "@/shared/utils/format";
 import { formatDistanceToNow } from "date-fns";
 import { FilterSidebar, type CategoryOption, type SortOption, type TimeFilter, type FeaturedFilter, type ForYouFilter } from "./FilterSidebar";
@@ -58,6 +59,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   const bookmarkStatuses = useBookmarkStatuses(lists.map((l) => l.id));
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Temporary filter state for mobile drawer (applied on "Apply" button)
   const [tempCategory, setTempCategory] = useState<string | null>(null);
@@ -75,6 +77,11 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
     currentOffset: number = 0,
     append: boolean = false
   ) => {
+    // Cancel any in-flight request
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
@@ -83,24 +90,26 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
         limit: "10",
         offset: currentOffset.toString(),
       });
-      
+
       if (category) {
         params.set("category", category);
       }
-      
+
       if (featured !== "all") {
         params.set("featured", featured);
       }
-      
+
       if (forYou) {
         params.set("forYou", forYou);
       }
 
-      const response = await fetch(`/api/feed?${params.toString()}`);
+      const response = await fetch(`/api/feed?${params.toString()}`, {
+        signal: controller.signal,
+      });
       if (!response.ok) throw new Error("Failed to fetch");
-      
+
       const data = await response.json();
-      
+
       if (append) {
         setLists(prev => [...prev, ...data.lists]);
       } else {
@@ -109,7 +118,7 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
       setHasMore(data.hasMore);
       setOffset(currentOffset + data.lists.length);
     } catch (error) {
-      console.error("Error fetching lists:", error);
+      if (error instanceof DOMException && error.name === "AbortError") return;
     } finally {
       setIsLoading(false);
     }
@@ -182,6 +191,17 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
       fetchLists(selectedCategory, selectedTime, selectedSort, selectedFeatured, selectedForYou, offset, true);
     }
   }, [isLoading, hasMore, selectedCategory, selectedTime, selectedSort, selectedFeatured, selectedForYou, offset, fetchLists]);
+
+  // Reset all filters
+  const handleResetFilters = useCallback(() => {
+    setSelectedCategory(null);
+    setSelectedTime("all");
+    setSelectedSort("trending");
+    setSelectedFeatured("all");
+    setSelectedForYou(null);
+    setOffset(0);
+    fetchLists(null, "all", "trending", "all", null, 0, false);
+  }, [fetchLists]);
 
   return (
     <>
@@ -280,13 +300,29 @@ export function FilteredListFeed({ initialLists, categories }: FilteredListFeedP
               </div>
             </>
           ) : (
-            <div className="flex w-full flex-col items-center justify-center py-12 gap-4">
-              <h2 className="text-heading-3 font-heading-3 text-default-font">
-                No lists found
-              </h2>
-              <p className="text-body font-body text-subtext-color">
-                Try adjusting your filters
-              </p>
+            <div className="flex w-full grow shrink-0 basis-0 flex-col items-center justify-center gap-6 py-12">
+              <div className="flex flex-col items-center gap-4">
+                <IconWithBackground
+                  variant="neutral"
+                  size="large"
+                  icon={<FeatherSearch />}
+                />
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-heading-3 font-heading-3 text-default-font">
+                    No lists found
+                  </span>
+                  <span className="text-body font-body text-subtext-color text-center">
+                    No lists match your current filters. Try adjusting your filters or reset them.
+                  </span>
+                </div>
+              </div>
+              <Button
+                variant="neutral-secondary"
+                icon={<FeatherRefreshCcw />}
+                onClick={handleResetFilters}
+              >
+                Reset filters
+              </Button>
             </div>
           )}
           

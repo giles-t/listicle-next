@@ -157,6 +157,7 @@ export default function UserListsClient({ initialLists, profile, filter = "all" 
       >
         <div className="flex w-80 flex-none flex-col items-start relative mobile:h-48 mobile:w-full mobile:flex-none">
           {list.cover_image ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               className="min-h-[0px] w-full grow shrink-0 basis-0 object-cover"
               src={list.cover_image}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@subframe/core';
 
 export interface ProfileData {
@@ -45,39 +45,38 @@ export function useProfile(username: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      console.log('useProfile - Fetching profile');
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchProfile = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const response = await fetch(`/api/profile/${username}`, {
-          credentials: 'include',
-        });
+      const response = await fetch(`/api/profile/${username}`, {
+        credentials: 'include',
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to fetch profile');
-        }
-
-        const profileData = await response.json();
-        setData(profileData);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch profile');
       }
-    };
 
-    if (username) {
-      fetchProfile();
+      const profileData = await response.json();
+      setData(profileData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   }, [username]);
 
-  return { data, isLoading, error, refetch: () => window.location.reload() };
+  useEffect(() => {
+    if (username) {
+      fetchProfile();
+    }
+  }, [username, fetchProfile]);
+
+  return { data, isLoading, error, refetch: fetchProfile };
 }
 
 export function useFollowUser(username: string) {

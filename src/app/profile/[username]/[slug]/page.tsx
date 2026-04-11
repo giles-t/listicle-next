@@ -19,6 +19,8 @@ import { ViewTracker, ListViewTracker } from "./ViewTracker";
 import { getListViewCount, getItemViewCounts } from "@/src/server/db/queries/views";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
 
+export const dynamic = 'force-dynamic';
+
 interface ViewListPageProps {
   params: Promise<{ username: string; slug: string }>;
 }
@@ -107,17 +109,29 @@ export default async function ViewListPage({ params }: ViewListPageProps) {
   const itemsCount = items.length;
 
   // Helper function to check if item content is empty
-  const isContentEmpty = (content: any): boolean => {
+  interface TipTapTextNode {
+    type: string;
+    text?: string;
+  }
+  interface TipTapBlockNode {
+    type: string;
+    content?: TipTapTextNode[];
+  }
+  interface TipTapDoc {
+    type: string;
+    content?: TipTapBlockNode[];
+  }
+  const isContentEmpty = (content: string | TipTapDoc | null | undefined): boolean => {
     if (!content) return true;
     if (typeof content === 'string') return content.trim() === '';
     if (typeof content === 'object') {
       // Check if it's an empty TipTap document
       if (content.type === 'doc' && (!content.content || content.content.length === 0)) return true;
-      if (content.type === 'doc' && content.content.length === 1) {
+      if (content.type === 'doc' && content.content && content.content.length === 1) {
         const firstNode = content.content[0];
         // Empty paragraph or empty text
         if (firstNode.type === 'paragraph' && (!firstNode.content || firstNode.content.length === 0)) return true;
-        if (firstNode.type === 'paragraph' && firstNode.content.length === 1 && 
+        if (firstNode.type === 'paragraph' && firstNode.content && firstNode.content.length === 1 &&
             firstNode.content[0].type === 'text' && !firstNode.content[0].text?.trim()) return true;
       }
     }

@@ -92,17 +92,19 @@ export function ViewTracker({ listId, itemIds }: ViewTrackerProps) {
       }
     });
 
+    const pendingItems = pendingItemsRef.current;
+
     return () => {
       // Cleanup observer
       observerRef.current?.disconnect();
-      
+
       // Flush any pending views on unmount
       if (flushTimeoutRef.current) {
         clearTimeout(flushTimeoutRef.current);
       }
-      if (pendingItemsRef.current.size > 0) {
+      if (pendingItems.size > 0) {
         // Fire final flush synchronously (best effort)
-        const itemsToTrack = Array.from(pendingItemsRef.current);
+        const itemsToTrack = Array.from(pendingItems);
         if (itemsToTrack.length > 0) {
           // Use sendBeacon for reliable delivery on page unload
           const data = JSON.stringify({ listId, itemIds: itemsToTrack });

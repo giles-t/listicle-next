@@ -4,6 +4,7 @@ import { db } from '@/src/server/db';
 import { lists, listItems } from '@/src/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 const reorderSchema = z.object({
   items: z.array(z.object({
@@ -14,7 +15,7 @@ const reorderSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -24,7 +25,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -110,7 +114,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    console.error('Error reordering list items:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -24,7 +24,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { signInWithMagicLink } = useAuth();
 
-  const handleEmailSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleEmailSubmit = async () => {
     if (email && !isLoading) {
       setIsLoading(true);
       try {
@@ -85,7 +85,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
             </div>
             <div className="flex w-full flex-col items-center gap-2">
               <span className="text-body font-body text-default-font text-center">
-                We've sent a magic link to your email address. Click the link to
+                We&apos;ve sent a magic link to your email address. Click the link to
                 sign in to your account.
               </span>
               <Badge variant="success" icon={<FeatherClock />}>
@@ -150,12 +150,18 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleEmailSubmit();
+                    }
+                  }}
                 />
               </TextField>
               <Button
                 className="h-10 w-full flex-none"
                 size="large"
-                onClick={handleEmailSubmit}
+                onClick={() => handleEmailSubmit()}
                 disabled={isLoading || !email.trim()}
               >
                 {isLoading ? 'Sending...' : 'Continue'}
@@ -163,7 +169,7 @@ function LoginModal({ open, onOpenChange, onSignUpClick }: LoginModalProps) {
             </div>
             <div className="flex flex-wrap items-start gap-2">
               <span className="text-body font-body text-subtext-color">
-                Don't have an account?
+                Don&apos;t have an account?
               </span>
               <LinkButton
                 variant="brand"

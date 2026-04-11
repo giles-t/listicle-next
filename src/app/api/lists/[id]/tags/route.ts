@@ -3,16 +3,17 @@ import { createClient } from '@/src/server/supabase';
 import { db } from '@/src/server/db';
 import { lists, tags, listToTags } from '@/src/server/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -53,7 +54,6 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -63,7 +63,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -73,7 +73,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -107,7 +110,7 @@ export async function PUT(
       const createSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       
       // Find existing tags or create new ones
-      const tagNames = categoriesArray.map((cat: any) => cat.name || cat);
+      const tagNames = categoriesArray.map((cat: string | { name: string }) => typeof cat === 'string' ? cat : cat.name);
       const existingTags = await db
         .select()
         .from(tags)
@@ -168,7 +171,6 @@ export async function PUT(
     }
 
   } catch (error) {
-    console.error('Error updating list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -178,7 +180,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -188,7 +190,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -220,7 +225,6 @@ export async function DELETE(
     });
 
   } catch (error) {
-    console.error('Error removing list tags:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

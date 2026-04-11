@@ -3,7 +3,7 @@ import '@/server/db/envConfig';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { config } from '../config';
-import { supabaseAdmin } from '../supabase';
+import { getSupabaseAdmin } from '../supabase';
 import * as schema from './schema';
 
 // Connection pool configuration
@@ -24,10 +24,10 @@ function getPostgresClient(): postgres.Sql {
     if (!connectionString) {
       throw new Error('DATABASE_URL is not defined');
     }
-    
+
     postgresClient = postgres(connectionString, poolConfig);
   }
-  
+
   return postgresClient;
 }
 
@@ -35,25 +35,46 @@ function getPostgresClient(): postgres.Sql {
 // Note: This now uses the singleton client to prevent connection pool exhaustion
 export const getDbClient = () => {
   const client = getPostgresClient();
-  return drizzle(client, { 
+  return drizzle(client, {
     schema,
     casing: 'snake_case'
   });
 };
 
-// Create database instance using the singleton client
-export const db = drizzle(getPostgresClient(), {
-  schema,
-  casing: 'snake_case'
+// Lazy singleton – avoids crashing the build when DATABASE_URL is not set
+// (e.g. during Next.js static page collection).
+let _db: ReturnType<typeof drizzle> | null = null;
+
+export function getDb() {
+  if (!_db) {
+    _db = drizzle(getPostgresClient(), {
+      schema,
+      casing: 'snake_case',
+    });
+  }
+  return _db;
+}
+
+/** @deprecated Use getDb() for lazy initialization. Kept for existing callers. */
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getDb(), prop, receiver);
+  },
 });
 
 // Export type helper
-export type DbClient = typeof db;
+export type DbClient = ReturnType<typeof getDb>;
 
 // For use in Server Components with Supabase
 export const getServerClient = async () => {
-  return supabaseAdmin;
+  return getSupabaseAdmin();
 };
 
-// For migrations and schema generation only
-export const migrationClient = postgres(config.database.url, { max: 1 }); 
+// Lazy migration client – only created when actually needed (CLI scripts).
+let _migrationClient: postgres.Sql | null = null;
+export function getMigrationClient() {
+  if (!_migrationClient) {
+    _migrationClient = postgres(config.database.url, { max: 1 });
+  }
+  return _migrationClient;
+} 

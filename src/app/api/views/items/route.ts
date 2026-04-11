@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trackItemViews, getVisitorId, getItemViewCounts } from '@/src/server/db/queries/views';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { headers } from 'next/headers';
 
 /**
@@ -10,6 +11,9 @@ import { headers } from 'next/headers';
  */
 export async function POST(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const body = await request.json();
     const { listId, itemIds } = body;
     
@@ -46,7 +50,6 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true, tracked: itemIds.length });
   } catch (error) {
-    console.error('[POST /api/views/items] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -58,6 +61,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { searchParams } = new URL(request.url);
     const idsParam = searchParams.get('ids');
     
@@ -83,7 +89,6 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ counts });
   } catch (error) {
-    console.error('[GET /api/views/items] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

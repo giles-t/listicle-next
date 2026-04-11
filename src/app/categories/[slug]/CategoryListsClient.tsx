@@ -335,7 +335,6 @@ export function CategoryListsClient({
                   title={list.title}
                   description={extractPlainText(list.description)}
                   author={list.author.name}
-                  authorAvatar={list.author.avatar || undefined}
                   views={formatNumber(list.view_count)}
                   likes={formatNumber(list.likesCount)}
                   comments={formatNumber(list.commentsCount)}

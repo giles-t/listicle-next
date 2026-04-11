@@ -2,6 +2,7 @@ import { db } from '@/src/server/db';
 import { reactions, profiles } from '@/src/server/db/schema';
 import { eq, and, sql, desc, isNull, inArray } from 'drizzle-orm';
 import { redis } from '@/src/server/redis';
+import logger from '@/src/server/logger';
 
 /**
  * Get all reactions for a list with counts grouped by emoji
@@ -82,7 +83,7 @@ export async function getAllListReactionsAggregate(listId: string) {
       // Cache for 5 minutes - invalidated on writes, so can be long
       // Fire-and-forget (don't await to keep response fast)
       redis.set(cacheKey, aggregateData, { ex: 300 }).catch(err => 
-        console.error('[Redis] Failed to cache reactions:', err)
+        logger.error({ err }, 'Failed to cache reactions')
       );
     }
 
@@ -216,13 +217,13 @@ export async function addListReaction(
 
     // Invalidate Redis cache for this list (fire-and-forget)
     redis.del(`reactions:aggregate:${listId}`).catch(err =>
-      console.error('[Redis] Failed to invalidate cache:', err)
+      logger.error({ err }, 'Failed to invalidate reactions cache')
     );
 
     return { success: true, reaction: result[0] };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle duplicate reaction (unique constraint violation)
-    if (error.code === '23505') {
+    if (error instanceof Error && 'code' in error && (error as { code: string }).code === '23505') {
       return { success: false, error: 'Reaction already exists' };
     }
     throw error;
@@ -251,7 +252,7 @@ export async function removeListReaction(
 
   // Invalidate Redis cache for this list (fire-and-forget)
   redis.del(`reactions:aggregate:${listId}`).catch(err =>
-    console.error('[Redis] Failed to invalidate cache:', err)
+    logger.error({ err }, 'Failed to invalidate reactions cache')
   );
 
   return { success: result.length > 0, reaction: result[0] };
@@ -279,13 +280,13 @@ export async function addListItemReaction(
 
     // Invalidate Redis cache for this list (fire-and-forget)
     redis.del(`reactions:aggregate:${listId}`).catch(err =>
-      console.error('[Redis] Failed to invalidate cache:', err)
+      logger.error({ err }, 'Failed to invalidate reactions cache')
     );
 
     return { success: true, reaction: result[0] };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle duplicate reaction (unique constraint violation)
-    if (error.code === '23505') {
+    if (error instanceof Error && 'code' in error && (error as { code: string }).code === '23505') {
       return { success: false, error: 'Reaction already exists' };
     }
     throw error;
@@ -315,7 +316,7 @@ export async function removeListItemReaction(
 
   // Invalidate Redis cache for this list (fire-and-forget)
   redis.del(`reactions:aggregate:${listId}`).catch(err =>
-    console.error('[Redis] Failed to invalidate cache:', err)
+    logger.error({ err }, 'Failed to invalidate reactions cache')
   );
 
   return { success: result.length > 0, reaction: result[0] };

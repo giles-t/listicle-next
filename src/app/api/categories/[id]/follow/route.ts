@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCategoryById, followCategory, unfollowCategory, isFollowingCategory } from '@/server/db/queries/categories';
 import { getUserById } from '@/server/db/queries/profiles';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@/server/supabase';
 
 /**
@@ -26,6 +27,9 @@ export async function POST(
     if (authError || !user) {
       throw ApiError.unauthorized('Authentication required');
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     // Verify user has a profile (required for foreign key constraint)
     const profile = await getUserById(user.id);
@@ -55,7 +59,6 @@ export async function POST(
       );
     }
 
-    console.error('Follow category API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -86,6 +89,9 @@ export async function DELETE(
       throw ApiError.unauthorized('Authentication required');
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     // Verify user has a profile
     const profile = await getUserById(user.id);
     if (!profile) {
@@ -114,7 +120,6 @@ export async function DELETE(
       );
     }
 
-    console.error('Unfollow category API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -145,6 +150,9 @@ export async function GET(
       return NextResponse.json({ isFollowing: false });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     // Verify user has a profile
     const profile = await getUserById(user.id);
     if (!profile) {
@@ -168,7 +176,6 @@ export async function GET(
       );
     }
 
-    console.error('Check category follow status API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

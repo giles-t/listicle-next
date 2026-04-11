@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Avatar } from "@/ui/components/Avatar";
 import { Badge } from "@/ui/components/Badge";
@@ -13,8 +14,8 @@ import { TextField } from "@/ui/components/TextField";
 import { ToggleGroup } from "@/ui/components/ToggleGroup";
 import { Loader } from "@/ui/components/Loader";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
-import AddToBookmarkDrawer from "@/client/components/AddToBookmarkDrawer";
-import ManageCollectionsDrawer from "@/client/components/ManageCollectionsDrawer";
+const AddToBookmarkDrawer = dynamic(() => import("@/client/components/AddToBookmarkDrawer"), { ssr: false });
+const ManageCollectionsDrawer = dynamic(() => import("@/client/components/ManageCollectionsDrawer"), { ssr: false });
 import {
   FeatherChevronDown,
   FeatherFolder,
