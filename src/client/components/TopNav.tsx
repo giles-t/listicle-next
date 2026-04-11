@@ -156,6 +156,7 @@ export function TopNav() {
       <TopbarWithSearch
         leftSlot={
           <Link href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="h-6 flex-none object-cover"
               src="https://res.cloudinary.com/subframe/image/upload/v1711417507/shared/y2rsnhq3mex4auk54aye.png"

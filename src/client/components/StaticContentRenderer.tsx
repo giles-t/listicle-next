@@ -127,13 +127,15 @@ function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown
     return (
       <div className="border border-neutral-200 rounded-lg p-3 my-2 bg-neutral-50">
         <div className="flex items-start gap-3">
+          {/* eslint-disable @next/next/no-img-element */}
           {thumbnail && (
-            <img 
-              src={thumbnail} 
-              alt={title || 'Embed thumbnail'} 
+            <img
+              src={thumbnail}
+              alt={title || 'Embed thumbnail'}
               className="w-16 h-16 object-cover rounded"
             />
           )}
+          {/* eslint-enable @next/next/no-img-element */}
           <div className="flex-1 min-w-0">
             <h3 className="font-medium text-sm line-clamp-2">
               {title || url}

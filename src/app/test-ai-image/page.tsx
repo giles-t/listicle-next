@@ -215,8 +215,9 @@ export default function TestAiImagePage() {
                 <h3 className="text-lg font-medium text-neutral-900 mb-4">Generated Image</h3>
                 
                 <div className="mb-4">
-                  <img 
-                    src={imageUrl} 
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageUrl}
                     alt={prompt}
                     className="max-w-full h-auto rounded-lg shadow-md"
                   />
