@@ -308,6 +308,9 @@ export function CommentsDrawer({
   };
 
   const handleDeleteComment = async (commentId: string) => {
+    const confirmed = window.confirm("Delete this comment? This action cannot be undone.");
+    if (!confirmed) return;
+
     try {
       const response = await fetch(
         `/api/lists/${listId}/comments?commentId=${commentId}`,

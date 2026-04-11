@@ -2,6 +2,10 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
+import { Button } from "@/ui/components/Button";
+import { IconWithBackground } from "@/ui/components/IconWithBackground";
+import { FeatherAlertTriangle } from "@subframe/core";
+import Link from "next/link";
 
 export default function Error({
   error,
@@ -15,19 +19,29 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-      <h2 className="text-heading-2 font-heading-2 text-default-font">
-        Something went wrong
-      </h2>
-      <p className="text-body font-body text-subtext-color">
-        {error.message || "An unexpected error occurred"}
-      </p>
-      <button
-        onClick={reset}
-        className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700"
-      >
-        Try again
-      </button>
+    <div className="container max-w-none flex h-full w-full flex-col items-center justify-center gap-6 bg-default-background py-24">
+      <IconWithBackground
+        variant="error"
+        size="x-large"
+        icon={<FeatherAlertTriangle />}
+        square={false}
+      />
+      <div className="flex flex-col items-center gap-2">
+        <span className="text-heading-2 font-heading-2 text-default-font">
+          Something went wrong
+        </span>
+        <span className="text-body font-body text-subtext-color text-center max-w-md">
+          {error.message || "An unexpected error occurred. Please try again."}
+        </span>
+      </div>
+      <div className="flex items-center gap-3">
+        <Button onClick={reset} variant="brand-primary">
+          Try again
+        </Button>
+        <Link href="/">
+          <Button variant="neutral-secondary">Go Home</Button>
+        </Link>
+      </div>
     </div>
   );
 }
