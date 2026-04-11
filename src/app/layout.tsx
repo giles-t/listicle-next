@@ -6,6 +6,9 @@ import { Toaster } from "@subframe/core";
 import { DefaultPageLayout } from "@/ui/layouts/DefaultPageLayout";
 import { ThemeProvider } from "@/client/components/ThemeProvider";
 
+// Force dynamic rendering — this app depends on database/auth for all pages
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Subframe Next.js Starter",
   description: "Your starter kit for integrating Subframe into Next.js",

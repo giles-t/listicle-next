@@ -3,7 +3,7 @@ import '@/server/db/envConfig';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { config } from '../config';
-import { supabaseAdmin } from '../supabase';
+import { getSupabaseAdmin } from '../supabase';
 import * as schema from './schema';
 
 // Connection pool configuration
@@ -24,10 +24,10 @@ function getPostgresClient(): postgres.Sql {
     if (!connectionString) {
       throw new Error('DATABASE_URL is not defined');
     }
-    
+
     postgresClient = postgres(connectionString, poolConfig);
   }
-  
+
   return postgresClient;
 }
 
@@ -35,16 +35,31 @@ function getPostgresClient(): postgres.Sql {
 // Note: This now uses the singleton client to prevent connection pool exhaustion
 export const getDbClient = () => {
   const client = getPostgresClient();
-  return drizzle(client, { 
+  return drizzle(client, {
     schema,
     casing: 'snake_case'
   });
 };
 
-// Create database instance using the singleton client
-export const db = drizzle(getPostgresClient(), {
-  schema,
-  casing: 'snake_case'
+// Lazy database singleton (avoids build-time errors when env vars are absent)
+type DrizzleDb = ReturnType<typeof drizzle<typeof schema>>;
+let _db: DrizzleDb | null = null;
+
+function getDb(): DrizzleDb {
+  if (!_db) {
+    _db = drizzle(getPostgresClient(), {
+      schema,
+      casing: 'snake_case'
+    });
+  }
+  return _db;
+}
+
+// Proxy provides backward-compatible `db.select(...)` usage while deferring initialization
+export const db: DrizzleDb = new Proxy({} as DrizzleDb, {
+  get(_, prop) {
+    return (getDb() as any)[prop];
+  },
 });
 
 // Export type helper
@@ -52,8 +67,15 @@ export type DbClient = typeof db;
 
 // For use in Server Components with Supabase
 export const getServerClient = async () => {
-  return supabaseAdmin;
+  return getSupabaseAdmin();
 };
 
-// For migrations and schema generation only
-export const migrationClient = postgres(config.database.url, { max: 1 }); 
+// Lazy migration client (for migrations and schema generation only)
+let _migrationClient: postgres.Sql | null = null;
+
+export function getMigrationClient(): postgres.Sql {
+  if (!_migrationClient) {
+    _migrationClient = postgres(config.database.url, { max: 1 });
+  }
+  return _migrationClient;
+} 

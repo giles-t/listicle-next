@@ -4,7 +4,14 @@ import logger from './logger';
 import { captureException } from './sentry';
 import { ReactElement } from 'react';
 
-const resend = new Resend(config.resend.apiKey);
+// Lazy Resend client (avoids build-time errors when env vars are absent)
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) {
+    _resend = new Resend(config.resend.apiKey);
+  }
+  return _resend;
+}
 
 type EmailPayload = {
   to: string | string[];
@@ -31,7 +38,7 @@ export async function sendEmail({
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from,
       to,
       subject,

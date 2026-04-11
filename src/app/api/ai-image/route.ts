@@ -4,10 +4,14 @@ import { createClient } from '@/src/server/supabase'
 import { put } from '@vercel/blob'
 import sharp from 'sharp'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy OpenAI client (avoids build-time errors when env vars are absent)
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  }
+  return _openai
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use gpt-image-1 model
-    const response = await openai.images.generate(requestParams)
+    const response = await getOpenAI().images.generate(requestParams)
 
     // gpt-image-1 returns base64-encoded images
     const imageB64 = response.data?.[0]?.b64_json
