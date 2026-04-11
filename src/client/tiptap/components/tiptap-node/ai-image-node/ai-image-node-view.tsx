@@ -211,7 +211,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <div className="flex gap-4 mobile:w-full mobile:flex-col">
           <Select
             className="mobile:h-auto mobile:w-full mobile:flex-none"
-            variant="outline-solid"
+            variant="outline"
             label=""
             placeholder="Image Size"
             helpText=""
@@ -270,7 +270,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="text-body font-body text-subtext-color italic">
-            "{prompt}"
+            &ldquo;{prompt}&rdquo;
           </span>
           <span className="text-caption font-caption text-subtext-color">
             {generationMessage || 'This may take 10-30 seconds'}
@@ -293,7 +293,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       </div>
       <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:gap-4">
         <div className="text-sm text-red-600">
-          Original prompt: "{prompt}"
+          Original prompt: &ldquo;{prompt}&rdquo;
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -330,11 +330,11 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       {revisedPrompt && revisedPrompt !== prompt && (
         <div className="w-full">
           <span className="text-heading-3 font-heading-3 text-default-font">
-            OpenAI's Enhanced Prompt
+            OpenAI&apos;s Enhanced Prompt
           </span>
           <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <span className="text-sm text-blue-800 italic">
-              "{revisedPrompt}"
+              &ldquo;{revisedPrompt}&rdquo;
             </span>
           </div>
         </div>
@@ -403,7 +403,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         className="w-full h-auto block rounded-xl"
       />
       <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-4 rounded-b-xl">
-        <span className="text-white text-sm italic">"{prompt}"</span>
+        <span className="text-white text-sm italic">&ldquo;{prompt}&rdquo;</span>
       </div>
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs rounded-full p-2">
         <FeatherImage className="w-4 h-4 text-neutral-600" />
@@ -440,7 +440,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       >
         <div className="flex items-center gap-3">
           <FeatherSparkles className="w-4 h-4 text-blue-600 shrink-0" />
-          <span className="flex-1 text-sm text-neutral-900 italic truncate">"{prompt}"</span>
+          <span className="flex-1 text-sm text-neutral-900 italic truncate">&ldquo;{prompt}&rdquo;</span>
           <span className="text-xs text-neutral-400 shrink-0">Click to edit</span>
         </div>
       </div>

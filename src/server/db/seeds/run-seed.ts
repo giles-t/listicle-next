@@ -1,23 +1,19 @@
 /**
  * Database Seed Runner
- * 
- * Run with: npx tsx src/server/db/seeds/run-seed.ts
- * 
+ *
+ * Run with: npm run db:seed
+ *
  * This script seeds the database with initial category data.
  * It can be run multiple times safely - existing categories will be updated.
  */
 
 import { db } from '../index';
-import { categories, categoryIconEnum, categoryColorEnum } from '../schema';
+import { categories } from '../schema';
 import { CATEGORIES } from './categories';
-import { sql } from 'drizzle-orm';
-
-type CategoryIcon = (typeof categoryIconEnum.enumValues)[number];
-type CategoryColor = (typeof categoryColorEnum.enumValues)[number];
 
 async function seedCategories() {
   console.log('🌱 Seeding categories...');
-  
+
   for (const category of CATEGORIES) {
     try {
       await db
@@ -26,8 +22,8 @@ async function seedCategories() {
           name: category.name,
           slug: category.slug,
           description: category.description,
-          icon: category.icon as CategoryIcon,
-          color: category.color as CategoryColor,
+          icon: category.icon,
+          color: category.color,
           sort_order: category.sort_order,
         })
         .onConflictDoUpdate({
@@ -35,8 +31,8 @@ async function seedCategories() {
           set: {
             name: category.name,
             description: category.description,
-            icon: category.icon as CategoryIcon,
-            color: category.color as CategoryColor,
+            icon: category.icon,
+            color: category.color,
             sort_order: category.sort_order,
             updated_at: new Date(),
           },

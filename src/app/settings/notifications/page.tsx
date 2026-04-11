@@ -100,7 +100,7 @@ export default function NotificationsSettingsPage() {
                 Publication Invites
               </span>
               <span className="text-body font-body text-subtext-color">
-                When you're invited to join a publication
+                When you&apos;re invited to join a publication
               </span>
             </div>
           </div>

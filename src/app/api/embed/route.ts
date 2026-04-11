@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       headers: { Accept: 'application/json' },
     })
 
-    let data: Record<string, unknown>
+    let data: any
     try {
       data = await response.json()
     } catch {
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Iframely may return 200 with error payload; handle it explicitly
     if (data.status && data.status !== 200) {
-      const status = parseInt(data.status)
+      const status = parseInt(String(data.status))
       let userMessage = data.error || 'Failed to fetch embed data'
       let shouldCache = true
 

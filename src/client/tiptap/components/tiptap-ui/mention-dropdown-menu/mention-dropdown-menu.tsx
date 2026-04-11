@@ -89,10 +89,11 @@ export const MentionDropdownMenu = (props: MentionDropdownMenuProps) => {
   const handleItemSelect = (props: {
     editor: Editor
     range: Range
-    context?: User
+    context?: unknown
   }) => {
     if (!props.editor || !props.range || !props.context) return
 
+    const user = props.context as User
     props.editor
       .chain()
       .focus()
@@ -100,8 +101,8 @@ export const MentionDropdownMenu = (props: MentionDropdownMenuProps) => {
         {
           type: "mention",
           attrs: {
-            id: props.context.id.toString(),
-            label: props.context.name,
+            id: user.id.toString(),
+            label: user.name,
           },
         },
         {
@@ -132,7 +133,7 @@ export const MentionDropdownMenu = (props: MentionDropdownMenuProps) => {
       items={getSuggestionItems}
       {...props}
     >
-      {(props) => <MentionList {...props} />}
+      {(props) => <MentionList {...props as SuggestionMenuRenderProps<User>} />}
     </SuggestionMenu>
   )
 }

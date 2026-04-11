@@ -225,10 +225,10 @@ export default function TestAiImagePage() {
                 {revisedPrompt && revisedPrompt !== prompt && (
                   <div className="mt-4">
                     <h4 className="text-sm font-medium text-neutral-700 mb-2">
-                      OpenAI's Enhanced Prompt:
+                      OpenAI&apos;s Enhanced Prompt:
                     </h4>
                     <p className="text-sm text-neutral-600 italic bg-blue-50 border border-blue-200 rounded p-3">
-                      "{revisedPrompt}"
+                      &ldquo;{revisedPrompt}&rdquo;
                     </p>
                   </div>
                 )}
@@ -238,7 +238,7 @@ export default function TestAiImagePage() {
                     Your Original Prompt:
                   </h4>
                   <p className="text-sm text-neutral-600 italic">
-                    "{prompt}"
+                    &ldquo;{prompt}&rdquo;
                   </p>
                 </div>
               </div>

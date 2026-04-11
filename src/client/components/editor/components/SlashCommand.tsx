@@ -142,7 +142,7 @@ function getSlashMenuItems(editor: Editor): SlashMenuItem[] {
     {
       title: "Quote",
       description: "Capture a quote",
-      icon: () => <span className="text-sm">"</span>,
+      icon: () => <span className="text-sm">&ldquo;</span>,
       command: (editor) => editor.chain().focus().toggleBlockquote().run(),
       group: "Blocks"
     },

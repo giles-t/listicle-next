@@ -4,10 +4,14 @@ import type { Stream } from 'openai/streaming'
 import { createClient } from '@/src/server/supabase'
 import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy-initialized OpenAI client to avoid build-time errors when env vars are unavailable
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  }
+  return _openai
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate text with OpenAI
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: model,
       messages: [
         { role: 'system', content: systemMessage },
@@ -88,7 +92,7 @@ export async function POST(request: NextRequest) {
       const readable = new ReadableStream({
         async start(controller) {
           try {
-            for await (const chunk of response as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
+            for await (const chunk of response as unknown as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
               const content = chunk.choices?.[0]?.delta?.content || ''
               if (content) {
                 // Send raw content chunks, not SSE format

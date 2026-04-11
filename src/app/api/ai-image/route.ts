@@ -5,10 +5,14 @@ import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 import { put } from '@vercel/blob'
 import sharp from 'sharp'
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy-initialized OpenAI client to avoid build-time errors when env vars are unavailable
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) {
+    _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  }
+  return _openai
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,7 +51,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use gpt-image-1 model
-    const response = await openai.images.generate(requestParams)
+    const response = await getOpenAI().images.generate(requestParams) as { data: Array<{ b64_json?: string; revised_prompt?: string }> }
 
     // gpt-image-1 returns base64-encoded images
     const imageB64 = response.data?.[0]?.b64_json

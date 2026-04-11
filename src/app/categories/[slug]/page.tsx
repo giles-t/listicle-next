@@ -19,7 +19,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';
+  const raw = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';
+  const baseUrl = raw.startsWith('http') ? raw : `https://${raw}`;
 
   return {
     title: `${category.name} Lists | Listicle`,

@@ -293,7 +293,7 @@ const displayExtensions = [
 
 // Factory function to create static embed component with lazy load config
 function createStaticEmbedComponent(disableLazyLoad: boolean = false) {
-  return function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, unknown> } }) {
+  return function StaticEmbedComponent({ node }: { node: { attrs?: Record<string, any> } }) {
     const { html, url, title, site, thumbnail } = node.attrs || {};
     
     // If we have embed HTML, use lazy loading component
@@ -346,7 +346,7 @@ function createStaticEmbedComponent(disableLazyLoad: boolean = false) {
 }
 
 // Static AI image component
-function StaticAiImageComponent({ node }: { node: { attrs?: Record<string, unknown> } }) {
+function StaticAiImageComponent({ node }: { node: { attrs?: Record<string, any> } }) {
   const { src, alt, prompt, width, height } = node.attrs || {};
   
   if (!src) return null;
@@ -373,7 +373,7 @@ function StaticAiImageComponent({ node }: { node: { attrs?: Record<string, unkno
 }
 
 // Static image upload component - renders uploaded images
-function StaticImageUploadComponent({ node }: { node: { attrs?: Record<string, unknown> } }) {
+function StaticImageUploadComponent({ node }: { node: { attrs?: Record<string, any> } }) {
   const { src, alt, caption, width, height } = node.attrs || {};
   
   if (!src) return null;

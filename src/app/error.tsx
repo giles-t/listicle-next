@@ -1,5 +1,7 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 import { Button } from "@/ui/components/Button";
 import { IconWithBackground } from "@/ui/components/IconWithBackground";
 import { FeatherAlertTriangle } from "@subframe/core";
@@ -12,6 +14,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <div className="container max-w-none flex h-full w-full flex-col items-center justify-center gap-6 bg-default-background py-24">
       <IconWithBackground

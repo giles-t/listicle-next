@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // External packages that should be treated as external in server components
@@ -44,7 +46,7 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     // Commented out for development
@@ -71,12 +73,12 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.iframe.ly",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self'",
               "img-src 'self' data: blob: https://images.unsplash.com https://img.youtube.com https://pbs.twimg.com https://res.cloudinary.com https://*.supabase.co https://*.vercel-storage.com",
               "media-src 'self' blob:",
-              "connect-src 'self' https://api.unsplash.com https://*.supabase.co https://*.upstash.io",
+              "connect-src 'self' https://api.unsplash.com https://*.supabase.co https://*.upstash.io https://*.ingest.sentry.io",
               "frame-src 'self' https://www.youtube.com https://platform.twitter.com",
               "object-src 'none'",
               "base-uri 'self'",
@@ -185,4 +187,23 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withSentryConfig(nextConfig, {
+  // Suppress source map upload logs during build
+  silent: true,
+
+  // Upload source maps for production debugging, then delete them from the build output
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+
+  // Automatically instrument server functions, middleware, and app router
+  autoInstrumentServerFunctions: true,
+  autoInstrumentMiddleware: true,
+  autoInstrumentAppDirectory: true,
+
+  // Remove Sentry SDK debug logger from client bundles
+  disableLogger: true,
+
+  // Include all client files for source map upload
+  widenClientFileUpload: true,
+});
