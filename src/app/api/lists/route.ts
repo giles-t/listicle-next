@@ -5,6 +5,7 @@ import { lists, listItems } from '@/src/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { createListSchema } from '@/shared/validation/list';
 import { generateSlug, generateUniqueSlug } from '@/shared/utils/slug';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +15,9 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.CREATE_LIST);
+    if (limited) return limited;
 
     const body = await request.json();
 
@@ -71,7 +75,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error creating list:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -87,6 +90,9 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     // Get all lists for the authenticated user
     const userLists = await db
@@ -109,7 +115,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(userLists);
 
   } catch (error) {
-    console.error('Error fetching lists:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

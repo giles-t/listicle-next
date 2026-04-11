@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getListsByCategorySlug, getCategoryById, type ListSortOption } from '@/server/db/queries/categories';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 /**
  * GET /api/categories/[id]/lists
@@ -12,6 +13,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { id } = await params;
 
     if (!id) {
@@ -76,7 +80,6 @@ export async function GET(
       );
     }
 
-    console.error('Get category lists API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

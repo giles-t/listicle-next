@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getUserByUsername, getUserLists, SortOption } from "@/server/db/queries/profiles";
 
 export async function GET(
@@ -6,6 +7,9 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { username } = await params;
     const { searchParams } = new URL(request.url);
     
@@ -33,9 +37,12 @@ export async function GET(
     // Get paginated lists
     const result = await getUserLists(user.id, { page, perPage, sort });
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600',
+      },
+    });
   } catch (error) {
-    console.error("Error fetching user lists:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

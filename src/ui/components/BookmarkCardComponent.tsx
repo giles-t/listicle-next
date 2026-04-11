@@ -78,6 +78,7 @@ const BookmarkCardComponentRoot = React.forwardRef<
           <img
             className="grow shrink-0 basis-0 self-stretch object-cover"
             src={image}
+            alt=""
           />
         ) : null}
         <div className="flex items-start absolute top-3 right-3">

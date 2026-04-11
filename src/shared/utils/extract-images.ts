@@ -2,9 +2,15 @@
  * Utility functions for extracting images from TipTap editor content
  */
 
+interface TipTapNodeAttrs {
+  src?: string;
+  generatedImageSrc?: string;
+  [key: string]: unknown;
+}
+
 interface TipTapNode {
   type: string;
-  attrs?: Record<string, any>;
+  attrs?: TipTapNodeAttrs;
   content?: TipTapNode[];
 }
 

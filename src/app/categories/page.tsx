@@ -3,6 +3,8 @@ import { CategoryBrowseClient, type Category } from './CategoryBrowseClient';
 import { getAllCategories } from '@/server/db/queries/categories';
 import { createClient } from '@/server/supabase';
 
+export const dynamic = 'force-dynamic';
+
 // SEO Metadata
 export const metadata: Metadata = {
   title: 'Browse Categories | Listicle',
@@ -26,8 +28,9 @@ export const metadata: Metadata = {
 
 // JSON-LD Structured Data for Categories page
 function generateJsonLd(categories: { name: string; slug: string; description: string | null }[]) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';
-  
+  const raw = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';
+  const baseUrl = raw.startsWith('http') ? raw : `https://${raw}`;
+
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',

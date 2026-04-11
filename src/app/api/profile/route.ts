@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { updateUserProfile } from '@/src/server/db/queries/profiles';
 import { db } from '@/src/server/db';
 import { profiles } from '@/src/server/db/schema';
@@ -11,16 +12,12 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    console.log('Profile API - Auth check:', { 
-      userId: user?.id, 
-      userEmail: user?.email, 
-      authError: authError?.message 
-    });
-
     if (authError || !user) {
-      console.log('Profile API - Unauthorized:', { authError, user: !!user });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     // Get user profile from database
     const [userProfile] = await db
@@ -29,20 +26,12 @@ export async function GET(request: NextRequest) {
       .where(eq(profiles.id, user.id))
       .limit(1);
 
-    console.log('Profile API - Database query result:', { 
-      userProfile: !!userProfile, 
-      userId: user.id 
-    });
-
     if (!userProfile) {
-      console.log('Profile API - User not found in database for ID:', user.id);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    console.log('Profile API - Returning user profile');
     return NextResponse.json(userProfile);
-  } catch (error) {
-    console.error('Profile API - Error fetching profile:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -56,10 +45,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const body = await request.json();
 
-    console.log('Profile API - Request body:', body);
-    
     // Validate the request body
     const validation = profileUpdateSchema.safeParse(body);
     if (!validation.success) {
@@ -99,7 +89,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Sync critical fields back to auth.users metadata for quick access
-    const metadataUpdates: Record<string, any> = {};
+    const metadataUpdates: Record<string, string> = {};
     if (updateData.username) metadataUpdates.username = updateData.username;
     if (updateData.name) metadataUpdates.name = updateData.name;
     if (updateData.avatar !== undefined) metadataUpdates.avatar = updateData.avatar;
@@ -109,15 +99,13 @@ export async function PUT(request: NextRequest) {
         await supabase.auth.updateUser({
           data: metadataUpdates
         });
-      } catch (metadataError) {
-        console.error('Failed to sync metadata:', metadataError);
+      } catch {
         // Don't fail the request if metadata sync fails
       }
     }
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error('Error updating profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/server/supabase';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getNotifications } from '@/server/db/queries/notifications';
 
 /**
@@ -16,6 +17,9 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       throw ApiError.unauthorized('Authentication required');
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     // Parse query parameters
     const searchParams = request.nextUrl.searchParams;
@@ -54,7 +58,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.error('Notifications API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

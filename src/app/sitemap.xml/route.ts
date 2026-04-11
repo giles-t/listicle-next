@@ -31,7 +31,8 @@ export async function GET() {
 }
 
 async function generateSitemapUrls(): Promise<SitemapUrl[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const raw = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = raw.startsWith('http') ? raw : `https://${raw}`;
   const urls: SitemapUrl[] = [];
   
   // Static pages

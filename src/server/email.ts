@@ -4,7 +4,7 @@ import logger from './logger';
 import { captureException } from './sentry';
 import { ReactElement } from 'react';
 
-// Lazy Resend client (avoids build-time errors when env vars are absent)
+// Lazy Resend client to avoid build-time initialization failure
 let _resend: Resend | null = null;
 function getResend() {
   if (!_resend) {

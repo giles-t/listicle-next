@@ -4,6 +4,8 @@ import { getAllCategories } from "@/server/db/queries/categories";
 import { getUserCollections } from "@/server/db/queries/collections";
 import BookmarksClient, { type BookmarkData, type Category, type Collection } from "./BookmarksClient";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "Bookmarks | Listicle",
   description: "Manage and organize your saved listicles and inspiration.",

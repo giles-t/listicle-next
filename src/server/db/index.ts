@@ -41,39 +41,38 @@ export const getDbClient = () => {
   });
 };
 
-// Lazy database singleton (avoids build-time errors when env vars are absent)
-type DrizzleDb = ReturnType<typeof drizzle<typeof schema>>;
-let _db: DrizzleDb | null = null;
+// Lazy singleton – avoids crashing the build when DATABASE_URL is not set
+// (e.g. during Next.js static page collection).
+let _db: ReturnType<typeof drizzle> | null = null;
 
-function getDb(): DrizzleDb {
+export function getDb() {
   if (!_db) {
     _db = drizzle(getPostgresClient(), {
       schema,
-      casing: 'snake_case'
+      casing: 'snake_case',
     });
   }
   return _db;
 }
 
-// Proxy provides backward-compatible `db.select(...)` usage while deferring initialization
-export const db: DrizzleDb = new Proxy({} as DrizzleDb, {
-  get(_, prop) {
-    return (getDb() as any)[prop];
+/** @deprecated Use getDb() for lazy initialization. Kept for existing callers. */
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getDb(), prop, receiver);
   },
 });
 
 // Export type helper
-export type DbClient = typeof db;
+export type DbClient = ReturnType<typeof getDb>;
 
 // For use in Server Components with Supabase
 export const getServerClient = async () => {
   return getSupabaseAdmin();
 };
 
-// Lazy migration client (for migrations and schema generation only)
+// Lazy migration client – only created when actually needed (CLI scripts).
 let _migrationClient: postgres.Sql | null = null;
-
-export function getMigrationClient(): postgres.Sql {
+export function getMigrationClient() {
   if (!_migrationClient) {
     _migrationClient = postgres(config.database.url, { max: 1 });
   }

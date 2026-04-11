@@ -9,6 +9,7 @@ import {
   removeListItemReaction,
 } from '@/src/server/db/queries/reactions';
 import { z } from 'zod';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 const reactionSchema = z.object({
   emoji: z.string().min(1).max(10),
@@ -44,7 +45,6 @@ export async function GET(
       userReactions,
     });
   } catch (error) {
-    console.error('Error fetching reactions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch reactions' },
       { status: 500 }
@@ -70,6 +70,9 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const body = await request.json();
     const validation = reactionSchema.safeParse(body);
@@ -103,7 +106,6 @@ export async function POST(
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error adding reaction:', error);
     return NextResponse.json(
       { error: 'Failed to add reaction' },
       { status: 500 }
@@ -129,6 +131,9 @@ export async function DELETE(
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
 
     const { searchParams } = new URL(request.url);
     const emoji = searchParams.get('emoji');
@@ -158,7 +163,6 @@ export async function DELETE(
       reaction: result.reaction,
     });
   } catch (error) {
-    console.error('Error removing reaction:', error);
     return NextResponse.json(
       { error: 'Failed to remove reaction' },
       { status: 500 }

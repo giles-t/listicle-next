@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { moveBookmarkToCollection, getBookmarkCollection } from '@/server/db/queries/collections';
 
 /**
@@ -18,6 +19,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id: bookmarkId } = await params;
 
     if (!bookmarkId) {
@@ -29,7 +33,6 @@ export async function GET(
     return NextResponse.json({ collection });
 
   } catch (error) {
-    console.error('Error fetching bookmark collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -52,6 +55,9 @@ export async function PUT(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const { id: bookmarkId } = await params;
 
@@ -82,7 +88,6 @@ export async function PUT(
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('Error moving bookmark to collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

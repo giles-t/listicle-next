@@ -3,6 +3,8 @@ import { getTrendingLists } from "@/server/db/queries/lists";
 import { getAllCategories } from "@/server/db/queries/categories";
 import { FilteredListFeed } from "@/client/components/FilteredListFeed";
 
+export const dynamic = 'force-dynamic';
+
 export default async function LandingPage() {
   // Fetch trending lists and categories server-side
   const [lists, categoriesWithStats] = await Promise.all([

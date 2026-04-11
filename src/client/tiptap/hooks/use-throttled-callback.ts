@@ -20,7 +20,7 @@ const defaultOptions: ThrottleSettings = {
  * @param dependencies The dependencies to watch for changes
  * @param options The throttle options
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Generic callback constraint requires `any` for type compatibility with arbitrary function signatures
 export function useThrottledCallback<T extends (...args: any[]) => any>(
   fn: T,
   wait = 250,

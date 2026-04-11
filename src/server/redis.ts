@@ -1,22 +1,38 @@
 import { Redis } from '@upstash/redis';
+import logger from './logger';
 
-// Lazy Redis singleton (avoids build-time errors when env vars are absent)
-let _redis: Redis | null = null;
+function createRedisClient(): Redis | null {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
 
-export function getRedis(): Redis {
-  if (!_redis) {
-    _redis = new Redis({
-      url: process.env.KV_REST_API_URL!,
-      token: process.env.KV_REST_API_TOKEN!,
-    });
+  if (!url || !token) {
+    logger.warn('Redis credentials not configured, caching disabled');
+    return null;
   }
-  return _redis;
+
+  try {
+    return new Redis({ url, token });
+  } catch (error) {
+    logger.error({ err: error }, 'Failed to create Redis client, caching disabled');
+    return null;
+  }
 }
 
-// Backward-compatible proxy so existing `redis.get(...)` calls continue to work
-export const redis: Redis = new Proxy({} as Redis, {
-  get(_, prop) {
-    return (getRedis() as any)[prop];
+const redisClient = createRedisClient();
+
+/**
+ * Redis client with graceful degradation.
+ * Returns a proxy that no-ops when Redis is unavailable rather than crashing.
+ */
+export const redis: Redis = redisClient ?? new Proxy({} as Redis, {
+  get(_target, prop) {
+    // Return a no-op async function for any method call
+    if (typeof prop === 'string') {
+      return async () => {
+        logger.warn({ method: prop }, 'Redis unavailable, skipping operation');
+        return null;
+      };
+    }
+    return undefined;
   },
 });
-

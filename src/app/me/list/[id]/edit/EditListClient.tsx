@@ -361,7 +361,7 @@ export default function EditListClient({
       toast.success(`List ${newPublishedState ? "published" : "unpublished"} successfully`);
 
       if (newPublishedState && data.autoCategorization?.applied) {
-        const categoryNames = data.autoCategorization.categories.map((c: any) => c.name).join(", ");
+        const categoryNames = data.autoCategorization.categories.map((c: { name: string }) => c.name).join(", ");
         toast.success(`Auto-categorized as: ${categoryNames}`);
         setCategories(data.autoCategorization.categories);
       }

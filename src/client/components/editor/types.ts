@@ -1,3 +1,5 @@
+import type { Editor } from "@tiptap/react"
+
 // Editor types and interfaces
 export interface MinimalEditorProps {
   content?: string
@@ -10,5 +12,5 @@ export interface MinimalEditorProps {
 }
 
 export interface EditorContextValue {
-  editor: any // Will be typed as Editor from @tiptap/react
+  editor: Editor | null
 }

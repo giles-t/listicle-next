@@ -65,47 +65,23 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     generationMessage,
     revisedPrompt
   } = node.attrs as AiImageData
-  
-  // Debug logging for initial state
-  console.log('🔍 DEBUG: AiImageNodeView rendered with:', {
-    'node.attrs.prompt': node.attrs.prompt,
-    'localPrompt': localPrompt,
-    'prompt (from attrs)': prompt,
-    'isExpanded': isExpanded,
-    'showPreview': showPreview,
-    'editor': editor,
-    'getPos': getPos,
-    'node.type.name': node.type.name,
-  })
-  
-  // Check if editor has AI capabilities
-  console.log('🔍 DEBUG: Editor capabilities:', {
-    'editor exists': !!editor,
-    'editor.chain exists': !!editor?.chain,
-    'aiImagePrompt exists': typeof editor?.chain?.().aiImagePrompt,
-    'editor extensions': editor?.extensionManager?.extensions?.map(ext => ext.name),
-  })
 
   // Focus textarea when component mounts with empty prompt
   useEffect(() => {
     if (!prompt && textareaRef.current) {
       textareaRef.current.focus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // No need to monitor AI storage anymore - we handle everything directly
 
   const handleGenerateImage = useCallback(async () => {
-    console.log('🔍 DEBUG: handleGenerateImage called')
-    console.log('🔍 DEBUG: localPrompt:', JSON.stringify(localPrompt))
-    
     if (!localPrompt.trim()) {
-      console.log('❌ DEBUG: No prompt provided, returning early')
       return
     }
 
     const trimmedPrompt = localPrompt.trim()
-    console.log('✅ DEBUG: Using prompt:', JSON.stringify(trimmedPrompt))
 
     // Update node attributes to show generating state
     updateAttributes({
@@ -118,12 +94,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
     })
 
     try {
-      console.log('🚀 DEBUG: Calling AI image API with:', {
-        prompt: trimmedPrompt,
-        size,
-        quality: quality || 'auto',
-      })
-      
       const response = await fetch('/api/ai-image', {
         method: 'POST',
         headers: {
@@ -142,7 +112,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       }
 
       const { imageUrl, revisedPrompt: apiRevisedPrompt } = await response.json()
-      console.log('✅ DEBUG: AI image generated successfully')
 
       // Update node with the blob storage URL
       updateAttributes({
@@ -159,7 +128,6 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       setIsExpanded(false)
       
     } catch (error) {
-      console.error('❌ DEBUG: Error in handleGenerateImage:', error)
       updateAttributes({
         isGenerating: false,
         error: error instanceof Error ? error.message : 'Image generation failed',
@@ -171,28 +139,15 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const handlePromptChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.target.value
-    console.log('🔍 DEBUG: TextArea onChange:', {
-      'previous localPrompt': localPrompt,
-      'new value': newValue,
-      'event.target.value': event.target.value,
-    })
     setLocalPrompt(newValue)
-  }, [localPrompt])
+  }, [])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    console.log('🔍 DEBUG: KeyDown event:', {
-      'key': e.key,
-      'metaKey': e.metaKey,
-      'ctrlKey': e.ctrlKey,
-      'current localPrompt': localPrompt,
-    })
-    
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
-      console.log('🚀 DEBUG: Keyboard shortcut triggered generation')
       handleGenerateImage()
     }
-  }, [handleGenerateImage, localPrompt])
+  }, [handleGenerateImage])
 
   const handleStyleChange = useCallback((value: string) => {
     updateAttributes({ style: value })
@@ -216,36 +171,29 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
 
   const handleInsert = useCallback(async () => {
     if (!generatedImageSrc || !getPos) return
-    
-    console.log('🔍 DEBUG: Inserting image into editor')
-    
+
     const { view } = editor
     const { tr } = view.state
     const pos = getPos()
-    
+
     if (typeof pos === 'number') {
       // Insert the image (already stored in blob storage)
       tr.replaceWith(pos, pos + node.nodeSize, view.state.schema.nodes.image.create({
         src: generatedImageSrc,
         alt: prompt || 'AI generated image',
       }))
-      
+
       view.dispatch(tr)
-      
-      console.log('✅ DEBUG: Image inserted into editor')
     }
   }, [generatedImageSrc, prompt, editor, getPos, node])
 
   const handleRegenerate = useCallback(() => {
-    console.log('🔍 DEBUG: Regenerating image')
-    
     // Simply call handleGenerateImage again with the current settings
     setShowPreview(false)
     handleGenerateImage()
   }, [handleGenerateImage, setShowPreview])
 
   const renderPromptInput = () => {
-    console.log('🔍 DEBUG: renderPromptInput called')
     return (
     <div className="flex w-full max-w-[768px] flex-col items-start gap-6 rounded-md border border-solid border-neutral-border bg-default-background px-6 py-6">
       <span className="text-heading-3 font-heading-3 text-default-font">
@@ -264,7 +212,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <div className="flex gap-4 mobile:w-full mobile:flex-col">
           <Select
             className="mobile:h-auto mobile:w-full mobile:flex-none"
-            variant="outline-solid"
+            variant="outline"
             label=""
             placeholder="Image Size"
             helpText=""
@@ -280,23 +228,8 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         <Button
           className="mobile:h-8 mobile:w-full mobile:flex-none"
           icon={<FeatherSparkles />}
-          onClick={(event) => {
-            console.log('🔍 DEBUG: Generate button clicked - RAW EVENT')
-            console.log('🔍 DEBUG: Event:', event)
-            console.log('🔍 DEBUG: Button click - localPrompt:', JSON.stringify(localPrompt))
-            console.log('🔍 DEBUG: Button click - localPrompt length:', localPrompt.length)
-            console.log('🔍 DEBUG: Button click - localPrompt.trim():', JSON.stringify(localPrompt.trim()))
-            console.log('🔍 DEBUG: Button click - disabled state:', !localPrompt.trim() || isGenerating)
-            console.log('🔍 DEBUG: Button click - isGenerating:', isGenerating)
-            console.log('🔍 DEBUG: Button click - editor:', editor)
-            console.log('🔍 DEBUG: Button click - editor.chain:', editor?.chain)
-            console.log('🔍 DEBUG: Button click - aiImagePrompt available:', typeof editor?.chain?.().aiImagePrompt)
-            
-            try {
-              handleGenerateImage()
-            } catch (error) {
-              console.error('❌ DEBUG: Error in button click handler:', error)
-            }
+          onClick={() => {
+            handleGenerateImage()
           }}
           disabled={!localPrompt.trim() || isGenerating}
         >
@@ -338,7 +271,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         
         <div className="flex flex-col items-center gap-2 text-center">
           <span className="text-body font-body text-subtext-color italic">
-            "{prompt}"
+            &ldquo;{prompt}&rdquo;
           </span>
           <span className="text-caption font-caption text-subtext-color">
             {generationMessage || 'This may take 10-30 seconds'}
@@ -361,7 +294,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       </div>
       <div className="flex w-full items-center justify-between mobile:flex-col mobile:flex-nowrap mobile:gap-4">
         <div className="text-sm text-red-600">
-          Original prompt: "{prompt}"
+          Original prompt: &ldquo;{prompt}&rdquo;
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -398,11 +331,11 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       {revisedPrompt && revisedPrompt !== prompt && (
         <div className="w-full">
           <span className="text-heading-3 font-heading-3 text-default-font">
-            OpenAI's Enhanced Prompt
+            OpenAI&apos;s Enhanced Prompt
           </span>
           <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <span className="text-sm text-blue-800 italic">
-              "{revisedPrompt}"
+              &ldquo;{revisedPrompt}&rdquo;
             </span>
           </div>
         </div>
@@ -471,7 +404,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
         className="w-full h-auto block rounded-xl"
       />
       <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-4 rounded-b-xl">
-        <span className="text-white text-sm italic">"{prompt}"</span>
+        <span className="text-white text-sm italic">&ldquo;{prompt}&rdquo;</span>
       </div>
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs rounded-full p-2">
         <FeatherImage className="w-4 h-4 text-neutral-600" />
@@ -508,7 +441,7 @@ export function AiImageNodeView({ node, updateAttributes, selected, editor, getP
       >
         <div className="flex items-center gap-3">
           <FeatherSparkles className="w-4 h-4 text-blue-600 shrink-0" />
-          <span className="flex-1 text-sm text-neutral-900 italic truncate">"{prompt}"</span>
+          <span className="flex-1 text-sm text-neutral-900 italic truncate">&ldquo;{prompt}&rdquo;</span>
           <span className="text-xs text-neutral-400 shrink-0">Click to edit</span>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getCollectionById, updateCollection, deleteCollection, collectionNameExists } from '@/server/db/queries/collections';
 
 /**
@@ -18,6 +19,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id } = await params;
 
     if (!id) {
@@ -33,7 +37,6 @@ export async function GET(
     return NextResponse.json({ collection });
 
   } catch (error) {
-    console.error('Error fetching collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -56,6 +59,9 @@ export async function PUT(
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const { id } = await params;
 
@@ -100,7 +106,6 @@ export async function PUT(
     return NextResponse.json({ collection });
 
   } catch (error) {
-    console.error('Error updating collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -124,6 +129,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
+
     const { id } = await params;
 
     if (!id) {
@@ -139,7 +147,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('Error deleting collection:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import type { Stream } from 'openai/streaming'
 import { createClient } from '@/src/server/supabase'
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 
-// Lazy OpenAI client (avoids build-time errors when env vars are absent)
+// Lazy-initialized OpenAI client to avoid build-time errors when env vars are unavailable
 let _openai: OpenAI | null = null
 function getOpenAI() {
   if (!_openai) {
@@ -24,6 +26,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Rate limit check
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.AI_REQUEST);
+    if (limited) return limited;
+
     // Parse request body
     const { 
       prompt, 
@@ -41,14 +47,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    console.log('🤖 Generating AI text:', { 
-      prompt: prompt.substring(0, 100) + '...', 
-      model, 
-      tone,
-      format,
-      userId: user.id 
-    })
 
     // Prepare system message based on tone and format
     let systemMessage = 'You are a helpful writing assistant.'
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
       const readable = new ReadableStream({
         async start(controller) {
           try {
-            for await (const chunk of response as any) {
+            for await (const chunk of response as unknown as Stream<OpenAI.Chat.Completions.ChatCompletionChunk>) {
               const content = chunk.choices?.[0]?.delta?.content || ''
               if (content) {
                 // Send raw content chunks, not SSE format
@@ -123,14 +121,10 @@ export async function POST(request: NextRequest) {
         throw new Error('No content returned from OpenAI')
       }
 
-      console.log('✅ AI text generated successfully')
-
       return NextResponse.json({ content })
     }
 
   } catch (error) {
-    console.error('❌ AI text generation error:', error)
-    
     let errorMessage = 'Text generation failed'
     let statusCode = 500
 

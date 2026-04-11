@@ -4,6 +4,8 @@ import { getUserByUsername, getUserStats, getUserLists } from "@/server/db/queri
 import { createClient } from "@/server/supabase";
 import { ProfileContent } from "./components/ProfileContent";
 
+export const dynamic = 'force-dynamic';
+
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
 }

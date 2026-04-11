@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/ui/components/Button";
 import { DropdownMenu } from "@/ui/components/DropdownMenu";
 import { IconButton } from "@/ui/components/IconButton";
@@ -16,8 +17,8 @@ import * as SubframeCore from "@subframe/core";
 import { ReactionBar } from "./ReactionBar";
 import { usePageReactions } from "./PageReactionsContext";
 import { useAuth } from "@/client/hooks/use-auth";
-import { ReactionsDrawer } from "@/client/components/ReactionsDrawer";
-import { CommentsDrawer } from "@/client/components/CommentsDrawer";
+const ReactionsDrawer = dynamic(() => import("@/client/components/ReactionsDrawer").then(m => m.ReactionsDrawer), { ssr: false });
+const CommentsDrawer = dynamic(() => import("@/client/components/CommentsDrawer").then(m => m.CommentsDrawer), { ssr: false });
 import { AddBookmarkButton } from "@/client/components/AddBookmarkButton";
 
 interface ItemEngagementBarProps {

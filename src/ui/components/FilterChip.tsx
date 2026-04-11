@@ -44,6 +44,7 @@ const FilterChipRoot = React.forwardRef<HTMLDivElement, FilterChipRootProps>(
       >
         {image ? (
           <img
+            alt=""
             className="h-4 w-4 flex-none rounded-md object-cover [clip-path:circle()]"
             src={image}
           />

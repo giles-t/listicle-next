@@ -1,21 +1,23 @@
 /**
  * Category seed data for Listicle
- * 
+ *
  * This file contains all pre-defined categories that will be seeded into the database.
  * Edit this file to add, remove, or modify categories.
- * 
- * Available icons: cpu, plane, utensils, heart, briefcase, activity, film, graduation-cap, 
+ *
+ * Available icons: cpu, plane, utensils, heart, briefcase, activity, film, graduation-cap,
  *                  trophy, shirt, book, music, camera, home, car, gamepad, palette, globe
- * 
+ *
  * Available colors: brand, success, warning, error, neutral
  */
+
+import { categoryIconEnum, categoryColorEnum } from '../schema';
 
 export interface CategorySeed {
   name: string;
   slug: string;
   description: string;
-  icon: string;
-  color: 'brand' | 'success' | 'warning' | 'error' | 'neutral';
+  icon: (typeof categoryIconEnum.enumValues)[number];
+  color: (typeof categoryColorEnum.enumValues)[number];
   sort_order: number;
 }
 

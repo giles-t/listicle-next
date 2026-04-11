@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/src/server/supabase';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { getUserBookmarks, getUserBookmarksCount, type SortOption } from '@/server/db/queries/bookmarks';
 
 /**
@@ -14,6 +15,9 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const limited = await checkRateLimit(request, user.id);
+    if (limited) return limited;
 
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search') || undefined;
@@ -45,7 +49,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching bookmarks:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

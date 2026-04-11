@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserByUsername } from '@/server/db/queries/profiles';
 import { getFollowingWithStatus, getFollowCounts } from '@/server/db/queries/follows';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@/server/supabase';
 
 /**
@@ -10,9 +11,12 @@ import { createClient } from '@/server/supabase';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     const { username } = await params;
 
     if (!username) {
@@ -60,7 +64,6 @@ export async function GET(
       );
     }
 
-    console.error('Get following API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

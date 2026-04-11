@@ -7,6 +7,7 @@ import { Button } from '@/ui/components/Button';
 import { IconWithBackground } from '@/ui/components/IconWithBackground';
 import { Badge } from '@/ui/components/Badge';
 import {
+  FeatherBookmark,
   FeatherEye,
   FeatherHeart,
   FeatherMessageCircle,
@@ -133,7 +134,7 @@ export function DashboardClient({
           </Button>
         </Link>
         <Link href="/me/bookmarks">
-          <Button variant="neutral-secondary" icon={<FeatherHeart />} size="small">
+          <Button variant="neutral-secondary" icon={<FeatherBookmark />} size="small">
             Bookmarks
           </Button>
         </Link>

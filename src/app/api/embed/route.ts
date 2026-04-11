@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null)
+    if (limited) return limited
+
     const { url } = await request.json()
 
     if (!url) {
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Iframely may return 200 with error payload; handle it explicitly
     if (data.status && data.status !== 200) {
-      const status = parseInt(data.status)
+      const status = parseInt(String(data.status))
       let userMessage = data.error || 'Failed to fetch embed data'
       let shouldCache = true
 

@@ -3,7 +3,6 @@ import { db } from '@/server/db';
 import { categories, lists, listItems } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-// Lazy OpenAI client (avoids build-time errors when env vars are absent)
 let _openai: OpenAI | null = null;
 function getOpenAI() {
   if (!_openai) {
@@ -180,8 +179,8 @@ Important:
     );
 
     const suggestions: CategorySuggestion[] = (parsed.suggestions || [])
-      .filter((s: any) => categoryMap.has(s.slug))
-      .map((s: any) => {
+      .filter((s: { slug: string; confidence?: number }) => categoryMap.has(s.slug))
+      .map((s: { slug: string; confidence?: number }) => {
         const cat = categoryMap.get(s.slug)!;
         return {
           id: cat.id,

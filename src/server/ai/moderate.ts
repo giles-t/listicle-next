@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 
-// Lazy OpenAI client (avoids build-time errors when env vars are absent)
 let _openai: OpenAI | null = null;
 function getOpenAI() {
   if (!_openai) {

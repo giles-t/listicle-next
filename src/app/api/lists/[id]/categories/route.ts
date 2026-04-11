@@ -4,6 +4,7 @@ import { db } from '@/server/db';
 import { lists, categories, listToCategories } from '@/server/db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { suggestCategoriesForList } from '@/server/ai/categorize';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 
 /**
  * GET /api/lists/[id]/categories
@@ -11,10 +12,10 @@ import { suggestCategoriesForList } from '@/server/ai/categorize';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const listId = params.id;
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -38,7 +39,6 @@ export async function GET(
       categories: listCategories,
     });
   } catch (error) {
-    console.error('Error fetching list categories:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -52,7 +52,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -62,7 +62,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -136,7 +139,6 @@ export async function PUT(
       message: 'Categories updated successfully',
     });
   } catch (error) {
-    console.error('Error updating list categories:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -150,7 +152,7 @@ export async function PUT(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -160,7 +162,10 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const listId = params.id;
+    const limited = await checkRateLimit(request, user.id, RATE_LIMITS.API_AUTHENTICATED);
+    if (limited) return limited;
+
+    const { id: listId } = await params;
 
     if (!listId) {
       return NextResponse.json({ error: 'List ID is required' }, { status: 400 });
@@ -222,8 +227,6 @@ export async function POST(
       message: 'Category suggestions generated',
     });
   } catch (error) {
-    console.error('Error auto-categorizing list:', error);
-    
     // Handle specific errors
     if (error instanceof Error) {
       if (error.message === 'List not found') {

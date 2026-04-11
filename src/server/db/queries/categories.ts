@@ -193,9 +193,9 @@ export async function followCategory(userId: string, categoryId: string): Promis
       category_id: categoryId,
     });
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If unique constraint violation, user already follows
-    if (error.code === '23505') {
+    if (error instanceof Error && 'code' in error && (error as { code: string }).code === '23505') {
       return false;
     }
     throw error;
@@ -368,30 +368,22 @@ export async function getListsByCategorySlug(
       .orderBy(desc(lists.published_at))
       .limit(limit)
       .offset(offset);
+  } else if (sortBy === 'likes') {
+    result = await baseQuery
+      .orderBy(sql`(SELECT COUNT(*) FROM ${reactions} WHERE ${reactions.list_id} = ${lists.id}) DESC`)
+      .limit(limit)
+      .offset(offset);
   } else {
-    // For 'trending' and 'likes', fetch all and sort in memory
-    const allResults = await baseQuery;
-    
-    // Sort in memory
-    if (sortBy === 'likes') {
-      allResults.sort((a, b) => Number(b.likesCount) - Number(a.likesCount));
-    } else if (sortBy === 'trending') {
-      // Trending: combination of views, likes, and recency
-      allResults.sort((a, b) => {
-        const scoreA = 
-          a.view_count * 0.1 + 
-          Number(a.likesCount) * 2 +
-          (a.published_at ? (Date.now() - new Date(a.published_at).getTime()) / (1000 * 60 * 60 * 24) * -0.1 : 0);
-        const scoreB = 
-          b.view_count * 0.1 + 
-          Number(b.likesCount) * 2 +
-          (b.published_at ? (Date.now() - new Date(b.published_at).getTime()) / (1000 * 60 * 60 * 24) * -0.1 : 0);
-        return scoreB - scoreA;
-      });
-    }
-    
-    // Apply pagination
-    result = allResults.slice(offset, offset + limit);
+    // sortBy === 'trending'
+    // Trending score: view_count * 0.1 + likesCount * 2 - days_since_published * 0.1
+    result = await baseQuery
+      .orderBy(sql`(
+        ${lists.view_count} * 0.1
+        + (SELECT COUNT(*) FROM ${reactions} WHERE ${reactions.list_id} = ${lists.id}) * 2
+        - EXTRACT(EPOCH FROM (NOW() - ${lists.published_at})) / 86400 * 0.1
+      ) DESC`)
+      .limit(limit)
+      .offset(offset);
   }
 
   return result.map((list) => ({

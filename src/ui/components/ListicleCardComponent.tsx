@@ -59,6 +59,7 @@ const ListicleCardComponentRoot = React.forwardRef<
       <div className="flex h-56 w-full flex-none items-start relative">
         {image ? (
           <img
+            alt=""
             className="grow shrink-0 basis-0 self-stretch object-cover"
             src={image}
           />

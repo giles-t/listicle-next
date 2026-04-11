@@ -131,6 +131,12 @@ function CreateList() {
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setTitle(event.target.value)
                 }
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                  if (e.key === "Enter" && title.trim() && !isSubmitting) {
+                    e.preventDefault();
+                    handleCreate();
+                  }
+                }}
                 maxLength={100}
               />
             </TextField>
@@ -224,7 +230,7 @@ function CreateList() {
             </div>
           </div>
         </div>
-        <div className="flex h-px flex-col items-center gap-2 bg-neutral-border mobile:hidden" />
+        <div className="flex w-px self-stretch flex-col items-center gap-2 bg-neutral-border mobile:hidden" />
         <div className="flex grow shrink-0 basis-0 flex-col items-start gap-8 bg-neutral-50 px-12 py-12">
           <div className="flex w-full flex-col items-start gap-2">
             <span className="text-heading-2 font-heading-2 text-default-font">

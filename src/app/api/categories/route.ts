@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllCategories } from '@/server/db/queries/categories';
 import { ApiError } from '@/server/api-error';
+import { checkRateLimit, RATE_LIMITS } from '@/src/server/rate-limit';
 import { createClient } from '@/server/supabase';
 
 /**
@@ -12,6 +13,9 @@ import { createClient } from '@/server/supabase';
  */
 export async function GET(request: NextRequest) {
   try {
+    const limited = await checkRateLimit(request, null);
+    if (limited) return limited;
+
     // Get current user if authenticated
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -38,7 +42,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.error('Categories API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
