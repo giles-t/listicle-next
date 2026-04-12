@@ -3,6 +3,19 @@ const nextConfig = {
   // External packages that should be treated as external in server components
   serverExternalPackages: ['drizzle-orm'],
 
+  // Suppress the "Critical dependency" warning from @opentelemetry/instrumentation
+  // (pulled in via @sentry/nextjs → @sentry/node). This is a known upstream issue
+  // where OpenTelemetry uses a dynamic require() that webpack cannot statically analyse.
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.ignoreWarnings = [
+        ...(config.ignoreWarnings || []),
+        { module: /@opentelemetry\/instrumentation/ },
+      ];
+    }
+    return config;
+  },
+
   // Experimental features
   experimental: {
     // Optimize package imports
