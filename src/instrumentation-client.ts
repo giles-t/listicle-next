@@ -1,4 +1,8 @@
-const dsn = process.env.SENTRY_DSN;
+// Client-side code only has access to env vars prefixed with NEXT_PUBLIC_.
+// `SENTRY_DSN` (without the prefix) is inlined as `undefined` on the client,
+// so reading it here means Sentry never initialises in the browser and
+// client-side errors are not captured in production Vercel deployments.
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 if (dsn && dsn.startsWith("https://")) {
   import("@sentry/nextjs").then((Sentry) => {

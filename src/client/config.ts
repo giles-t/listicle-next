@@ -15,7 +15,9 @@ export const config = {
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
   },
   sentry: {
-    dsn: process.env.SENTRY_DSN || '',
+    // Must use NEXT_PUBLIC_ prefix; without it Next.js inlines this as
+    // `undefined` in the client bundle.
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
     environment: process.env.NODE_ENV || 'development',
   },
 } as const;
