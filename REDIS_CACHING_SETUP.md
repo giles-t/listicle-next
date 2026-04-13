@@ -24,16 +24,24 @@ With 10,000 concurrent users polling every 5 seconds, we had **120,000 database 
 
 ### 1. Add Environment Variables
 
-Add these to your `.env.local` file:
+Add these to your `.env.local` file. The variable names match those the
+Vercel <> Upstash KV integration provisions automatically — see
+`src/server/redis.ts`, which reads `KV_REST_API_URL` / `KV_REST_API_TOKEN`
+and silently degrades to a no-op client when they are missing.
 
 ```bash
-UPSTASH_REDIS_REST_URL=https://flexible-muskrat-11924.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AS6UAAIncDI0ZGIxYzBiMzQ0ZmM0NzhlOGFmZjliMzJlYmJjMmE3M3AyMTE5MjQ
+KV_REST_API_URL=https://your-kv-rest-api-url
+KV_REST_API_TOKEN=your-kv-rest-api-token
 ```
 
 ### 2. Deployment
 
-For Vercel/production, add these same environment variables to your deployment settings.
+For Vercel, enable the Upstash KV integration on the project — it provisions
+both variables automatically for every environment (production, preview,
+staging). If you roll your own Upstash store instead, add the two vars to the
+deployment's environment settings using the `KV_REST_API_*` names above;
+the `UPSTASH_REDIS_REST_*` names that older Upstash docs reference are
+ignored by this codebase.
 
 ## How It Works
 
