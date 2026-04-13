@@ -54,6 +54,25 @@ function createNoopPipeline() {
   return noopPipeline;
 }
 
+/**
+ * Numeric/counter Redis methods. When Redis is unavailable we must return `0`
+ * (not `null`) because callers feed the result straight into arithmetic — e.g.
+ * `rate-limit.ts` does `remaining: limit.requests - current` and sends the
+ * value as an `X-RateLimit-Remaining` response header. Returning `null` coerces
+ * to `NaN` in the header, which breaks clients parsing it.
+ */
+const NUMERIC_METHODS = new Set([
+  'incr', 'incrby', 'decr', 'decrby',
+  'pttl', 'ttl',
+  'pfadd', 'pfcount',
+  'exists', 'expire', 'pexpire',
+  'sadd', 'srem', 'scard',
+  'zadd', 'zrem', 'zcard',
+  'hset', 'hdel', 'hlen',
+  'lpush', 'rpush', 'llen',
+  'del',
+]);
+
 export const redis: Redis = new Proxy({} as Redis, {
   get(_target, prop) {
     const client = getRedis();
@@ -76,12 +95,23 @@ export const redis: Redis = new Proxy({} as Redis, {
     if (prop === 'scan') {
       return async () => [0, []];
     }
-    // Any other method call returns a no-op async function.
+    // Counter/numeric methods must resolve to `0` (not `null`) so downstream
+    // arithmetic — e.g. `limit - current` in the rate limiter — doesn't
+    // produce `NaN` values that leak into response headers.
+    if (typeof prop === 'string' && NUMERIC_METHODS.has(prop)) {
+      return async () => 0;
+    }
+    // Any other method call returns a no-op async function that resolves to
+    // `null` (matches the contract of `redis.get` on a cache miss, so callers
+    // like reactions.ts fall through to their database path cleanly).
+    //
+    // We intentionally do NOT log a warning per call: `getRedis()` already
+    // logs once when credentials are missing, and logging on every call
+    // floods Vercel logs on staging (Redis is touched 5-10× per request via
+    // rate limiting, view tracking, and reactions caching), making the logs
+    // unusable and burning through log ingestion quotas.
     if (typeof prop === 'string') {
-      return async () => {
-        logger.warn({ method: prop }, 'Redis unavailable, skipping operation');
-        return null;
-      };
+      return async () => null;
     }
     return undefined;
   },
