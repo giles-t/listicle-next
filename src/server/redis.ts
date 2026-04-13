@@ -67,6 +67,15 @@ export const redis: Redis = new Proxy({} as Redis, {
     if (prop === 'pipeline' || prop === 'multi') {
       return () => createNoopPipeline();
     }
+    // `scan` must return `[cursor, keys[]]` because callers destructure the
+    // result (e.g. `const [newCursor, keys] = await redis.scan(...)` in
+    // `syncViewCountsToDatabase`). Returning the generic `null` no-op below
+    // would throw `TypeError: null is not iterable` and break the
+    // `/api/views/sync` Vercel cron when KV env vars are missing. Return a
+    // terminal cursor (0) and empty keys so the scan loop exits cleanly.
+    if (prop === 'scan') {
+      return async () => [0, []];
+    }
     // Any other method call returns a no-op async function.
     if (typeof prop === 'string') {
       return async () => {
