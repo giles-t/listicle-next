@@ -66,8 +66,16 @@ const nextConfig = {
 
   // Compiler options
   compiler: {
-    // Remove console.log in production
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Strip debug console.log/.info/.debug in production, but keep console.error
+    // and console.warn so runtime failures (e.g. [trackListView] / [syncViewCounts]
+    // catches in src/server/db/queries, OpenAI moderation/categorization errors,
+    // embed route failures, and Redis degradation warnings) remain visible in
+    // Vercel logs. With `removeConsole: true`, SWC strips every console.* call
+    // from user code — silently erasing every error-logging path in the codebase.
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? { exclude: ['error', 'warn'] }
+        : false,
   },
 
   // Performance optimizations
