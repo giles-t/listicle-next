@@ -18,8 +18,20 @@ const nextConfig = {
 
   // Experimental features
   experimental: {
-    // Optimize package imports
-    optimizePackageImports: ['@heroicons/react', 'lucide-react'],
+    // Optimize barrel imports from @subframe/core. Its `dist/esm/index.mjs`
+    // re-exports ~80 submodules (Feather icons, Radix primitives, charts,
+    // calendar, skeleton, etc.), so a bare `import { FeatherX } from
+    // '@subframe/core'` used to pull the entire barrel into every bundle
+    // that touches a Subframe component. The package is imported in 200+
+    // files across the app, inflating First Load JS on Subframe-heavy
+    // routes (the `/me/list/[id]/edit` and `/notion-like` pages shipped
+    // 500-602 kB). Listing the package here lets Next.js rewrite the
+    // named imports to direct submodule paths and tree-shake the rest.
+    //
+    // The previous value (`['@heroicons/react', 'lucide-react']`) was a
+    // leftover from the starter template — neither package is installed
+    // or imported anywhere in src/, so the optimization was a no-op.
+    optimizePackageImports: ['@subframe/core'],
   },
 
   // Image optimization
