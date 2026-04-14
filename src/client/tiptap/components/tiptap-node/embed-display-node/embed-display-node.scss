@@ -1,7 +1,9 @@
+@reference "../../../../../app/globals.css";
+
 .embed-display-node-wrapper {
   // Remove any default background
   background: transparent !important;
-  
+
   &.ProseMirror-selectednode {
     > div {
       border-radius: 0.75rem;
