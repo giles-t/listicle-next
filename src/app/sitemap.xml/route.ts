@@ -44,15 +44,9 @@ async function generateSitemapUrls(): Promise<SitemapUrl[]> {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/explore`,
+      url: `${baseUrl}/categories`,
       lastModified: new Date().toISOString(),
-      changeFrequency: 'hourly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/trending`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: 'hourly',
+      changeFrequency: 'daily',
       priority: 0.8,
     }
   );
