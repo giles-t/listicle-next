@@ -35,7 +35,13 @@ async function generateSitemapUrls(): Promise<SitemapUrl[]> {
   const baseUrl = raw.startsWith('http') ? raw : `https://${raw}`;
   const urls: SitemapUrl[] = [];
   
-  // Static pages
+  // Static pages. Every URL below must resolve to a real route under
+  // `src/app/` — advertising 404 URLs in a sitemap burns crawl budget and
+  // triggers soft-404 flags in Google Search Console. The previous list
+  // included `/explore` and `/trending`, neither of which exists (Vercel
+  // runtime logs show `/explore` returning 404). The homepage at `/` is
+  // already the trending feed (`getTrendingLists` in `src/app/page.tsx`),
+  // and discovery is handled via `/categories` and `/search`.
   urls.push(
     {
       url: `${baseUrl}/`,
@@ -44,16 +50,16 @@ async function generateSitemapUrls(): Promise<SitemapUrl[]> {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/explore`,
+      url: `${baseUrl}/categories`,
       lastModified: new Date().toISOString(),
-      changeFrequency: 'hourly',
+      changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/trending`,
+      url: `${baseUrl}/search`,
       lastModified: new Date().toISOString(),
-      changeFrequency: 'hourly',
-      priority: 0.8,
+      changeFrequency: 'weekly',
+      priority: 0.5,
     }
   );
 
