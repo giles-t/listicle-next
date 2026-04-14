@@ -18,6 +18,7 @@ import { createClient } from "@/src/server/supabase";
 import { ViewTracker, ListViewTracker } from "./ViewTracker";
 import { getListViewCount, getItemViewCounts } from "@/src/server/db/queries/views";
 import { extractPlainText } from "@/shared/utils/tiptap-text";
+import { generateOGImageUrl } from "@/shared/utils/metadata";
 
 export const dynamic = 'force-dynamic';
 
@@ -37,13 +38,23 @@ export async function generateMetadata({ params }: ViewListPageProps): Promise<M
 
   const plainDescription = extractPlainText(list.description) || undefined;
 
+  // Fall back to the generated /api/og PNG when the list has no cover image
+  // so social crawlers always have an og:image meta tag pointing at an image
+  // (previously `images` was undefined, producing no preview card).
+  const ogImage =
+    list.cover_image ||
+    generateOGImageUrl('list', {
+      title: list.title,
+      author: list.author_name,
+    });
+
   return {
     title: list.title,
     description: plainDescription,
     openGraph: {
       title: list.title,
       description: plainDescription,
-      images: list.cover_image ? [list.cover_image] : undefined,
+      images: [ogImage],
       type: "article",
       authors: [list.author_name],
       publishedTime: list.published_at?.toISOString(),
@@ -52,7 +63,7 @@ export async function generateMetadata({ params }: ViewListPageProps): Promise<M
       card: "summary_large_image",
       title: list.title,
       description: plainDescription,
-      images: list.cover_image ? [list.cover_image] : undefined,
+      images: [ogImage],
     },
   };
 }
