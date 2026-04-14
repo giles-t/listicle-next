@@ -1,7 +1,7 @@
 import "./globals.css";
 import "@/src/client/tiptap/styles/_variables.scss";
 import "@/src/client/tiptap/styles/_keyframe-animations.scss";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Toaster } from "@subframe/core";
@@ -55,6 +55,19 @@ export const metadata: Metadata = {
   },
 };
 
+// Theme-color must come from the `viewport` export, not a manual <head> in the
+// layout. A hand-written <head> element in a Next.js 15 App Router layout
+// streams its children and closes the <head> before the framework's generated
+// <title>/<meta> tags are emitted, so every metadata tag (og:image, twitter,
+// canonical, description) ends up rendered after </head> where crawlers won't
+// see it. See: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -62,10 +75,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <Toaster richColors />
