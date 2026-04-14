@@ -24,6 +24,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const raw = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';
   const baseUrl = raw.startsWith('http') ? raw : `https://${raw}`;
 
+  // Fall back to the generated /api/og PNG so social crawlers always have an
+  // image for the preview card — category pages don't have their own cover
+  // image, so without this every share produced an imageless preview.
+  const ogImage = `/api/og?type=homepage&title=${encodeURIComponent(
+    category.name,
+  )}&subtitle=${encodeURIComponent(`Curated lists about ${category.name.toLowerCase()}`)}`;
+
   return {
     title: `${category.name} Lists | Listicle`,
     description: category.description || `Discover curated lists about ${category.name.toLowerCase()} on Listicle.`,
@@ -33,11 +40,20 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description: category.description || `Discover curated lists about ${category.name.toLowerCase()}.`,
       type: 'website',
       url: `${baseUrl}/categories/${slug}`,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${category.name} lists on Listicle`,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${category.name} Lists | Listicle`,
       description: category.description || `Discover curated lists about ${category.name.toLowerCase()}.`,
+      images: [ogImage],
     },
     alternates: {
       canonical: `/categories/${slug}`,

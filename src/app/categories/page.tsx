@@ -15,11 +15,23 @@ export const metadata: Metadata = {
     description: 'Explore all categories on Listicle. Discover curated lists about technology, travel, food, lifestyle, business, health, entertainment, education, sports, fashion and more.',
     type: 'website',
     url: '/categories',
+    // Fall back to the generated /api/og PNG so social crawlers have an
+    // image to render — without this, every share of /categories produced
+    // a preview card with no image on staging.
+    images: [
+      {
+        url: '/api/og?type=homepage&title=Browse+Categories&subtitle=Discover+curated+lists+across+all+topics',
+        width: 1200,
+        height: 630,
+        alt: 'Browse Categories on Listicle',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Browse Categories | Listicle',
     description: 'Explore all categories on Listicle. Discover curated lists across all topics.',
+    images: ['/api/og?type=homepage&title=Browse+Categories&subtitle=Discover+curated+lists+across+all+topics'],
   },
   alternates: {
     canonical: '/categories',

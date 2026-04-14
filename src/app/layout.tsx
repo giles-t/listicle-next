@@ -30,11 +30,28 @@ export const metadata: Metadata = {
     siteName: "Listicle",
     title: "Listicle",
     description: "Create and share engaging list-based articles.",
+    // Default og:image fallback so pages that inherit this layout's openGraph
+    // (the homepage at `/`, `/search`, and any future page that doesn't set
+    // its own `openGraph`) produce a real social-preview card. Resolved
+    // against `metadataBase` above. Next.js shallow-merges metadata by
+    // top-level field, so pages that define their own `openGraph` (the list
+    // page, the profile layout, `/categories`, `/categories/[slug]`) replace
+    // this object wholesale — those should continue wiring their own
+    // `images` entry.
+    images: [
+      {
+        url: "/api/og?type=homepage",
+        width: 1200,
+        height: 630,
+        alt: "Listicle — Create and Discover Beautiful Lists",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Listicle",
     description: "Create and share engaging list-based articles.",
+    images: ["/api/og?type=homepage"],
   },
 };
 
