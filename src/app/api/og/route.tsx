@@ -17,9 +17,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-// Edge runtime is required for `ImageResponse`.
-export const runtime = 'edge';
-
 type OgType = 'list' | 'profile' | 'publication' | 'homepage';
 
 const KNOWN_TYPES: ReadonlySet<OgType> = new Set([
