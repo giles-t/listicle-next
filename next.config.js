@@ -24,8 +24,8 @@ const nextConfig = {
     // '@subframe/core'` used to pull the entire barrel into every bundle
     // that touches a Subframe component. The package is imported in 200+
     // files across the app, inflating First Load JS on Subframe-heavy
-    // routes (the `/me/list/[id]/edit` and `/notion-like` pages shipped
-    // 500-602 kB). Listing the package here lets Next.js rewrite the
+    // routes (the `/me/list/[id]/edit` page shipped 500+ kB). Listing
+    // the package here lets Next.js rewrite the
     // named imports to direct submodule paths and tree-shake the rest.
     //
     // The previous value (`['@heroicons/react', 'lucide-react']`) was a
