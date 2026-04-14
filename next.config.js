@@ -110,7 +110,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https://images.unsplash.com https://img.youtube.com https://pbs.twimg.com https://res.cloudinary.com https://*.supabase.co https://*.vercel-storage.com",
               "media-src 'self' blob:",
               "connect-src 'self' https://api.unsplash.com https://*.supabase.co https://*.upstash.io https://*.ingest.sentry.io",
-              "frame-src 'self' https://www.youtube.com https://platform.twitter.com",
+              "frame-src 'self' https://www.youtube.com https://platform.twitter.com https://cdn.iframe.ly https://iframe.ly",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
