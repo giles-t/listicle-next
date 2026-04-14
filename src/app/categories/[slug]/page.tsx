@@ -15,10 +15,12 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
 
+  // Call notFound() here so the 404 status propagates before the layout
+  // commits. Returning "Category Not Found" metadata without throwing would
+  // let Next.js 15.5 render the not-found.tsx UI with a 200 status, which
+  // crawlers classify as a soft-404.
   if (!category) {
-    return {
-      title: 'Category Not Found | Listicle',
-    };
+    notFound();
   }
 
   const raw = process.env.NEXT_PUBLIC_APP_URL || 'https://listicle.com';

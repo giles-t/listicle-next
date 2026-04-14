@@ -30,10 +30,12 @@ export async function generateMetadata({ params }: ViewListPageProps): Promise<M
   const { username, slug } = await params;
   const list = await getListByUsernameAndSlug(username, slug);
 
+  // Call notFound() here so the 404 status propagates before the layout
+  // commits. Returning "List Not Found" metadata without throwing would
+  // let Next.js 15.5 render the not-found.tsx UI with a 200 status, which
+  // crawlers classify as a soft-404.
   if (!list) {
-    return {
-      title: "List Not Found",
-    };
+    notFound();
   }
 
   const plainDescription = extractPlainText(list.description) || undefined;
