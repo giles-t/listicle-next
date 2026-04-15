@@ -118,7 +118,14 @@ function rewriteToNotFound(request: NextRequest) {
   const url = request.nextUrl.clone();
   url.pathname = NOT_FOUND_REWRITE_PATH;
   url.search = '';
-  return NextResponse.rewrite(url);
+  // `NextResponse.rewrite(url)` alone defaults to HTTP 200 — Vercel's edge
+  // routing matched the original `/profile/[username]` (or category) function,
+  // ran middleware, saw the rewrite header, and served the not-found.tsx body
+  // at status 200. That's exactly the soft-404 symptom commit 7c237b0 tried
+  // to eliminate. Passing `status: 404` in the response init sets the outer
+  // HTTP status explicitly so crawlers see a real 404 while the client still
+  // receives the rendered app/not-found.tsx UI.
+  return NextResponse.rewrite(url, { status: 404 });
 }
 
 export async function middleware(request: NextRequest) {
