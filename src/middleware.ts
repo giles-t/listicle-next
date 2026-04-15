@@ -125,7 +125,20 @@ function rewriteToNotFound(request: NextRequest) {
   // commit 7c237b0 tried to eliminate. Passing `status: 404` in the response
   // init sets the outer HTTP status explicitly so crawlers see a real 404
   // while the client still receives the rendered app/not-found.tsx UI.
-  return NextResponse.rewrite(url, { status: 404 });
+  //
+  // `X-Robots-Tag: noindex, nofollow` is set as defence-in-depth alongside
+  // the status 404 and the `<meta name="robots" content="noindex">` Next.js
+  // emits in the `/_not-found` body. The HTTP header is authoritative for
+  // crawlers that check headers before parsing HTML (Bingbot, Slackbot,
+  // Twitterbot, Discordbot) and works for RSC/JSON responses where the body
+  // meta tag isn't parsed. Matches Google's Search Central recommendation
+  // for error pages (https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag).
+  return NextResponse.rewrite(url, {
+    status: 404,
+    headers: {
+      'x-robots-tag': 'noindex, nofollow',
+    },
+  });
 }
 
 export async function middleware(request: NextRequest) {
