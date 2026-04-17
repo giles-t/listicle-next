@@ -15,9 +15,6 @@ const inter = Inter({
   display: "swap",
 });
 
-// Force dynamic rendering — this app depends on database/auth for all pages
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: {
     default: "Listicle",
