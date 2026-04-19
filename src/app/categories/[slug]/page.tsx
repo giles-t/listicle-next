@@ -34,11 +34,11 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   )}&subtitle=${encodeURIComponent(`Curated lists about ${category.name.toLowerCase()}`)}`;
 
   return {
-    title: `${category.name} Lists | Listicle`,
+    title: `${category.name} Lists`,
     description: category.description || `Discover curated lists about ${category.name.toLowerCase()} on Listicle.`,
     keywords: [category.name.toLowerCase(), 'listicle', 'curated lists', category.slug],
     openGraph: {
-      title: `${category.name} Lists | Listicle`,
+      title: `${category.name} Lists`,
       description: category.description || `Discover curated lists about ${category.name.toLowerCase()}.`,
       type: 'website',
       url: `${baseUrl}/categories/${slug}`,
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${category.name} Lists | Listicle`,
+      title: `${category.name} Lists`,
       description: category.description || `Discover curated lists about ${category.name.toLowerCase()}.`,
       images: [ogImage],
     },

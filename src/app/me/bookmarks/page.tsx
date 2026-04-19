@@ -7,7 +7,7 @@ import BookmarksClient, { type BookmarkData, type Category, type Collection } fr
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: "Bookmarks | Listicle",
+  title: "Bookmarks",
   description: "Manage and organize your saved listicles and inspiration.",
 };
 

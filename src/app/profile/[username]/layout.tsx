@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   } catch (error) {
     console.error('Error generating profile metadata:', error);
     return {
-      title: 'Profile | Listicle',
+      title: 'Profile',
       description: 'View user profile on Listicle',
     };
   }

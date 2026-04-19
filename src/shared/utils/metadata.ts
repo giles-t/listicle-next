@@ -51,7 +51,7 @@ export interface PublicationMetadata {
  * @returns Next.js Metadata object
  */
 export function generateListMetadata(list: ListMetadata): Metadata {
-  const title = `${list.title} | Listicle`;
+  const title = list.title;
   const description = list.description || `A curated list by ${list.author.name} with ${list.itemCount} items.`;
   const url = `${config.app.url}/@${list.author.username}/${list.id}`;
   const imageUrl = list.coverImage || generateOGImageUrl('list', {
@@ -108,7 +108,7 @@ export function generateListMetadata(list: ListMetadata): Metadata {
  * @returns Next.js Metadata object
  */
 export function generateUserMetadata(user: UserMetadata): Metadata {
-  const title = `${user.name} (@${user.username}) | Listicle`;
+  const title = `${user.name} (@${user.username})`;
   const description = user.bio || `Check out ${user.name}'s listicles on Listicle. ${user.listsCount} lists and counting.`;
   const url = `${config.app.url}/@${user.username}`;
   const imageUrl = user.avatar || generateOGImageUrl('profile', {
@@ -155,7 +155,7 @@ export function generateUserMetadata(user: UserMetadata): Metadata {
  * @returns Next.js Metadata object
  */
 export function generatePublicationMetadata(publication: PublicationMetadata): Metadata {
-  const title = `${publication.name} | Listicle`;
+  const title = publication.name;
   const description = publication.description || `Discover curated listicles from ${publication.name}. ${publication.listsCount} lists from ${publication.membersCount} contributors.`;
   const url = `${config.app.url}/pub/${publication.slug}`;
   const imageUrl = publication.logo || generateOGImageUrl('publication', {

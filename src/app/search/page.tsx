@@ -5,7 +5,7 @@ import { getAllCategories } from "@/server/db/queries/categories";
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: "Search - Listicle",
+  title: "Search",
   description: "Search for lists, topics, and creators on Listicle",
 };
 

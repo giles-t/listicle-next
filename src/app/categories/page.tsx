@@ -7,13 +7,12 @@ export const dynamic = 'force-dynamic';
 
 // SEO Metadata
 export const metadata: Metadata = {
-  title: 'Browse Categories | Listicle',
+  title: 'Browse Categories',
   description: 'Explore all categories on Listicle. Discover curated lists about technology, travel, food, lifestyle, business, health, entertainment, education, sports, fashion and more.',
   keywords: ['categories', 'topics', 'listicle', 'curated lists', 'technology', 'travel', 'food', 'lifestyle', 'business', 'health', 'entertainment', 'education', 'sports', 'fashion'],
   openGraph: {
-    title: 'Browse Categories | Listicle',
+    title: 'Browse Categories',
     description: 'Explore all categories on Listicle. Discover curated lists about technology, travel, food, lifestyle, business, health, entertainment, education, sports, fashion and more.',
-    type: 'website',
     url: '/categories',
     // Fall back to the generated /api/og PNG so social crawlers have an
     // image to render — without this, every share of /categories produced
@@ -29,7 +28,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Browse Categories | Listicle',
+    title: 'Browse Categories',
     description: 'Explore all categories on Listicle. Discover curated lists across all topics.',
     images: ['/api/og?type=homepage&title=Browse+Categories&subtitle=Discover+curated+lists+across+all+topics'],
   },
